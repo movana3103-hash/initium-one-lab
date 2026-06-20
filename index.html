@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>INITIUM ONE LAB — Nat Moreno &amp; Co.</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:#111111;min-height:100vh;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#D3BC8D;border-radius:2px}
+
+/* SISTEMA DE PANTALLAS - todo oculto por defecto */
+.pg{display:none;min-height:100vh}
+.pg.on{display:flex}
+
+/* PANTALLA ENTRADA (clave API) */
+#pg-key{background:#111111;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px}
+.key-logo{margin-bottom:16px;text-align:center}
+.key-logo img{max-width:220px;height:auto}
+.key-brand{text-align:center;margin-bottom:28px}
+.key-brand .k1{font-size:24px;font-weight:800;color:#F7F4EE;letter-spacing:-.3px}
+.key-brand .k2{font-size:10px;color:#D3BC8D;letter-spacing:.5px;margin-top:2px}
+.key-brand .k3{font-size:7.5px;color:#5F5957;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+.key-box{background:#1A1A1A;border:1px solid #333;border-radius:3px;padding:24px;max-width:400px;width:100%}
+.key-box h2{font-size:14px;font-weight:700;color:#F7F4EE;margin-bottom:6px}
+.key-box p{font-size:11.5px;color:#666;line-height:1.65;margin-bottom:14px}
+.key-box input{width:100%;padding:11px 13px;border:1.5px solid #333;border-radius:3px;font-size:13px;font-family:inherit;color:#F7F4EE;background:#111111;box-sizing:border-box;transition:border-color .15s}
+.key-box input:focus{outline:none;border-color:#D3BC8D}
+.key-box .hint{font-size:10.5px;color:#444;margin:8px 0 14px;font-style:italic;line-height:1.5}
+.key-btn{width:100%;background:#D3BC8D;color:#111111;border:none;border-radius:3px;padding:12px;font-size:12px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.8px;font-family:inherit;transition:background .2s}
+.key-btn:hover{background:#C0A875}
+.key-err{color:#A8453A;font-size:11px;margin-top:6px;display:none}
+
+/* PANTALLA BIENVENIDA + DATOS (pantalla dividida) */
+#pg-bv{background:#F7F4EE;flex-direction:row;align-items:stretch}
+/* Lado izquierdo - texto Nat */
+.bv-left{width:55%;background:#111111;overflow-y:auto;padding:40px 44px;display:flex;flex-direction:column}
+.bv-left-logo{margin-bottom:24px}
+.bv-left-logo img{max-width:180px;height:auto}
+.bv-h1{font-size:26px;font-weight:800;color:#F7F4EE;margin-bottom:20px;letter-spacing:-.4px;line-height:1.2}
+.bv-p{font-size:12.5px;color:#9C9281;line-height:1.85;margin-bottom:12px}
+.bv-p strong{color:#F7F4EE}
+.bv-p.gold{color:#D3BC8D;font-style:italic;border-left:2px solid #D3BC8D;padding-left:12px;margin:16px 0}
+.bv-divider{height:1px;background:#222;margin:20px 0}
+.bv-subtitle{font-size:13px;font-weight:700;color:#D3BC8D;margin-bottom:12px;letter-spacing:-.1px}
+.bv-cols{display:flex;flex-direction:column;gap:12px;margin:12px 0}
+.bv-col{background:#1A1A1A;border:1px solid #222;border-radius:3px;padding:14px 16px}
+.bv-col-t{font-size:9px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
+.bv-col ul,.bv-col ol{padding-left:16px}
+.bv-col li{font-size:11.5px;color:#666;line-height:1.75;margin-bottom:2px}
+.bv-footer-txt{font-size:11.5px;color:#444;margin-top:16px;line-height:1.7;border-top:1px solid #222;padding-top:16px}
+.bv-footer-txt strong{color:#9C9281}
+/* Lado derecho - formulario */
+.bv-right{width:45%;background:#F7F4EE;overflow-y:auto;padding:40px 36px;display:flex;flex-direction:column;justify-content:flex-start}
+.bv-right-logo{margin-bottom:20px;text-align:center}
+.bv-right-logo img{max-width:160px;height:auto}
+.bv-r-brand{text-align:center;margin-bottom:28px}
+.bv-r-brand .r1{font-size:18px;font-weight:800;color:#111111;letter-spacing:-.3px}
+.bv-r-brand .r2{font-size:9px;color:#D3BC8D;letter-spacing:.5px;margin-top:2px}
+.bv-r-brand .r3{font-size:7px;color:#9C9281;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+.bv-section{margin-bottom:24px}
+.bv-section-title{font-size:10px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:block}
+.bv-input{width:100%;padding:11px 13px;border:1.5px solid #DDD5C6;border-radius:3px;font-size:13px;font-family:inherit;color:#111111;background:#FDFAF5;box-sizing:border-box;transition:border-color .15s;margin-bottom:8px}
+.bv-input:focus{outline:none;border-color:#D3BC8D;background:#fff}
+.bv-hint{font-size:10.5px;color:#9C9281;font-style:italic;line-height:1.5;margin-bottom:14px}
+.bv-cards{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.card{background:#fff;border:1.5px solid #E8E2D8;border-radius:3px;padding:13px 15px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:all .2s}
+.card:hover{border-color:#D3BC8D;background:#FDFAF5}.card.sel{border-left:3px solid #D3BC8D;background:#FDFAF5}
+.ci{font-size:20px;flex-shrink:0;line-height:1.2}.ct{font-size:12.5px;font-weight:700;color:#111111;margin-bottom:2px}.cx{font-size:11px;color:#5F5957;line-height:1.4}
+.bv-btn{width:100%;background:#111111;color:#D3BC8D;border:1.5px solid #111111;border-radius:3px;padding:13px;font-size:12px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.8px;font-family:inherit;transition:all .2s}
+.bv-btn:hover{background:#D3BC8D;color:#111111;border-color:#D3BC8D}
+.bv-btn:disabled{background:#DDD5C6;color:#9C9281;border-color:#DDD5C6;cursor:default}
+.bv-err{color:#A8453A;font-size:11px;margin-top:6px;display:none}
+
+/* PANTALLA IDEA */
+#pg-idea{background:#F7F4EE;flex-direction:column;align-items:center;justify-content:flex-start;padding:32px 16px}
+.idea-back{color:#D3BC8D;font-size:12px;cursor:pointer;margin-bottom:20px;align-self:flex-start;max-width:540px;width:100%}
+.idea-box{background:#fff;border:1px solid #E8E2D8;border-left:3px solid #D3BC8D;border-radius:3px;padding:16px 18px;max-width:540px;width:100%;margin-bottom:14px}
+textarea.itxt{width:100%;max-width:540px;min-height:140px;padding:11px 13px;border:1.5px solid #DDD5C6;border-radius:3px;font-size:12.5px;font-family:inherit;resize:vertical;color:#111111;background:#FDFAF5;margin-bottom:8px;box-sizing:border-box;transition:border-color .15s}
+textarea.itxt:focus{outline:none;border-color:#D3BC8D;background:#fff}
+.btn{width:100%;background:#111111;color:#D3BC8D;border:1.5px solid #111111;border-radius:3px;padding:13px;font-size:12px;font-weight:700;cursor:pointer;display:block;max-width:540px;letter-spacing:.8px;text-transform:uppercase;transition:all .2s;font-family:inherit}
+.btn:hover{background:#D3BC8D;color:#111111;border-color:#D3BC8D}
+.btn:disabled{background:#DDD5C6;color:#9C9281;border-color:#DDD5C6;cursor:default}
+
+/* APP 3 COLUMNAS */
+#pg-app{flex-direction:row;background:#F7F4EE}
+.cl{width:230px;background:#111111;color:#F7F4EE;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.cl-top{padding:14px 12px 10px}
+.cl-logo img{max-width:130px;height:auto;margin-bottom:8px}
+.ia-brand .ia2{font-size:11px;font-weight:800;color:#F7F4EE;line-height:1.1}
+.ia-brand .ol2{font-size:8px;color:#9C9281;letter-spacing:.3px}
+.ab{background:#1A1A1A;border-radius:2px;padding:5px 9px;font-size:9px;color:#D3BC8D;margin:8px 0 2px;letter-spacing:.2px;font-weight:600;border-left:2px solid #D3BC8D}
+.mbd{background:#1A1A1A;border-radius:2px;padding:5px 9px;margin-bottom:8px;font-size:9px;color:#666;border-left:2px solid #333}.mbd span{color:#D3BC8D;font-weight:700}
+.pw{background:#1A1A1A;border-radius:2px;padding:7px 9px;margin-bottom:8px}
+.pl2{font-size:8px;color:#444;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.pn{font-size:15px;font-weight:800;color:#D3BC8D;letter-spacing:-.3px}
+.psc{font-size:9px;color:#444;margin-top:2px}
+.pb{height:2px;background:#222;border-radius:1px;margin-top:4px;overflow:hidden}
+.pf{height:2px;background:#D3BC8D;transition:width .4s ease}
+.cl-nav{flex:1;overflow-y:auto;padding:4px 12px}
+nav{display:flex;flex-direction:column;gap:1px}
+.nb{text-align:left;padding:6px 8px;border-radius:2px;border:none;cursor:pointer;font-size:10px;line-height:1.3;display:flex;align-items:flex-start;gap:6px;color:#555;background:transparent;width:100%;transition:all .15s;font-family:inherit}
+.nb:hover{background:#1A1A1A;color:#C9BFA8}.nb.act{background:#D3BC8D;color:#111111;font-weight:700}.nb.dn{color:#888}
+.nb.dn .bdg{background:#3F7D5B;color:#fff}
+.bdg{width:14px;height:14px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;flex-shrink:0;margin-top:1px;color:#555}
+.nb.act .bdg{background:#111111;color:#D3BC8D}
+.cl-support{border-top:1px solid #1A1A1A;padding:10px 12px}
+.sup-toggle{width:100%;background:transparent;border:1px solid #333;border-radius:2px;padding:7px 10px;font-size:10px;color:#9C9281;cursor:pointer;text-align:left;font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:6px}
+.sup-toggle:hover{border-color:#D3BC8D;color:#D3BC8D}
+.sup-panel{display:none;margin-top:8px;background:#1A1A1A;border-radius:3px;overflow:hidden}
+.sup-panel.open{display:block}
+.sup-msgs{max-height:180px;overflow-y:auto;padding:10px 10px 6px;display:flex;flex-direction:column;gap:6px}
+.sup-msg-user{align-self:flex-end;background:#D3BC8D;color:#111111;border-radius:3px 3px 0 3px;padding:6px 9px;font-size:10.5px;max-width:90%}
+.sup-msg-bot{align-self:flex-start;background:#222;color:#C9BFA8;border-radius:3px 3px 3px 0;padding:6px 9px;font-size:10.5px;max-width:95%;line-height:1.5}
+.sup-input-row{display:flex;border-top:1px solid #222}
+.sup-input{flex:1;background:#111111;border:none;padding:8px 10px;font-size:10.5px;color:#F7F4EE;font-family:inherit}
+.sup-input:focus{outline:none}
+.sup-send{background:#D3BC8D;color:#111111;border:none;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:700}
+.af{padding:8px 12px;font-size:7px;color:#333;border-top:1px solid #1A1A1A;line-height:1.7}
+.cm{flex:1;padding:22px 28px;background:#F7F4EE;overflow-y:auto;min-width:0}
+.ey{font-size:9px;color:#D3BC8D;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;margin-bottom:4px}
+.mt{font-size:20px;font-weight:800;color:#111111;margin-bottom:12px;letter-spacing:-.4px;line-height:1.15}
+.mbdg{display:inline-flex;align-items:center;background:#111111;border-radius:2px;padding:3px 10px;font-size:9px;color:#D3BC8D;font-weight:700;margin-bottom:16px;letter-spacing:.8px;text-transform:uppercase}
+.mc{background:#fff;border:1px solid #E8E2D8;border-radius:3px;padding:16px 18px;margin-bottom:12px}
+.mc label{font-size:9px;font-weight:700;color:#D3BC8D;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px}
+.mh{font-size:11px;color:#5F5957;margin-bottom:9px;line-height:1.65}
+.fb{background:#F7F4EE;border:1px solid #E8E2D8;border-radius:3px;padding:12px 14px;margin-bottom:10px;font-size:11px;color:#5F5957;line-height:1.9;white-space:pre-wrap;font-family:inherit}
+.fl{font-size:9px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;display:block}
+.dt{width:100%;min-height:160px;padding:10px 13px;border:1.5px solid #DDD5C6;border-radius:3px;font-size:12.5px;font-family:inherit;resize:vertical;color:#111111;background:#FDFAF5;transition:border-color .15s}
+.dt:focus{outline:none;border-color:#D3BC8D;background:#fff}
+.attach-area{border:1.5px dashed #D3BC8D;border-radius:3px;padding:13px 15px;margin-bottom:10px;background:#FDFAF5}
+.attach-title{font-size:9px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block}
+.attach-row{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.attach-btn{background:#111111;color:#D3BC8D;border:1px solid #333;border-radius:2px;padding:7px 12px;font-size:10.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.attach-btn:hover{background:#D3BC8D;color:#111111}
+.attach-hint{font-size:10px;color:#9C9281;font-style:italic;line-height:1.5}
+.attach-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.att-preview{position:relative;display:inline-block}
+.att-preview img{width:60px;height:60px;object-fit:cover;border-radius:2px;border:1px solid #E8E2D8}
+.att-del{position:absolute;top:-4px;right:-4px;background:#A8453A;color:#fff;border:none;border-radius:50%;width:14px;height:14px;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.att-file{display:flex;align-items:center;gap:6px;background:#F7F4EE;border:1px solid #E8E2D8;border-radius:2px;padding:5px 9px;font-size:10.5px;color:#5F5957;margin-top:6px}
+.att-file button{background:none;border:none;color:#A8453A;cursor:pointer;font-size:11px;padding:0;margin-left:4px}
+.gb{margin-top:10px;background:#111111;color:#D3BC8D;border:1.5px solid #111111;border-radius:3px;padding:10px 22px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .2s;font-family:inherit}
+.gb:hover{background:#D3BC8D;color:#111111;border-color:#D3BC8D}.gb:disabled{background:#DDD5C6;color:#9C9281;border-color:#DDD5C6;cursor:default}
+.em{color:#A8453A;font-size:10.5px;margin-top:5px}
+.res-block{background:#FDFAF5;border:1px solid #E8E2D8;border-left:3px solid #D3BC8D;border-radius:3px;padding:16px 18px;margin-top:12px}
+.rl{font-size:8px;color:#8A6D2B;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #E8E2D8}
+.md-content{font-size:12.5px;line-height:1.8;color:#111111}
+.md-content h1,.md-content h2{font-weight:800;color:#111111;margin:14px 0 6px;letter-spacing:-.2px}
+.md-content h1{font-size:16px}.md-content h2{font-size:14px}
+.md-content h3{font-size:12.5px;font-weight:700;color:#8A6D2B;margin:12px 0 5px;text-transform:uppercase;letter-spacing:.5px}
+.md-content strong{font-weight:700;color:#111111}.md-content em{font-style:italic;color:#5F5957}
+.md-content ul,.md-content ol{padding-left:20px;margin:6px 0}.md-content li{margin-bottom:4px}
+.md-content hr{border:none;border-top:1px solid #E8E2D8;margin:12px 0}
+.md-content blockquote{border-left:3px solid #D3BC8D;padding:6px 12px;color:#5F5957;margin:10px 0;background:#F7F4EE}
+.md-content table{width:100%;border-collapse:collapse;margin:10px 0;font-size:11.5px}
+.md-content th{background:#111111;color:#D3BC8D;padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.md-content td{padding:6px 10px;border-bottom:1px solid #E8E2D8}.md-content tr:nth-child(even) td{background:#FDFAF5}
+.vp{background:#111111;border-radius:3px;padding:24px 20px;margin-bottom:14px;text-align:center;border:1px solid #1A1A1A}
+.vp-icon{font-size:36px;display:block;margin-bottom:10px}
+.vp-title{font-size:13px;font-weight:700;color:#F7F4EE;margin-bottom:6px}
+.vp-desc{font-size:11.5px;color:#666;line-height:1.6;margin-bottom:14px}
+.vp-pills{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+.vp-pill{background:#1A1A1A;border:1px solid #333;border-radius:2px;padding:5px 12px;font-size:10px;color:#666;cursor:pointer;transition:all .2s}
+.vp-pill.w{border-color:#D3BC8D;color:#D3BC8D;background:#1F1A0F}
+.btn-vw{background:transparent;color:#D3BC8D;border:1.5px solid #D3BC8D;border-radius:3px;padding:9px 22px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.8px;text-transform:uppercase;transition:all .2s;font-family:inherit}
+.btn-vw:hover{background:#D3BC8D;color:#111111}.btn-vw.done{background:#3F7D5B;color:#fff;border-color:#3F7D5B}
+.locked{background:#fff;border:1.5px dashed #DDD5C6;border-radius:3px;padding:22px;text-align:center;margin-bottom:12px}
+.locked p{font-size:12px;color:#9C9281;line-height:1.65}.locked strong{color:#5F5957}
+.cr{width:285px;background:#fff;border-left:1px solid #E8E2D8;overflow-y:auto;flex-shrink:0;position:sticky;top:0;height:100vh}
+.cr-inner{padding:14px;display:flex;flex-direction:column;gap:11px}
+.rps{background:#F7F4EE;border-radius:3px;padding:12px 13px}
+.rpl{font-size:8.5px;font-weight:700;color:#8A6D2B;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px;display:block}
+.frase{font-size:11.5px;color:#5F5957;line-height:1.7;font-style:italic;border-left:2px solid #D3BC8D;padding-left:10px}
+.hlocked{font-size:11px;color:#9C9281;text-align:center;padding:14px;border:1.5px dashed #DDD5C6;border-radius:3px}
+.hunlocked{font-size:11.5px;color:#111111;line-height:1.75;background:#fff;border:1px solid #E8E2D8;border-left:2px solid #D3BC8D;border-radius:3px;padding:12px 13px;display:none;white-space:pre-line}
+.hunlocked.show{display:block}
+.slocked{font-size:10.5px;color:#9C9281;text-align:center;padding:10px;border:1.5px dashed #DDD5C6;border-radius:3px}
+.sv{background:#E6F0EA;color:#3F7D5B;border:1.5px solid #3F7D5B;border-radius:3px;padding:9px 13px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px}
+.sa{background:#FEF9EC;color:#B07D2B;border:1.5px solid #D3BC8D;border-radius:3px;padding:9px 13px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px}
+.sr{background:#F9EDEC;color:#A8453A;border:1.5px solid #A8453A;border-radius:3px;padding:9px 13px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px}
+.sdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sdv{background:#3F7D5B}.sda{background:#B07D2B}.sdr{background:#A8453A}
+.nv{background:#E6F0EA;border:1.5px solid #3F7D5B;color:#3F7D5B;border-radius:3px;padding:5px 11px;font-size:11.5px;font-weight:700;display:inline-block}
+.na{background:#FEF9EC;border:1.5px solid #D3BC8D;color:#B07D2B;border-radius:3px;padding:5px 11px;font-size:11.5px;font-weight:700;display:inline-block}
+.nr{background:#F9EDEC;border:1.5px solid #A8453A;color:#A8453A;border-radius:3px;padding:5px 11px;font-size:11.5px;font-weight:700;display:inline-block}
+.qq{font-size:11.5px;color:#111111;margin-bottom:9px;font-weight:600;line-height:1.5}
+.qo{width:100%;text-align:left;padding:9px 12px;border:1.5px solid #E8E2D8;border-radius:3px;font-size:11px;color:#111111;background:#fff;cursor:pointer;margin-bottom:5px;transition:all .2s;line-height:1.4;display:block;font-family:inherit}
+.qo:hover:not(.disabled){border-color:#D3BC8D;background:#FDFAF5}
+.qo.correct{border-color:#3F7D5B;background:#E6F0EA;color:#3F7D5B;cursor:default;font-weight:600}
+.qo.wrong{border-color:#A8453A;background:#F9EDEC;color:#A8453A;cursor:default}
+.qo.disabled{cursor:default}
+.qexp{font-size:10.5px;line-height:1.6;padding:9px 12px;border-radius:3px;margin-top:5px;display:none}
+.qexp.show{display:block}
+.qexp.ok{background:#E6F0EA;color:#3F7D5B;border:1px solid #3F7D5B}.qexp.fail{background:#F9EDEC;color:#A8453A;border:1px solid #A8453A}
+.pts{display:inline-flex;align-items:center;background:#111111;border-radius:2px;padding:2px 8px;font-size:9px;color:#D3BC8D;font-weight:700;letter-spacing:.5px;margin-left:4px}
+.rta{width:100%;min-height:90px;padding:9px 11px;border:1.5px solid #DDD5C6;border-radius:3px;font-size:11px;font-family:inherit;resize:vertical;color:#111111;background:#FDFAF5;transition:border-color .15s}
+.rta:focus{outline:none;border-color:#D3BC8D;background:#fff}
+.bc{width:100%;background:#F7F4EE;color:#5F5957;border:1.5px solid #DDD5C6;border-radius:3px;padding:10px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.3px;text-transform:uppercase;font-family:inherit}
+.bc:hover{border-color:#D3BC8D;color:#8A6D2B}.bc.done{background:#3F7D5B;color:#fff;border-color:#3F7D5B}
+.bsig{width:100%;background:#D3BC8D;color:#111111;border:none;border-radius:3px;padding:11px;font-size:11.5px;font-weight:700;cursor:pointer;display:none;letter-spacing:.5px;text-transform:uppercase;transition:background .2s;font-family:inherit}
+.bsig:hover{background:#C0A875}.bsig.show{display:block}
+.wmsg{background:#FEF9EC;border:1px solid #D3BC8D;border-left:3px solid #D3BC8D;border-radius:0 3px 3px 0;padding:9px 12px;font-size:10.5px;color:#8A6D2B;display:none}
+.wmsg.show{display:block}
+.mmsg{font-size:11px;color:#3F7D5B;text-align:center;padding:8px 6px;font-weight:600;background:#E6F0EA;border-radius:3px;margin-top:4px}
+#pg-cert{background:#111111;align-items:center;justify-content:center;padding:32px 16px}
+.cb{border:1.5px solid #D3BC8D;border-radius:4px;padding:36px 32px;max-width:500px;width:100%;text-align:center}
+.cb p{font-size:12px;color:#666;line-height:1.75}
+.cbtn{margin-top:20px;background:#D3BC8D;color:#111111;border:none;border-radius:3px;padding:12px 28px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.8px;text-transform:uppercase;font-family:inherit}
+.cbtn:hover{background:#C0A875}
+@media(max-width:900px){.bv-left{width:100%}.bv-right{width:100%}#pg-bv{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<!-- PG 2: BIENVENIDA + DATOS (pantalla dividida) -->
+<div id="pg-bv" class="pg">
+  <!-- IZQUIERDA: texto Nat -->
+  <div class="bv-left">
+    <div class="bv-left-logo"><img src="data:image/jpeg;base64,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" alt="Nat Moreno &amp; Co."/></div>
+    <h2 class="bv-h1">Hola, soy Nat Moreno.</h2>
+    <p class="bv-p">Soy estratega en dirección empresarial con una convicción que ha guiado mi trabajo durante más de dos décadas: el marketing no empieza en las redes, ni en la pauta, ni en el contenido; empieza en la <strong>estrategia del negocio</strong>.</p>
+    <p class="bv-p">Después de 23 años trabajando en agencias de publicidad, corporativos multinacionales y empresas, desarrollé la metodología INITIUM: una forma de leer negocios a través del marketing para entender qué está funcionando, qué está frenando resultados y qué debe ordenarse antes de seguir invirtiendo tiempo, dinero y energía en acciones sueltas.</p>
+    <p class="bv-p">Te doy la bienvenida a <strong>INITIUM Academy</strong>, la línea de formación de Nat Moreno &amp; Co., y a <strong>INITIUM ONE LAB</strong>, una plataforma metodológica de marketing estratégico creada para dueños de negocio, directivos, empresarios y profesionales que necesitan aprender a dirigir su marketing con claridad.</p>
+    <p class="bv-p gold">No estás entrando a una plataforma para hacer más contenido. Estás entrando a una ruta para entender mejor tu negocio, diagnosticarlo con honestidad y construir un plan de marketing que puedas dirigir, delegar o contratar con mayor claridad.</p>
+    <div class="bv-divider"></div>
+    <h3 class="bv-subtitle">Aquí aprenderás la metodología INITIUM by Nat Moreno &amp; Co.</h3>
+    <p class="bv-p">Esta plataforma no existe para que hagas más contenido o aprendas herramientas de moda. Existe para que aprendas a <strong>dirigir tu marketing</strong>.</p>
+    <div class="bv-cols">
+      <div class="bv-col">
+        <div class="bv-col-t">Qué harás aquí</div>
+        <ul>
+          <li>Diagnosticar qué está fallando</li>
+          <li>Separar síntomas de causas</li>
+          <li>Revisar oferta, cliente, mercado, marca y canales</li>
+          <li>Construir tu Plan Estratégico de Marketing</li>
+          <li>Convertirlo en un Plan Operativo de Ejecución</li>
+        </ul>
+      </div>
+      <div class="bv-col">
+        <div class="bv-col-t">Cómo funciona</div>
+        <ol>
+          <li>Ves las clases</li>
+          <li>Respondes la evaluación</li>
+          <li>Desbloqueas la práctica</li>
+          <li>Trabajas tu negocio en la plataforma</li>
+          <li>Generas análisis con el Método INITIUM</li>
+          <li>Avanzas hasta tu diagnóstico y plan</li>
+        </ol>
+      </div>
+      <div class="bv-col">
+        <div class="bv-col-t">Qué obtendrás</div>
+        <ul>
+          <li>Diagnóstico real de tu negocio</li>
+          <li>Dashboards por módulo</li>
+          <li>Plan Estratégico a un año</li>
+          <li>Plan Operativo a seis meses</li>
+          <li>Certificado digital INITIUM ONE LAB</li>
+        </ul>
+      </div>
+    </div>
+    <p class="bv-footer-txt">INITIUM ONE LAB no te convierte en todólogo. Te enseña a entender el marketing para dirigirlo y dejar de pagarlo a ciegas.<br/><strong>El marketing no empieza en redes. Empieza en la estrategia del negocio.</strong></p>
+  </div>
+  <!-- DERECHA: formulario -->
+  <div class="bv-right">
+    <div class="bv-right-logo"><img src="data:image/jpeg;base64,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" alt="Nat Moreno &amp; Co."/></div>
+    <div class="bv-r-brand">
+      <div class="r1">INITIUM ACADEMY</div>
+      <div class="r2">INITIUM ONE LAB</div>
+      <div class="r3">Strategy &middot; Execution &middot; Results &middot; Soul</div>
+    </div>
+    <div class="bv-section">
+      <span class="bv-section-title">Tu información</span>
+      <input type="text" id="inp-nom" class="bv-input" placeholder="Tu nombre completo"/>
+      <input type="text" id="inp-emp" class="bv-input" placeholder="Tu empresa o proyecto (opcional)"/>
+      <p class="bv-hint">Tu nombre personaliza toda tu experiencia y aparece en tu certificado final.</p>
+    </div>
+    <div class="bv-section">
+      <span class="bv-section-title">¿Con qué trabajarás en el programa?</span>
+      <div class="bv-cards">
+        <div class="card" data-t="marcha" onclick="selCard(this)">
+          <span class="ci">🏪</span>
+          <div><div class="ct">Negocio en marcha</div><div class="cx">Ya tengo operación, ventas y activos. Trabajaré con mis datos reales.</div></div>
+        </div>
+        <div class="card" data-t="lanzamiento" onclick="selCard(this)">
+          <span class="ci">🚀</span>
+          <div><div class="ct">Producto en lanzamiento</div><div class="cx">Tengo un negocio pero estoy lanzando algo nuevo dentro de él.</div></div>
+        </div>
+        <div class="card" data-t="cero" onclick="selCard(this)">
+          <span class="ci">🏗️</span>
+          <div><div class="ct">Emprendimiento / Marca desde cero</div><div class="cx">Tengo una idea pero aún no tengo negocio. Construiré un caso con el Método INITIUM.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="bv-err" id="bv-err" style="display:none">Por favor ingresa tu nombre y selecciona una opción.</div>
+    <button class="bv-btn" id="btn-cont" onclick="continuar()">Comenzar mi recorrido INITIUM &rarr;</button>
+  </div>
+</div>
+
+<!-- PG 3: IDEA (solo marca desde cero) -->
+<div id="pg-idea" class="pg">
+  <div style="color:#D3BC8D;font-size:12px;cursor:pointer;margin-bottom:20px;align-self:flex-start;max-width:540px;width:100%" onclick="goBackToEntry()">&#8592; Cambiar selección</div>
+  <img src="data:image/jpeg;base64,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" alt="Nat Moreno &amp; Co." style="max-width:160px;height:auto;margin-bottom:16px"/>
+  <div style="font-size:16px;font-weight:700;color:#111111;text-align:center;margin-bottom:8px">Cuéntanos tu idea</div>
+  <div style="font-size:12px;color:#5F5957;line-height:1.65;max-width:520px;text-align:center;margin-bottom:14px">El Método INITIUM construirá un caso de negocio basado en tu idea para que trabajes todos los módulos.</div>
+  <div class="idea-box">
+    <div style="font-size:9px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Incluye en tu descripción:</div>
+    <ul style="padding-left:16px;font-size:11.5px;color:#5F5957;line-height:1.9">
+      <li>Qué quieres vender o hacer</li><li>A quién le quieres vender</li>
+      <li>En qué ciudad o país</li><li>Cómo imaginas que se vende</li><li>Si ya tienes algún precio en mente</li>
+    </ul>
+  </div>
+  <textarea id="idea-txt" class="itxt" placeholder="Ej: Quiero crear una línea de jabones artesanales para vender en México..."></textarea>
+  <div style="font-size:10.5px;color:#9C9281;max-width:520px;margin-bottom:12px;font-style:italic">Mientras más detallada sea tu descripción, mejor el análisis en cada módulo.</div>
+  <div style="color:#A8453A;font-size:11px;max-width:520px;margin-bottom:8px;display:none" id="idea-err">Describe tu idea antes de continuar.</div>
+  <button class="btn" id="btn-idea" onclick="buildCase()">Ingresar al Método INITIUM &rarr;</button>
+</div>
+
+<!-- PG 4: APP 3 COLUMNAS -->
+<div id="pg-app" class="pg">
+  <div class="cl">
+    <div class="cl-top">
+      <div class="cl-logo"><img src="data:image/jpeg;base64,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" alt="NM&Co."/></div>
+      <div class="ia-brand"><div class="ia2">INITIUM ACADEMY</div><div class="ol2">INITIUM ONE LAB</div></div>
+      <div class="ab" id="ab">—</div>
+      <div class="mbd">Modo: <span id="modo-lbl">—</span></div>
+      <div class="pw">
+        <div class="pl2">Avance del programa</div>
+        <div class="pn"><span id="prog-n">0</span> / 19</div>
+        <div class="psc" id="sc-lbl">Puntaje: 0 / 95 pts</div>
+        <div class="pb"><div class="pf" id="prog-f" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="cl-nav"><nav id="nav-list"></nav></div>
+    <div class="cl-support">
+      <button class="sup-toggle" onclick="toggleSupport()">&#128172; Soporte INITIUM</button>
+      <div class="sup-panel" id="sup-panel">
+        <div class="sup-msgs" id="sup-msgs"></div>
+        <div class="sup-input-row">
+          <input class="sup-input" id="sup-input" placeholder="Escribe tu pregunta..."/>
+          <button class="sup-send" onclick="sendSupport()">&#8594;</button>
+        </div>
+      </div>
+    </div>
+    <div class="af">INITIUM ACADEMY &middot; Nat Moreno &amp; Co.<br/>Programa piloto 2026</div>
+  </div>
+  <div class="cm" id="col-mid"></div>
+  <div class="cr"><div class="cr-inner" id="cr-inner"></div></div>
+</div>
+
+<!-- PG 5: CERTIFICADO -->
+<div id="pg-cert" class="pg" style="background:#111111;align-items:center;justify-content:center;padding:32px 16px"></div>
+
+<script>
+const M=[
+  {
+    c:"0",
+    t:"Bienvenida y uso de IA",
+    p:`Actúa como estratega senior de marketing, ventas y planeación empresarial. Quiero iniciar una formación llamada INITIUM ONE LAB para construir mi propio diagnóstico y Plan Estratégico de Marketing aplicado a mi negocio real.
+
+No me des respuestas genéricas. Primero ayúdame a ordenar la información base de mi negocio.
+
+Mi negocio es: [describir negocio].
+Mis productos o servicios son: [listar].
+Mis ventas mensuales aproximadas son: [dato].
+Mi ticket promedio es: [dato].
+Mis canales actuales son: [Instagram, Facebook, WhatsApp, TikTok, YouTube, Google, LinkedIn, marketplace, ecommerce, tienda física, distribuidores, eventos, referidos, etc.].
+Mi principal frustración de marketing, ventas o crecimiento es: [describir].
+He trabajado antes con agencias, freelancers, marketplace, pauta, contenido o proveedores en: [describir].
+Lo que quiero lograr con este curso es: [describir].
+
+Necesito que me entregues un Dashboard Inicial INITIUM con:
+1. Resumen del negocio.
+2. Situación actual.
+3. Problema aparente.
+4. Preguntas clave antes de invertir más en marketing.
+5. Señales de improvisación actual.
+6. Riesgos de seguir ejecutando sin diagnóstico.
+7. Información que me falta recopilar.
+8. Primeras prioridades de claridad.
+9. Cómo debo usar este dashboard durante el curso.
+
+No inventes información. Si algo no está claro, márcalo como pendiente.`,
+    f:`Mi negocio es: [describir negocio].
+Mis productos o servicios son: [listar].
+Mis ventas mensuales aproximadas son: [dato].
+Mi ticket promedio es: [dato].
+Mis canales actuales son: [Instagram, Facebook, WhatsApp, TikTok, YouTube, Google, LinkedIn, marketplace, ecommerce, tienda fisica, distribuidores, eventos, referidos, etc.].
+Mi principal frustracion de marketing, ventas o crecimiento es: [describir].
+He trabajado antes con agencias, freelancers o proveedores en: [describir].
+Lo que quiero lograr con este curso es: [describir].`,
+    ha:"Lo que te falta: No tienes claro tu cuello de botella real (confundes síntoma con causa).\n\nPor qué es un hallazgo: Sin saber dónde se rompe tu negocio, cualquier inversión apunta al lugar equivocado. Es como medicar sin diagnóstico.\n\nQué hacer en la vida real: Antes de invertir, identifica si tu freno es oferta, mensaje, canal o conversión. Ese diagnóstico es tu primera decisión de marketing rentable.",
+    fr:"el negocio que diagnostica primero, crece mejor. Sigue adelante.",
+    qp:"Un dueño tiene redes activas, pauta corriendo y ventas por marketplace, pero dice que 'no vende como quiere'. ¿Cuál es el primer paso correcto antes de recomendar más publicidad?",
+    qo:["Aumentar el presupuesto de pauta para llegar a más personas", "Hacer un diagnóstico real del negocio: oferta, mensaje, canal, margen y proceso de venta", "Cambiar la agencia o el proveedor de contenido", "Abrir más canales de venta para no depender de uno solo"],
+    qc:1,
+    qe:"Antes de invertir más en publicidad, el método INITIUM exige diagnosticar. El problema raramente es falta de alcance: casi siempre es oferta desordenada, mensaje confuso, canal equivocado o proceso de venta roto. Invertir más sin diagnóstico amplifica el problema.",
+    ps:5
+  },
+  {
+    c:"1",
+    t:"Diagnóstico real del negocio",
+    p:`Actúa como consultor estratégico de marketing, ventas, rentabilidad y planeación empresarial. Haz un diagnóstico real de mi negocio en estas 10 áreas:
+1. Oferta.
+2. Cliente.
+3. Mercado.
+4. Marca.
+5. Canales.
+6. Contenido/comunicación.
+7. Venta.
+8. Experiencia del cliente.
+9. Métricas.
+10. Rentabilidad.
+
+Mi negocio vende: [describir].
+Mis líneas de producto o servicio son: [listar].
+Mis ventas mensuales aproximadas son: [dato].
+Mi ticket promedio es: [dato].
+Mis márgenes aproximados son: [dato si lo sé].
+Mis canales actuales son: [listar].
+Mi proceso de venta actual es: [describir].
+He trabajado con agencias, freelancers, pauta, marketplace o proveedores en: [describir].
+Mi principal problema actual es: [describir].
+
+Necesito que identifiques:
+1. Qué sí funciona.
+2. Qué está desgastando resultados.
+3. Dónde se pierde foco.
+4. Dónde se pierde dinero o rentabilidad.
+5. Qué decisiones se han tomado sin suficiente claridad.
+6. Qué errores pueden ser míos como dueño o responsable del negocio.
+7. Qué errores pueden venir de agencia, freelance, marketplace o ejecución externa.
+8. Qué señales de humo o mala ejecución pueden existir.
+9. Qué información me falta para decidir mejor.
+10. Qué debería ordenar antes de invertir más.
+
+Entrégame un Dashboard de Diagnóstico INITIUM con diagnóstico breve, hallazgos, cuello de botella aparente, errores internos posibles, errores externos posibles, señales de humo, riesgos de seguir igual, información faltante, prioridades de corrección, decisión recomendada antes de invertir más, semáforo por área y nivel de problema.
+
+No recomiendes más publicidad hasta revisar si oferta, cliente, canal, mensaje, venta, experiencia, margen y medición tienen sentido. No inventes datos. Distingue síntomas de causas.`,
+    f:`Mi negocio vende: [describir].
+Mis lineas de producto o servicio son: [listar].
+Mis ventas mensuales aproximadas son: [dato].
+Mi ticket promedio es: [dato].
+Mis margenes aproximados son: [dato si lo se].
+Mis canales actuales son: [listar].
+Mi proceso de venta actual es: [describir].
+He trabajado con agencias, freelancers, pauta o proveedores en: [describir].
+Mi principal problema actual es: [describir].`,
+    ha:"Lo que te falta: No tienes claro tu cuello de botella real (confundes síntoma con causa).\n\nPor qué es un hallazgo: Sin saber dónde se rompe tu negocio, cualquier inversión apunta al lugar equivocado. Es como medicar sin diagnóstico.\n\nQué hacer en la vida real: Antes de invertir, identifica si tu freno es oferta, mensaje, canal o conversión. Ese diagnóstico es tu primera decisión de marketing rentable.",
+    fr:"cada módulo que completas es una decisión que ya no tomarás a ciegas.",
+    qp:"Un negocio recibe visitas, likes y ventas por marketplace, pero el dueño 'no ve la caja'. ¿Qué revisarías primero?",
+    qo:["Aumentar las ventas para que el volumen compense los costos", "Hacer más descuentos para mover el inventario más rápido", "Calcular ventas netas reales: descontar comisiones de marketplace, devoluciones, envíos y descuentos dados", "Cambiar a otro marketplace con menos competencia"],
+    qc:2,
+    qe:"Las ventas brutas en marketplace no son lo mismo que las ventas netas. Hay que descontar comisiones (16-20% típicamente), devoluciones, envíos y descuentos. Muchos negocios descubren que su margen real es mínimo o negativo después de este cálculo.",
+    ps:5
+  },
+  {
+    c:"2",
+    t:"Mercado, competencia y consumidor",
+    p:`Actúa como estratega de mercado, competencia, consumidor y comportamiento de compra. Ayúdame a entender el contexto real donde compite mi negocio.
+
+IMPORTANTE: antes de analizar, identifica para cada producto o línea si es un negocio establecido (el cliente ya conoce la categoría y compara opciones) o un producto en lanzamiento (el cliente aún no sabe que existe o no sabe que lo necesita). La estrategia, el canal y el mensaje son distintos en cada caso. Si hay productos en ambas situaciones, analiza cada uno por separado y señala la diferencia.
+
+Mi negocio vende: [describir].
+Mi categoría o industria es: [describir].
+Mis competidores directos son: [listar si los conozco].
+Mis competidores indirectos o sustitutos pueden ser: [listar].
+Mis clientes actuales son: [describir].
+Mis productos o líneas son: [listar].
+Mis precios aproximados son: [listar].
+Mis canales actuales son: [listar].
+Mi modelo es: [B2B / B2C / B2P / mixto].
+Para cada producto o línea, mi situación es: [negocio establecido donde el cliente ya conoce la categoría / producto en lanzamiento donde el mercado no lo conoce todavía].
+Lo que descubrí en mi diagnóstico del Módulo 1 es: [pegar resumen].
+
+Analiza todos los canales posibles, no solo redes sociales. Considera canales digitales, offline, B2B, B2C, B2P, marketplace, buscadores, contenido largo, pauta, referidos, eventos, PR, aliados, distribuidores y ventas directas.
+
+Necesito que construyas un Dashboard de Mercado, Competencia y Consumidor con:
+1. Lectura general de la categoría.
+2. Competidores directos.
+3. Competidores indirectos o sustitutos.
+4. Qué compara el cliente antes de comprar.
+5. Qué objeciones puede tener.
+6. Qué señales de confianza necesita.
+7. Dónde descubre soluciones.
+8. Dónde busca cuando ya tiene intención.
+9. Dónde compara alternativas.
+10. Dónde valida confianza.
+11. Dónde prefiere preguntar.
+12. Dónde prefiere comprar.
+13. Dónde puede recomprar.
+14. Qué canal sería un error priorizar.
+15. Qué canal podría parecer atractivo por moda, pero no necesariamente rentable.
+16. Por qué sí pagaría.
+17. Por qué no pagaría.
+18. Qué hipótesis debo validar.
+19. Qué datos no debo inventar.
+20. Prioridades para entender mejor mi mercado.
+21. Semáforo por área.
+22. Nivel de problema.
+23. Para cada producto en lanzamiento: qué debe ocurrir primero (educación y consciencia de mercado) antes de pedir la venta, y qué canal es más adecuado para esa etapa de creación de mercado.
+
+No asumas que Instagram, TikTok, Google, LinkedIn o marketplace sirven para todo. Si algo es hipótesis, márcalo como hipótesis y dime cómo validarlo.`,
+    f:`Mi negocio vende: [describir].
+Mi categoria o industria es: [describir].
+Mis competidores directos son: [listar si los conozco].
+Mis competidores indirectos o sustitutos pueden ser: [listar].
+Mis clientes actuales son: [describir].
+Mis productos o lineas son: [listar].
+Mis precios aproximados son: [listar].
+Mis canales actuales son: [listar].
+Mi modelo es: [B2B / B2C / B2P / mixto].
+Para cada producto o linea, mi situacion es: [negocio establecido donde el cliente ya conoce la categoria / producto en lanzamiento donde el mercado no lo conoce todavia].
+Lo que descubri en mi diagnostico del Modulo 1 es: [pegar resumen].`,
+    ha:"Lo que te falta: No sabes con certeza qué compara tu cliente ni por qué te elige (o por qué no).\n\nPor qué es un hallazgo: Cada producto tiene un cliente que decide distinto; un mensaje único para todos no le habla a ninguno.\n\nQué hacer en la vida real: Estudia la decisión de compra de cada cliente. Hablar a su intención real es lo que convierte alcance en venta.",
+    fr:"no se trata de saber más. Se trata de confundirse menos. Vas bien.",
+    qp:"Una empresa quiere vender consultoría B2B, cursos online y talleres presenciales usando el mismo mensaje en Instagram. ¿Por qué es un error estratégico?",
+    qo:["Porque Instagram no es un canal válido para ninguno de esos productos", "Porque cada producto tiene un cliente distinto, una intención de compra diferente y requiere un canal y mensaje propios", "Porque deberían usar primero LinkedIn y después Instagram", "Porque el mensaje único simplifica la comunicación y ahorra recursos"],
+    qc:1,
+    qe:"El cliente de consultoría B2B no toma la misma decisión que el de un taller presencial. Tienen perfiles, intenciones y canales distintos. Comunicar todo igual diluye el mensaje y confunde al mercado. El método INITIUM define canal, cliente y mensaje por línea de negocio.",
+    ps:5
+  },
+  {
+    c:"3",
+    t:"Esencia de marca y posicionamiento",
+    p:`Actúa como estratega senior de marca, posicionamiento y planeación empresarial. Ayúdame a definir la esencia estratégica de mi marca antes de construir contenido, campañas, pauta, marketplace o presencia multicanal.
+
+No quiero una definición decorativa ni frases genéricas. Quiero una base clara que pueda sostener mi comunicación, mi propuesta de valor, mi experiencia de cliente y mi venta.
+
+Mi negocio es: [describir].
+Mis productos o servicios son: [listar].
+Mi cliente ideal es: [describir].
+Mi mercado o categoría es: [describir].
+Mis competidores principales son: [listar].
+Mis precios actuales son: [describir por línea]. Cómo definí esos precios: [intuición / costo + margen / lo que cobra la competencia / otro]. Si doy descuentos: [frecuencia y tipo]. Mi margen aproximado por línea: [dato si lo sé].
+Mi forma actual de comunicar es: [describir].
+Lo que quiero que el cliente piense de mi marca es: [describir].
+Lo que NO quiero que mi marca parezca es: [describir].
+Lo que sí puedo prometer y cumplir es: [describir].
+Lo que no debo prometer es: [describir].
+Lo que descubrí en el Módulo 1 sobre mi diagnóstico es: [pegar resumen].
+Lo que descubrí en el Módulo 2 sobre mercado, competencia y consumidor es: [pegar resumen].
+
+Construye un Dashboard de Esencia de Marca con:
+1. Diagnóstico de marca actual.
+2. Esencia de marca en una frase.
+3. Razón de ser de la marca.
+4. Promesa central.
+5. Propuesta de valor clara.
+6. Diferenciadores reales.
+7. Territorio de posicionamiento.
+8. Qué lugar debería ocupar en la mente del cliente.
+9. Qué no debe parecer la marca.
+10. Tono de voz recomendado.
+11. Palabras que sí puede usar.
+12. Palabras que debería evitar.
+13. Dirección visual recomendada.
+14. Errores actuales de branding o comunicación.
+15. Riesgos si la marca sigue comunicando sin esta claridad.
+16. Cómo esta esencia debe reflejarse en contenido, web, WhatsApp, marketplace, pauta, ventas, experiencia y canales offline.
+17. Qué incoherencias pueden existir entre lo que digo, vendo, cobro, comunico y entrego.
+18. Qué debo corregir antes de construir parrillas, campañas o pauta.
+19. Preguntas pendientes que debo responder para afinar la marca.
+20. Semáforo por área.
+21. Nivel de problema.
+22. Análisis de pricing: si el precio actual cubre costos, margen y crecimiento, o si hay un hueco de rentabilidad.
+23. Diagnóstico de descuentos: si estoy usando descuentos como estrategia o como parche, y qué riesgo tiene eso para la percepción de la marca.
+24. Recomendación de precio comunicado: cómo justificar el precio desde el valor, no desde la comparación con la competencia.
+
+No inventes atributos que no estén respaldados por lo que te compartí. Si algo no está claro, márcalo como hipótesis y dime cómo validarlo. Distingue entre estética, branding, propuesta de valor y posicionamiento. En el análisis de pricing, distingue entre precio que el mercado acepta, precio que el negocio necesita para ser rentable y precio que la marca puede sostener con su propuesta de valor. No recomiendes simplemente 'subir precios': primero analiza si la esencia de marca, la propuesta de valor y la comunicación actual sostienen ese precio.`,
+    f:`Mi negocio es: [describir].
+Mis productos o servicios son: [listar].
+Mi cliente ideal es: [describir].
+Mi mercado o categoria es: [describir].
+Mis competidores principales son: [listar].
+Mis precios actuales son: [describir por linea].
+Como defini esos precios: [intuicion / costo + margen / lo que cobra la competencia / otro].
+Si doy descuentos: [frecuencia y tipo de descuento que suelo dar].
+Mi margen aproximado por linea es: [dato si lo se, o 'no lo tengo claro'].
+Mi forma actual de comunicar es: [describir].
+Lo que quiero que el cliente piense de mi marca es: [describir].
+Lo que NO quiero que mi marca parezca es: [describir].
+Lo que si puedo prometer y cumplir es: [describir].
+Lo que no debo prometer es: [describir].
+Resultado del Modulo 1 (diagnostico): [pegar resumen].
+Resultado del Modulo 2 (mercado y consumidor): [pegar resumen].`,
+    ha:"Lo que te falta: No tienes una esencia de marca ni propuesta de valor claras y coherentes.\n\nPor qué es un hallazgo: Sin esencia compites por precio y por moda, y eso destruye el valor percibido de lo que vendes.\n\nQué hacer en la vida real: Define qué te hace distinto y por qué te elegirían aun costando más. Una marca clara cobra mejor y gasta menos en convencer.",
+    fr:"el marketing sin diagnóstico es dinero que se va sin dirección. Tú ya entendiste eso.",
+    qp:"Una marca premium usa memes, descuentos agresivos y sigue tendencias de redes. ¿Cuál es el problema central?",
+    qo:["No tiene suficiente presupuesto para producir contenido de calidad", "Su community manager no tiene experiencia en marcas premium", "Hay incoherencia entre la esencia de marca, la propuesta de valor y la comunicación: lo que dice no corresponde con lo que cobra", "Debería dejar las redes sociales y enfocarse en relaciones públicas"],
+    qc:2,
+    qe:"Una marca premium que usa memes y descuentos agresivos destruye su posicionamiento. La esencia de marca define cómo habla, cómo se relaciona y qué promete. Si la comunicación contradice la propuesta de valor y el precio, el cliente pierde confianza en el valor que se cobra.",
+    ps:5
+  },
+  {
+    c:"4",
+    t:"Oferta y líneas de negocio",
+    p:`Actúa como estratega de oferta, arquitectura comercial y rentabilidad. Ayúdame a ordenar mis productos o servicios por función comercial.
+
+Mi negocio vende: [describir].
+Mis líneas de producto o servicio son: [listar].
+Mis precios aproximados son: [listar].
+Mis márgenes aproximados son: [si los sé].
+Mis productos o servicios más vendidos son: [listar].
+Mis productos o servicios más rentables son: [listar].
+Mis productos o servicios que más atraen clientes son: [listar].
+Mis productos o servicios que más consumen tiempo, operación o dinero son: [listar].
+Mis canales actuales de venta son: [listar].
+Mi esencia de marca y propuesta de valor son: [pegar resultado del Módulo 3].
+Lo que descubrí en mi diagnóstico del Módulo 1 es: [pegar resumen].
+Lo que descubrí del mercado y consumidor en el Módulo 2 es: [pegar resumen].
+
+Clasifica cada línea según su función:
+1. Producto o servicio de entrada.
+2. Producto o servicio de margen.
+3. Producto o servicio de recurrencia.
+4. Producto o servicio de autoridad o posicionamiento.
+5. Producto o servicio de recompra.
+6. Producto o servicio de volumen.
+7. Producto o servicio que no conviene empujar.
+8. Producto o servicio que necesita ajuste antes de vender más.
+
+Construye un Dashboard de Oferta y Líneas de Negocio con:
+1. Línea de negocio.
+2. Función comercial.
+3. Precio.
+4. Margen estimado.
+5. Cliente ideal por línea.
+6. Propuesta de valor por línea.
+7. Canal sugerido por línea.
+8. Mensaje principal por línea.
+9. CTA recomendado.
+10. Métrica principal a observar.
+11. Riesgo de vender esa línea sin ajuste.
+12. Riesgo de vender mucho sin ganar bien.
+13. Relación con la esencia de marca.
+14. Qué línea fortalece el posicionamiento.
+15. Qué línea puede debilitar el posicionamiento.
+16. Qué línea conviene priorizar durante los próximos 30 días.
+17. Qué línea conviene pausar, revisar o dejar en segundo plano.
+18. Qué información falta para decidir mejor.
+19. Semáforo por línea.
+20. Nivel de problema por línea.
+
+No asumas que lo más vendido es lo más rentable. No confundas volumen con crecimiento. No confundas ventas con utilidad. Si algo no está claro, márcalo como pendiente.`,
+    f:`Mi negocio vende: [describir].
+Mis lineas de producto o servicio son: [listar con precios y margenes si los se].
+Mis productos o servicios mas vendidos son: [listar].
+Mis productos o servicios mas rentables son: [listar].
+Mis productos o servicios que mas atraen clientes son: [listar].
+Mis productos o servicios que mas consumen tiempo, operacion o dinero son: [listar].
+Mis canales actuales de venta son: [listar].
+Mi esencia de marca y propuesta de valor son: [pegar resultado del Modulo 3].
+Resultado del Modulo 1 (diagnostico): [pegar resumen].
+Resultado del Modulo 2 (mercado y consumidor): [pegar resumen].`,
+    ha:"Lo que te falta: No conoces el margen real ni la función de cada línea de tu negocio.\n\nPor qué es un hallazgo: Sin margen por línea no sabes qué producto te da de comer y cuál te lo quita; empujas por volumen, no por rentabilidad.\n\nQué hacer en la vida real: Calcula cuánto te deja cada línea tras todos los costos y prioriza por rentabilidad, no por cantidad de ventas.",
+    fr:"la claridad que construyes aquí vale más que cualquier agencia sin método.",
+    qp:"Una marca vende mucho su producto barato en marketplace pero ignora su producto premium de alto margen. ¿Cuál es la decisión estratégica correcta?",
+    qo:["Eliminar el producto barato para enfocarse solo en el premium", "Seguir priorizando el producto barato porque genera volumen y visibilidad", "Analizar la función comercial de cada producto: el barato puede ser entrada, pero el premium debe recibir inversión de marketing prioritaria por su margen", "Bajar el precio del producto premium para hacerlo más accesible"],
+    qc:2,
+    qe:"En la arquitectura comercial INITIUM, cada producto tiene una función. El producto barato puede ser de entrada o volumen, pero no necesariamente es el que financia el negocio. El producto premium con alto margen es el que debe recibir inversión de marketing estratégica.",
+    ps:5
+  },
+  {
+    c:"4.5",
+    t:"Portafolio y Matriz BCG",
+    p:`Actua como estratega del modulo 4.5`,
+    f:`Mi negocio es: [describir].
+Mis lineas de negocio y productos son: [pegar resultado del Modulo 4].
+Mi estrategia de pricing y margenes (Modulo 3, analisis de pricing): [pegar].
+Para cada producto:
+- Rentabilidad real o margen aproximado: [dato o 'no lo se'].
+- Demanda o traccion: [alta / media / baja].
+- Tipo de cliente que lo compra: [describir].
+- Tipo de decision de compra: [impulso / comparada / consultiva].`,
+    ha:"Lo que te falta: No has clasificado tu portafolio: no sabes cuál producto es estrella, vaca, interrogante o hueso.\n\nPor qué es un hallazgo: Sin ver el peso estratégico de cada producto, repartes esfuerzo y dinero por intuición o por moda, no por rentabilidad.\n\nQué hacer en la vida real: Clasifica tu portafolio por rentabilidad y demanda. Invierte donde hay retorno y sostén; revisa con honestidad lo que solo consume energía.",
+    fr:"cada respuesta honesta que das es un paso hacia la rentabilidad real.",
+    qp:"Un dueño quiere poner toda su pauta en el producto que más vende en Instagram. Al analizar el portafolio, ese producto tiene 12% de margen y es clasificado como 'hueso' en la BCG. Su producto 'vaca lechera' tiene 58% de margen y casi no se comunica. ¿Qué recomiendas?",
+    qo:["Mantener la pauta en el producto más vendido porque genera reconocimiento de marca", "Reasignar el presupuesto de marketing hacia la vaca lechera y revisar si el hueso debe seguir en el portafolio activo", "Aumentar el precio del hueso para mejorar su margen antes de pautar", "Hacer pauta en ambos productos por igual para no perder volumen ni margen"],
+    qc:1,
+    qe:"La Matriz BCG clasifica por rentabilidad y demanda, no por volumen. Un hueso consume recursos sin retorno real. La vaca lechera es la que financia el negocio. Invertir pauta en un hueso mientras la vaca no recibe atención es uno de los errores más costosos de portafolio.",
+    ps:5
+  },
+  {
+    c:"5",
+    t:"Cliente, intención y canales",
+    p:`Actúa como estratega senior de growth marketing, canales y dirección de ventas. Necesito identificar qué canales realmente tienen sentido para mi negocio según cliente, línea de negocio, intención de compra, ticket, margen, ciclo de venta y capacidad de medición.
+
+Mi negocio es: [describir].
+Mis líneas de negocio son: [pegar resultado del Módulo 4].
+Mi cliente ideal por línea es: [describir si ya lo sé].
+Mi ticket promedio por línea es: [dato].
+Mi margen aproximado por línea es: [dato si lo sé].
+Mi ciclo de venta por línea es: [inmediato / días / semanas / meses].
+Mis canales actuales son: [Instagram, Facebook, WhatsApp, TikTok, YouTube, Google Ads, Google Search, Google Maps, SEO, blog, email marketing, LinkedIn, marketplace, ecommerce propio, afiliados, influencers, PR, eventos, ferias, distribuidores, referidos, punto físico, prospección directa, alianzas, webinars, canales offline, etc.].
+Mis canales donde creo que debería estar son: [listar].
+Mis ventas actuales vienen de: [describir].
+Mis problemas actuales son: [describir].
+Mi esencia de marca y posicionamiento son: [pegar resumen del Módulo 3].
+Lo que descubrí del mercado, competencia y consumidor es: [pegar resumen del Módulo 2].
+
+Analiza todos los canales posibles, incluyendo Instagram, Facebook, WhatsApp, TikTok, YouTube, Google Ads, Google Search, Google Maps, SEO, blog, email marketing, LinkedIn, marketplace, ecommerce propio, afiliados, influencers, PR, eventos, ferias, distribuidores, referidos, punto físico, prospección directa, alianzas, webinars y canales offline.
+
+Para cada línea de negocio, entrégame una Matriz Canal-Cliente-Intención con:
+1. Línea de negocio.
+2. Cliente ideal.
+3. Ticket.
+4. Margen aproximado.
+5. Ciclo de venta.
+6. Intención del cliente: descubrimiento, comparación, decisión, compra o recompra.
+7. Canal de descubrimiento recomendado.
+8. Canal de confianza recomendado.
+9. Canal de conversión recomendado.
+10. Canal de cierre recomendado.
+11. Canal de recompra recomendado.
+12. Canal que NO debería priorizar.
+13. Canal que podría parecer atractivo por moda, pero no necesariamente conviene.
+14. Riesgo de elegir mal el canal.
+15. Métrica principal por canal.
+16. Qué debe estar listo antes de invertir en ese canal.
+17. Recomendación de prioridad para los próximos 30 días.
+18. Qué canal puede estar generando ventas, pero no necesariamente rentabilidad.
+19. Qué canal puede servir para posicionamiento aunque no cierre de inmediato.
+20. Qué canal puede servir para recompra o relación directa.
+21. Semáforo por canal.
+22. Nivel de problema por canal.
+
+Justifica cada canal según intención, cliente, ticket, margen, ciclo de venta y modelo de negocio. No confundas canal de descubrimiento con canal de cierre. No inventes datos.`,
+    f:`Mi negocio es: [describir].
+Mis lineas de negocio son: [pegar resultado del Modulo 4].
+Mi cliente ideal por linea es: [describir si ya lo se].
+Mi ticket promedio por linea es: [dato].
+Mi margen aproximado por linea es: [dato si lo se].
+Mi ciclo de venta por linea es: [inmediato / dias / semanas / meses].
+Mis canales actuales son: [Instagram, Facebook, WhatsApp, TikTok, YouTube, Google Ads, SEO, email, LinkedIn, marketplace, ecommerce propio, afiliados, influencers, eventos, distribuidores, referidos, punto fisico, prospección directa, alianzas, etc.].
+Mis canales donde creo que deberia estar son: [listar].
+Mis ventas actuales vienen de: [describir].
+Mi esencia de marca y posicionamiento son: [pegar resumen del Modulo 3].
+Lo que descubri del mercado, competencia y consumidor es: [pegar resumen del Modulo 2].`,
+    ha:"Lo que te falta: No tienes claro por qué canal se vende cada producto, ni por cuál NO debe venderse.\n\nPor qué es un hallazgo: Un producto de alto ticket y decisión consultiva no se cierra en un canal de consumo rápido: el canal no soporta esa compra.\n\nQué hacer en la vida real: Asigna a cada producto el canal donde su cliente realmente decide, y descarta con criterio los que no sirven a esa compra.",
+    fr:"no estás aprendiendo marketing. Estás aprendiendo a dirigirlo. Eso es más valioso.",
+    qp:"Una empresa B2B vende consultoría de alto ticket (50.000 pesos). El dueño quiere generar clientes desde TikTok. ¿Cuál es el problema principal?",
+    qo:["TikTok no tiene suficientes usuarios en Latinoamérica para ese nicho", "El contenido de TikTok es muy costoso de producir para una empresa B2B", "El canal no corresponde a la intención de compra del cliente B2B: una decisión consultiva de alto ticket no se inicia por contenido viral de entretenimiento", "Primero debería tener más seguidores en Instagram antes de ir a TikTok"],
+    qc:2,
+    qe:"La intención de compra B2B de alto ticket se activa por referidos, LinkedIn, eventos sectoriales y llamadas consultivas. TikTok es un canal de descubrimiento masivo para decisiones impulsivas o de bajo ticket. Confundir el canal con la intención es uno de los errores más caros.",
+    ps:5
+  },
+  {
+    c:"6",
+    t:"Narrativa comercial",
+    p:`Actúa como estratega senior de narrativa comercial, contenido con intención y dirección de comunicación. Necesito construir los mensajes base de mi negocio antes de hacer parrilla, campañas, pauta, marketplace o contenido multicanal.
+
+Mi negocio es: [describir].
+Mi esencia de marca es: [pegar resultado del Módulo 3].
+Mis líneas de negocio son: [pegar resultado del Módulo 4].
+Mi cliente por línea y canal recomendado es: [pegar resultado del Módulo 5].
+Mis objeciones principales son: [listar].
+Mi objetivo de marketing de los próximos 30 días es: [describir].
+Mi tono de marca debe ser: [describir].
+Mis canales prioritarios hasta ahora son: [listar].
+Lo que no quiero que mi marca parezca es: [describir].
+
+Necesito que construyas un Dashboard de Narrativa Comercial con:
+1. Mensaje principal de marca.
+2. Mensaje por línea de negocio.
+3. Beneficio racional por línea.
+4. Beneficio emocional por línea.
+5. Objeciones que debo responder.
+6. Objeciones convertidas en temas de contenido.
+7. Argumentos de autoridad.
+8. Pruebas que debo mostrar.
+9. Temas educativos necesarios.
+10. Temas de venta directa.
+11. Temas de confianza.
+12. Temas de experiencia.
+13. CTA por etapa: descubrir, comparar, decidir, comprar, recomprar.
+14. CTA por canal: Google, Instagram, TikTok, YouTube, LinkedIn, email, WhatsApp, marketplace, evento, punto físico o canal B2B.
+15. Palabras que mantienen coherencia con mi marca.
+16. Palabras o enfoques que debo evitar.
+17. Riesgos de sonar genérico.
+18. Cómo esta narrativa debe reflejarse en web, redes, WhatsApp, YouTube, TikTok, Google, LinkedIn, marketplace, email, eventos y ventas.
+19. Qué piezas de contenido necesito antes de pautar.
+20. Qué piezas de contenido necesito antes de vender una línea de alto ticket.
+21. Qué piezas de contenido necesito para recompra.
+22. Qué partes de mi comunicación actual parecen bonitas, pero no estratégicas.
+23. Semáforo narrativo.
+24. Nivel de problema narrativo.
+
+No uses frases motivacionales vacías. No exageres beneficios. No inventes resultados. No prometas lo que la marca no puede sostener.`,
+    f:`Mi negocio es: [describir].
+Mi esencia de marca es: [pegar resultado del Modulo 3].
+Mis lineas de negocio son: [pegar resultado del Modulo 4].
+Mi cliente por linea y canal recomendado es: [pegar resultado del Modulo 5].
+Mis objeciones principales son: [listar].
+Mi objetivo de marketing de los proximos 30 dias es: [describir].
+Mi tono de marca debe ser: [describir].
+Mis canales prioritarios hasta ahora son: [listar].
+Lo que no quiero que mi marca parezca es: [describir].`,
+    ha:"Lo que te falta: No tienes narrativa comercial: tu contenido no conecta lo que el cliente teme con lo que ofreces.\n\nPor qué es un hallazgo: Contenido bonito sin narrativa gusta pero no vende ni resuelve la objeción que frena la compra.\n\nQué hacer en la vida real: Construye un mensaje que hable de la objeción y la decisión del cliente. El contenido debe vender con coherencia con tu marca, no solo adornar.",
+    fr:"la mayoría improvisa. Tú estás construyendo con método. Eso marca la diferencia.",
+    qp:"Una marca tiene identidad visual cuidada y fotos profesionales, pero sus clientes dicen 'no entiendo bien qué vendes'. ¿Cuál es el problema?",
+    qo:["Le falta invertir más en diseño y producción de contenido", "Necesita más seguidores para que su mensaje llegue a más personas", "Tiene estética sin narrativa: la comunicación es bonita pero no dice qué vende, para quién, por qué cuesta lo que cuesta ni por qué elegirla", "Debería cambiar su paleta de colores por algo más llamativo"],
+    qc:2,
+    qe:"La estética no es la narrativa. Una marca puede ser visualmente impecable y comunicativamente vacía. La narrativa comercial responde: qué vendo, para quién, qué problema resuelvo, por qué cuesta lo que cuesta y por qué confiar. Sin eso, la comunicación bonita no convierte.",
+    ps:5
+  },
+  {
+    c:"7",
+    t:"Parrilla estratégica",
+    p:`Actúa como estratega senior de contenido, comunicación multicanal, producción de contenido y dirección de marca.
+
+Necesito construir una Parrilla Estratégica Multicanal de 30 días para mi negocio. No quiero una lista genérica de posts. Quiero un plan de comunicación ejecutable, conectado a mi estrategia, mi esencia de marca, mis líneas de negocio, mis canales, mis objeciones, mis CTA y mis recursos reales de producción.
+
+Mi negocio es: [describir].
+Mi esencia de marca es: [pegar resultado del Módulo 3].
+Mi propuesta de valor es: [pegar resultado del Módulo 3].
+Mis líneas de negocio son: [pegar resultado del Módulo 4].
+Mi línea prioritaria para los próximos 30 días es: [describir].
+Mi cliente ideal por línea es: [pegar resultado del Módulo 5].
+Mis canales prioritarios son: [Instagram, Facebook, TikTok, YouTube, LinkedIn, Google Business, blog, email, WhatsApp, marketplace, ecommerce, eventos, PR, punto físico, etc.].
+Mi narrativa comercial es: [pegar resultado del Módulo 6].
+Mi auditoría de redes (Módulo 7.5): [pegar resultado si ya lo tengo — brecha de ejecución detectada].
+Mis objeciones principales son: [listar].
+Mis pruebas disponibles son: [testimonios, casos, fotos reales, reseñas, antes/después, resultados, procesos, demostraciones, etc.].
+Mis recursos actuales de producción son: [puedo tomar fotos / puedo grabar video / tengo diseñador / tengo celular / tengo locación / tengo clientes para testimonio / tengo producto físico / tengo equipo / tengo local / tengo casos / etc.].
+Mi tono visual debe ser: [describir según esencia de marca].
+Lo que NO quiero que mi marca parezca es: [describir].
+Mi objetivo del mes es: [ventas, consultas, cotizaciones, reservas, posicionamiento, autoridad, recompra, leads B2B, lanzamiento, tráfico, comunidad, etc.].
+
+Construye una Parrilla Estratégica Multicanal de 30 días con columnas:
+1. Día.
+2. Línea de negocio.
+3. Objetivo del contenido.
+4. Etapa de decisión: descubrimiento, comparación, confianza, decisión, compra o recompra.
+5. Tipo de contenido: autoridad, educación, objeción, prueba, venta, experiencia o recompra.
+6. Tema.
+7. Idea central.
+8. Formato recomendado: reel, historia, post estático, carrusel, video corto, video largo, live, masterclass, artículo, email, WhatsApp, LinkedIn post, TikTok, YouTube Short, YouTube largo, ficha marketplace, caso de estudio, testimonio, Google Business, presentación comercial, pieza para evento o material offline.
+9. Canal recomendado.
+10. Justificación del formato elegido.
+11. Copy base o guion base.
+12. CTA principal.
+13. Hashtags, keywords o palabras clave si aplica.
+14. Métrica a observar.
+15. Relación con la esencia de marca.
+16. Requerimiento de producción.
+17. Fotos necesarias.
+18. Videos necesarios.
+19. Tomas o escenas sugeridas.
+20. Material de prueba necesario.
+21. Recursos que debo preparar antes de publicar.
+22. Nivel de complejidad de ejecución: bajo, medio o alto.
+23. Responsable sugerido: dueño, equipo, fotógrafo, diseñador, editor, vendedor, agencia o proveedor.
+24. Riesgo si se publica sin ajuste.
+25. Semáforo de preparación.
+
+Además, entrégame lista de fotos, videos, testimonios o pruebas, piezas apoyables con IA, piezas que requieren material real, recomendaciones para coherencia visual, advertencias contra contenido genérico, prioridad de producción de la primera semana y piezas que deben estar listas antes de pautar.
+
+No propongas formatos por moda. No asumas que todo debe ser reel o Instagram. Si una pieza requiere foto, video, testimonio, caso o prueba real, indícalo.`,
+    f:`Mi negocio es: [describir].
+Mi esencia de marca es: [pegar resultado del Modulo 3].
+Mi propuesta de valor es: [pegar resultado del Modulo 3].
+Mis lineas de negocio son: [pegar resultado del Modulo 4].
+Mi linea prioritaria para los proximos 30 dias es: [describir].
+Mi cliente ideal por linea es: [pegar resultado del Modulo 5].
+Mis canales prioritarios son: [Instagram, Facebook, TikTok, YouTube, LinkedIn, Google Business, blog, email, WhatsApp, marketplace, etc.].
+Mi narrativa comercial es: [pegar resultado del Modulo 6].
+Mis objeciones principales son: [listar].
+Mis pruebas disponibles son: [testimonios, casos, fotos reales, resenas, antes/despues, resultados, procesos, demostraciones, etc.].
+Mis recursos actuales de produccion son: [puedo tomar fotos / puedo grabar video / tengo disenador / tengo celular / tengo locacion / tengo casos / etc.].
+Mi tono visual debe ser: [describir segun esencia de marca].
+Lo que NO quiero que mi marca parezca es: [describir].
+Mi objetivo del mes es: [ventas, consultas, cotizaciones, reservas, posicionamiento, autoridad, recompra, leads B2B, lanzamiento, trafico, comunidad, etc.].`,
+    ha:"Lo que te falta: Tu contenido publicado no coincide con tu estrategia: ejecutas sin dirección.\n\nPor qué es un hallazgo: Si lo que publicas no refleja tu marca, tu línea prioritaria ni tiene CTA, tus redes trabajan en contra de tu plan.\n\nQué hacer en la vida real: Alinea cada pieza a una línea de negocio, un mensaje y un llamado a la acción. Sin eso, más contenido solo es más gasto.",
+    fr:"el plan que construyes es tuyo. No de una agencia. No de un freelancer. Tuyo.",
+    qp:"Una marca de maquillaje genera su parrilla completa con IA, publica reels diarios y tiene contenido variado. Las ventas no crecen. ¿Cuál es el diagnóstico correcto?",
+    qo:["Necesita publicar más frecuentemente y en más plataformas", "La parrilla no tiene dirección estratégica: el formato y la frecuencia no compensan la falta de narrativa, esencia y conexión con lo que el cliente necesita escuchar", "El problema es que los reels no tienen suficientes efectos y música de tendencia", "Debería cambiar a contenido estático que es más fácil de consumir"],
+    qc:1,
+    qe:"Publicar mucho sin dirección es ruido. La parrilla estratégica INITIUM nace de la narrativa, la esencia de marca y los objetivos de negocio. Sin esa base, el contenido puede verse bien pero no mover al cliente a ninguna acción. La frecuencia no reemplaza la estrategia.",
+    ps:5
+  },
+  {
+    c:"7.5",
+    t:"Auditoría de redes sociales",
+    p:`Actua como estratega del modulo 7.5`,
+    f:`Mi negocio es: [describir].
+Mi esencia de marca es: [pegar resultado del Modulo 3].
+Mi narrativa comercial es: [pegar resultado del Modulo 6].
+Mi parrilla estrategica de 30 dias es: [pegar resultado del Modulo 7].
+Mi linea de negocio prioritaria es: [pegar resultado del Modulo 4].
+Mis redes sociales activas son: [usuario o URL de Instagram, Facebook, TikTok, LinkedIn, YouTube, etc.].
+Seguidores actuales: [dato].
+Publicaciones por semana en promedio: [dato].
+Alcance promedio por publicacion: [dato].
+Interacciones promedio: [dato].
+Las 3 publicaciones con mejor desempeno reciente son: [describir o pegar texto].
+Las 3 publicaciones con peor desempeno reciente son: [describir o pegar texto].
+Mensajes o consultas que recibo por redes al mes: [dato].
+Ventas o citas que puedo atribuir directamente a redes: [dato si lo se].
+Inversion actual en pauta en estas redes: [dato].
+Lo que siento que no esta funcionando es: [describir].`,
+    ha:"Lo que te falta: Tu contenido publicado no coincide con tu estrategia: ejecutas sin dirección.\n\nPor qué es un hallazgo: Si lo que publicas no refleja tu marca, tu línea prioritaria ni tiene CTA, tus redes trabajan en contra de tu plan.\n\nQué hacer en la vida real: Alinea cada pieza a una línea de negocio, un mensaje y un llamado a la acción. Sin eso, más contenido solo es más gasto.",
+    fr:"vas a terminar esto con más claridad de la que tenías al empezar. Sigue.",
+    qp:"Una marca tiene 40.000 seguidores, publica todos los días y recibe muchos likes, pero no genera mensajes ni ventas. ¿Qué revisarías antes de concluir que necesita más pauta?",
+    qo:["El horario de publicación para asegurarse de publicar en horas pico", "El tipo de contenido: si hay CTA claro, si la narrativa responde objeciones, si existe coherencia entre lo que se publica y lo que se vende", "El número de hashtags para mejorar el alcance orgánico", "El algoritmo de la plataforma que favorece cuentas con más publicaciones"],
+    qc:1,
+    qe:"Los likes y seguidores son métricas de vanidad. El problema casi siempre es narrativo o de CTA: el contenido no lleva al cliente a ninguna acción. Antes de pautar, hay que auditar si el contenido existente comunica bien, tiene un llamado a la acción claro y conecta con la oferta real.",
+    ps:5
+  },
+  {
+    c:"7.8",
+    t:"Métricas que sí importan",
+    p:`Actua como estratega del modulo 7.8`,
+    f:`Mi negocio es: [describir].
+Mis redes activas son: [listar con usuario o URL].
+Tengo pauta activa en: [si/no, y en que plataforma: Meta Ads / Google Ads / TikTok Ads / otra].
+Mis metricas organicas actuales son: [seguidores, likes promedio, alcance, guardados, comentarios reales].
+Si tengo pauta, mis metricas de campana son: [CPM, CPC, CTR, conversiones, costo por resultado, ROAS si aplica].
+Lo que mi proveedor o plataforma me reporta es: [describir o pegar el reporte].
+Lo que no entiendo o no se leer es: [describir].
+Lo que quiero lograr con mi marketing digital ahora mismo es: [ventas / leads / posicionamiento / comunidad / otro].
+Mi narrativa comercial es: [pegar resultado del Modulo 6].
+Mis canales prioritarios son: [pegar resultado del Modulo 5].
+Mi auditoria de redes (Modulo 7.5): [pegar resultado si ya lo tengo].`,
+    ha:"Lo que te falta: No distingues métricas de vanidad de métricas de rendimiento, ni contenido orgánico de pauta pagada.\n\nPor qué es un hallazgo: Sin esta distinción, aceptas reportes que se ven bien pero no dicen nada útil, y pagas por actividad que no genera retorno medible.\n\nQué hacer en la vida real: Exige siempre el costo por conversión y el ROAS de tus campañas pagadas. Y separa mentalmente tu inversión en contenido orgánico de tu inversión en pauta: son presupuestos distintos con objetivos distintos.",
+    fr:"el diagnóstico duele a veces. Pero es mejor saber la verdad ahora que pagar más tarde.",
+    qp:"Tu agencia te presenta este reporte: 250.000 impresiones, 18.000 reproducciones de video, 3.200 likes y alcance de 80.000 personas. Invirtiste 8.000 pesos. ¿Qué dato crítico falta para saber si la campaña funcionó?",
+    qo:["El número de comentarios y compartidos para medir el engagement", "El costo por clic (CPC) y las conversiones: cuántas personas tomaron la acción que querías (compra, lead, mensaje) y cuánto costó cada una", "El alcance desglosado por edad y género para entender la audiencia", "El número de nuevos seguidores que ganaste durante la campaña"],
+    qc:1,
+    qe:"Impresiones, reproducciones y likes son métricas de vanidad. Lo que define si una campaña funcionó es el costo por conversión: cuánto pagaste por cada acción valiosa (venta, lead, mensaje). Sin ese dato, el reporte es actividad sin resultado. Tienes derecho a exigirlo.",
+    ps:5
+  },
+  {
+    c:"8",
+    t:"Ecosistema conectado",
+    p:`Actua como estratega del modulo 8`,
+    f:`Mi negocio vende: [describir].
+Mis lineas de negocio son: [listar].
+Mis canales actuales son: [Instagram, Facebook, WhatsApp, TikTok, YouTube, Google, LinkedIn, web, ecommerce, marketplace, email, CRM, tienda fisica, eventos, distribuidores, referidos, PR, etc.].
+Actualmente los clientes llegan por: [describir].
+Actualmente vendo por: [WhatsApp, web, marketplace, llamada, tienda, DM, formulario, distribuidor, etc.].
+Actualmente mido: [ventas, leads, clics, ROAS, ROI, margen, nada, etc.].
+Mi linea prioritaria es: [pegar del Modulo 4].
+Mi matriz cliente-canal-intencion es: [pegar del Modulo 5].
+Mi narrativa comercial es: [pegar del Modulo 6].
+Mi parrilla estrategica es: [pegar del Modulo 7].`,
+    ha:"Lo que te falta: No tienes tus canales conectados ni sabes registrar de dónde viene cada cliente.\n\nPor qué es un hallazgo: Si tus canales están sueltos, pierdes ventas, datos y trazabilidad: no sabes qué esfuerzo trajo qué resultado.\n\nQué hacer en la vida real: Conecta tus canales y registra el origen de cada cliente. Un ecosistema ordenado es lo que te permite, después, medir y decidir con datos.",
+    fr:"cada módulo completado es evidencia de que tú diriges, no eres dirigido.",
+    qp:"Un negocio vende por Instagram, marketplace, tienda física y WhatsApp, pero el dueño no sabe qué canal le deja utilidad real. ¿Cuál es el primer paso del ecosistema?",
+    qo:["Cerrar los canales menos populares y concentrarse en el que más vende", "Conectar cada canal con una métrica de origen: registrar de dónde viene cada cliente y qué margen deja cada canal después de sus costos específicos", "Invertir más en el canal digital porque tiene más alcance", "Contratar a alguien que maneje todos los canales simultáneamente"],
+    qc:1,
+    qe:"Sin registro de origen no hay ecosistema, solo canales desconectados. El primer paso es saber de dónde viene cada cliente y qué costo tiene ese canal. Sin eso, cualquier decisión de inversión es intuición. El ecosistema INITIUM conecta canales con métricas de rentabilidad.",
+    ps:5
+  },
+  {
+    c:"9",
+    t:"Ventas, seguimiento y experiencia",
+    p:`Actua como estratega del modulo 9`,
+    f:`Mi negocio es: [describir].
+Mis lineas de negocio son: [pegar resultado del Modulo 4].
+Mi cliente ideal por linea es: [pegar resultado del Modulo 5].
+Mis canales de venta son: [WhatsApp, DM, llamada, web, ecommerce, marketplace, tienda fisica, distribuidor, formulario, reunion, evento, email, etc.].
+Mi narrativa comercial es: [pegar resultado del Modulo 6].
+Mi ecosistema actual es: [pegar resultado del Modulo 8 si ya lo tengo].
+Mis metricas de campana (Modulo 7.8): [si tengo pauta activa, pegar el analisis de metricas para considerar como llegan los prospectos].
+Mis clientes suelen preguntar: [listar preguntas frecuentes].
+Mis objeciones frecuentes son: [precio, tiempo, confianza, comparacion, urgencia, envio, garantia, resultados, compatibilidad, disponibilidad, etc.].
+Mi proceso actual despues del pago es: [describir].
+Mi postventa actual es: [describir].
+Mi principal problema es: [muchos leads y pocas ventas / respondo pero no cierro / no hago seguimiento / vendo una vez pero no recompra / no pido testimonios / no se de donde vienen los clientes / etc.].`,
+    ha:"Lo que te falta: No tienes un proceso de seguimiento ni de cierre de ventas.\n\nPor qué es un hallazgo: Atraer interesados sin proceso para atenderlos y cerrarlos es llenar una cubeta agujereada: el esfuerzo se fuga al final.\n\nQué hacer en la vida real: Diseña tu proceso de respuesta, seguimiento y cierre antes de invertir más en atraer. Sin cierre, más leads solo es más gasto.",
+    fr:"la rentabilidad empieza con entender. Tú estás entendiendo. Continúa.",
+    qp:"Meta Ads genera 80 conversaciones al mes y solo 3 se convierten en ventas. El dueño quiere duplicar la pauta para 'traer mejores leads'. ¿Cuál es el error?",
+    qo:["El problema es la segmentación de Meta Ads que trae personas sin perfil de compra", "Duplicar la pauta sin revisar el proceso de venta es amplificar el problema: hay que auditar qué pasa entre la conversación y el cierre antes de invertir más", "Los leads de Meta Ads nunca son de calidad para productos de alto valor", "Debería cambiar a Google Ads que trae leads con más intención de compra"],
+    qc:1,
+    qe:"80 conversaciones y 3 ventas (3.7% de cierre) indica un problema en el proceso de venta, no en la calidad del lead. Duplicar pauta traerá 160 conversaciones y probablemente 6 ventas: el mismo problema, el doble del costo. Hay que revisar qué pasa en la conversación antes de invertir más.",
+    ps:5
+  },
+  {
+    c:"9.5",
+    t:"ROAS, ROI y madurez de datos",
+    p:`Actúa como asesor financiero y de medición de marketing, dentro de la metodología INITIUM ONE LAB. Tu trabajo aquí no es calcular todavía mi rentabilidad, sino ayudarme a entender si de verdad puedo medir mi marketing, y ser honesto conmigo si no puedo. No me adules. Si me faltan datos clave, dímelo con claridad y respeto.
+
+Mi negocio es: [describir].
+Mi tipo de negocio es: [retail físico / ecommerce / mixto físico y online / B2B / servicios].
+Mi situación es: [negocio o producto ya establecido con histórico de ventas / producto en lanzamiento sin histórico todavía]. Si es lanzamiento, recuérdame que no puedo medir lo que aún no existe: en lugar de exigirme datos históricos, ayúdame a estimar con supuestos razonables y a definir qué empezaré a medir desde el primer día de venta.
+Mis líneas de negocio son: [pegar resultado del Módulo 4].
+
+Responde mi test de madurez de datos. Para cada punto te digo sí o no:
+1. Registro el origen de cada venta o lead: [sí/no].
+2. Sé cuánto invierto en publicidad por canal y por periodo: [sí/no].
+3. Conozco el costo real de mi producto o servicio por línea: [sí/no].
+4. Conozco mis costos comerciales (comisiones, envíos, devoluciones, descuentos): [sí/no].
+5. Puedo separar ventas brutas de ventas netas: [sí/no].
+6. Tengo forma de saber qué campaña generó qué venta: [sí/no].
+7. Reviso estos números de forma periódica: [sí/no].
+
+Con base en esto, entrégame un DASHBOARD DE MADUREZ DE MEDICIÓN INITIUM con:
+1. Una explicación breve y clara de qué es ROAS aplicada a mi tipo de negocio.
+2. Una explicación breve y clara de qué es ROI aplicada a mi tipo de negocio.
+3. Un ejemplo numérico simple con mi tipo de negocio donde el ROAS se ve bien pero el ROI puede no serlo.
+4. Mi nivel de madurez de datos: verde, amarillo o rojo, según mis respuestas.
+5. Qué datos sí tengo para medir.
+6. Qué datos me faltan, en orden de importancia.
+7. Mi ruta recomendada: Ruta A (analizar con mis datos reales) o Ruta B (aprender con un caso de ejemplo de mi tipo de negocio y construir mi plan de medición).
+8. Si voy por Ruta B: dime con honestidad y sin rodeos en qué estado está mi empresa respecto a la medición, qué riesgos corro al invertir sin estos datos, y qué debo empezar a registrar desde ya.
+9. Un primer borrador de mi Plan de Implementación de Medición: qué registrar, cómo, con qué herramienta simple, y en cuánto tiempo podría tener datos confiables.
+10. Qué NO debo hacer hasta tener estos datos.
+
+No inventes mis datos. No supongas que mido algo que no te dije que mido. Si estoy en rojo, sé honesto: es mejor que sepa la verdad ahora a que invierta a ciegas. Distingue siempre entre dato real, estimación e hipótesis.`,
+    f:`Mi negocio es: [describir].
+Mi tipo de negocio es: [retail fisico / ecommerce / mixto fisico y online / B2B / servicios].
+Mi situacion es: [negocio o producto ya establecido con historico de ventas / producto en lanzamiento sin historico todavia].
+Mis lineas de negocio son: [pegar resultado del Modulo 4].
+
+Test de madurez de datos (responde si o no a cada uno):
+1. Registro el origen de cada venta o lead: [si/no].
+2. Se cuanto invierto en publicidad por canal y por periodo: [si/no].
+3. Conozco el costo real de mi producto o servicio por linea: [si/no].
+4. Conozco mis costos comerciales (comisiones, envios, devoluciones, descuentos): [si/no].
+5. Puedo separar ventas brutas de ventas netas: [si/no].
+6. Tengo forma de saber que campana genero que venta: [si/no].
+7. Reviso estos numeros de forma periodica: [si/no].`,
+    ha:"Lo que te falta: No tienes los datos para medir: no registras origen de ventas, margen ni atribución.\n\nPor qué es un hallazgo: Sin datos no puedes saber si tu marketing funciona. Crees medir, pero estás adivinando, y adivinar con dinero es caro.\n\nQué hacer en la vida real: Empieza a registrar de dónde viene cada venta, cuánto inviertes y cuánto te deja. Sin medición, no hay marketing rentable posible.",
+    fr:"no hay atajos en la estrategia real. Pero hay métodos. Este es uno de ellos.",
+    qp:"Un empresario dice que su marketing 'es rentable porque vende mucho por Instagram'. No sabe cuánto invierte exactamente, no registra qué venta vino de qué canal y no conoce su margen real. ¿Cuál es el nivel de madurez de datos de este negocio?",
+    qo:["Nivel verde: tiene ventas, eso confirma que el marketing funciona", "Nivel amarillo: tiene algunos datos pero necesita ordenarlos mejor", "Nivel rojo: sin datos de origen, inversión por canal y margen real, no puede calcular ROAS ni ROI y está invirtiendo a ciegas", "No importa el nivel si las ventas siguen creciendo"],
+    qc:2,
+    qe:"Sin saber de dónde viene cada venta, cuánto cuesta atraer ese cliente y qué margen deja, el ROAS y el ROI son imposibles de calcular. Este negocio está en nivel rojo de madurez de datos: tiene actividad de marketing pero no puede medir su retorno real. Invertir más en este estado es apostar, no decidir.",
+    ps:5
+  },
+  {
+    c:"10",
+    t:"Inversión y rentabilidad real",
+    p:`Actua como estratega del modulo 10`,
+    f:`Mi negocio es: [describir].
+Mis lineas de negocio son: [pegar resultado del Modulo 4].
+Mis canales actuales de venta son: [listar].
+Mis precios de venta al publico (PVP) son: [listar por linea].
+Mis precios de venta a distribuidor (PDV), si aplica, son: [listar].
+Mi costo de producto o prestacion por linea es: [dato].
+Mi margen bruto aproximado por linea es: [dato si lo se].
+Mis ventas brutas por canal son: [dato si lo se].
+Mis descuentos promedio son: [dato].
+Mis devoluciones o cancelaciones son: [dato].
+Mis costos de envio o entrega son: [dato].
+Mis comisiones de marketplace o pasarela son: [dato].
+Mi inversion en pauta es: [dato].
+Mi inversion en contenido, produccion, agencia o freelance es: [dato].
+Mis costos de equipo comercial, sueldos, comisiones o atencion son: [dato].
+Mis herramientas comerciales o digitales son: [dato].
+Mi principal problema actual es: [vendo mucho pero no veo caja / no se si marketplace es rentable / no entiendo ROAS / no se mi ROI / tengo leads pero no cierro / etc.].`,
+    ha:"Lo que te falta: No distingues ventas de utilidad: mides el negocio por lo que factura, no por lo que gana.\n\nPor qué es un hallazgo: Vender mucho no es ganar. Comisiones, envíos, devoluciones y pauta pueden dejar tu utilidad real en casi nada.\n\nQué hacer en la vida real: Calcula utilidad neta y ROI por canal antes de escalar. Solo se invierte más en lo que demuestra dejar ganancia, no solo movimiento.",
+    fr:"tu negocio merece una dirección clara. La estás construyendo ahora mismo.",
+    qp:"Una marca vende 300.000 pesos al mes en marketplace. La plataforma le propone aumentar su inversión en pauta interna. Antes de aceptar, ¿qué debe calcular?",
+    qo:["Cuántos nuevos productos puede agregar para aprovechar el mayor tráfico", "Ventas netas reales después de comisiones (18%), devoluciones, envíos y pauta interna: si el margen neto no soporta el costo de adquisición, más pauta destruye rentabilidad", "El número de reseñas positivas necesarias para que la inversión en pauta funcione", "Si la competencia también está invirtiendo en pauta interna en esa plataforma"],
+    qc:1,
+    qe:"300.000 en ventas brutas en marketplace puede ser 50.000 o menos en utilidad neta después de comisiones, devoluciones, envíos y descuentos. Si el margen no cubre el costo de adquisición de la pauta adicional, crecer en marketplace destruye caja. Primero calcular, luego decidir.",
+    ps:5
+  },
+  {
+    c:"10.8",
+    t:"Tu Diagnóstico INITIUM",
+    p:`Actúa como consultor estratégico senior en la junta de diagnóstico final con tu cliente, dentro de la metodología INITIUM ONE LAB. Ya revisaste con él todo su negocio módulo a módulo. Ahora vas a entregarle su Diagnóstico INITIUM: la radiografía completa, equilibrada y profesional.
+
+Este diagnóstico no es una lista de defectos. Es una evaluación honesta en ambas direcciones: reconoce las fortalezas reales, señala lo que está en riesgo y nombra con claridad lo que está enfermo. Un diagnóstico que solo señala problemas es incompleto e injusto: sobre lo sano también se construye.
+
+Aquí está el resumen acumulado de todo el trabajo del curso:
+
+Dashboard Inicial (Módulo 0): [pegar resultado].
+
+Dashboard de Diagnóstico (Módulo 1): [pegar resultado].
+
+Dashboard de Mercado, Competencia y Consumidor (Módulo 2): [pegar resultado].
+
+Dashboard de Esencia de Marca y Pricing (Módulo 3): [pegar resultado].
+
+Dashboard de Oferta y Líneas de Negocio (Módulo 4): [pegar resultado].
+
+Dashboard de Portafolio BCG (Módulo 4.5): [pegar resultado].
+
+Matriz Cliente-Canal-Intención (Módulo 5): [pegar resultado].
+
+Dashboard de Narrativa Comercial (Módulo 6): [pegar resultado].
+
+Parrilla Estratégica (Módulo 7): [pegar resultado].
+
+Dashboard de Auditoría de Redes (Módulo 7.5): [pegar resultado].
+
+Dashboard de Métricas de Plataforma (Módulo 7.8): [pegar resultado].
+
+Dashboard de Ecosistema Comercial (Módulo 8): [pegar resultado].
+
+Dashboard de Venta, Seguimiento y Experiencia (Módulo 9): [pegar resultado].
+
+Dashboard de Madurez de Medición (Módulo 9.5): [pegar resultado].
+
+Dashboard de Inversión y Rentabilidad (Módulo 10): [pegar resultado].
+
+Con todo esto, construye el Diagnóstico INITIUM con la siguiente estructura:
+
+SANO (verde): 2 a 4 áreas que funcionan y son fortalezas reales sobre las que construir. Explica por qué son una fortaleza, no solo las nombres.
+
+EN RIESGO (amarillo): 2 a 3 áreas que hoy funcionan pero pueden deteriorarse si no se atienden. Explica qué las pone en riesgo y qué consecuencia tiene ignorarlas.
+
+ENFERMO (rojo): 2 a 4 áreas que están frenando el negocio o costando dinero hoy. Nombra el problema, explica por qué es un problema real y cuál es su impacto en rentabilidad, ventas o posicionamiento.
+
+PROBLEMA RAÍZ: el problema central del negocio, distinguiendo síntoma de causa. No el que parece más urgente: el que, si se resuelve, mueve todo lo demás. Explica por qué es la raíz y no un síntoma.
+
+PROBLEMAS SECUNDARIOS: los que alimentan o agravan el problema raíz. Lista hasta cinco, en orden de impacto.
+
+FORTALEZAS REALES: lo que el negocio tiene que otros no, y sobre lo que se va a construir el plan. Mínimo dos, máximo cuatro.
+
+ESTADO DE OBJETIVOS: ¿tiene este negocio objetivos claros más allá de vender más? Si no los tiene, señálalo como hallazgo. No como defecto: como oportunidad de claridad. El plan de marketing del siguiente módulo los ayudará a definirlos.
+
+NIVEL DE PROBLEMA GENERAL: Nivel 1 (desorden de ejecución), Nivel 2 (problema de estrategia y foco) o Nivel 3 (problema estructural de negocio). Con una justificación de dos líneas.
+
+CIERRE: recuerda al alumno que este diagnóstico es la base sobre la que se construirá el Plan de Marketing en el Módulo 11. El diagnóstico dice cuál es el problema. El plan dará la medicina. No son documentos paralelos: son la primera y la segunda mitad de un mismo proceso.
+
+No inventes datos que no te di. Si falta información para evaluar un área, dilo con honestidad. Sé directo y constructivo: el objetivo es que el alumno entienda su situación real, no que se sienta atacado ni que se sienta sobrevalorado sin razón. Distingue siempre entre síntoma y causa, y entre dato real e hipótesis.`,
+    f:`INSTRUCCION: Pega aqui el resumen o resultado de cada modulo completado. Mientras mas completo sea el resumen, mejor sera la radiografia.
+
+Dashboard Inicial (Modulo 0): [pegar resultado].
+Dashboard de Diagnostico (Modulo 1): [pegar resultado].
+Dashboard de Mercado, Competencia y Consumidor (Modulo 2): [pegar resultado].
+Dashboard de Esencia de Marca y Pricing (Modulo 3): [pegar resultado].
+Dashboard de Oferta y Lineas de Negocio (Modulo 4): [pegar resultado].
+Dashboard de Portafolio BCG (Modulo 4.5): [pegar resultado].
+Matriz Cliente-Canal-Intencion (Modulo 5): [pegar resultado].
+Dashboard de Narrativa Comercial (Modulo 6): [pegar resultado].
+Parrilla Estrategica (Modulo 7): [pegar resultado].
+Dashboard de Auditoria de Redes (Modulo 7.5): [pegar resultado].
+Dashboard de Metricas de Plataforma (Modulo 7.8): [pegar resultado].
+Dashboard de Ecosistema Comercial (Modulo 8): [pegar resultado].
+Dashboard de Venta, Seguimiento y Experiencia (Modulo 9): [pegar resultado].
+Dashboard de Madurez de Medicion (Modulo 9.5): [pegar resultado].
+Dashboard de Inversion y Rentabilidad (Modulo 10): [pegar resultado].`,
+    ha:"Lo que te falta: Integrar todo el trabajo del curso en un diagnóstico honesto que distinga lo sano de lo enfermo.\n\nPor qué es un hallazgo: Sin radiografía completa no hay base real para el plan de marketing. Un plan sin diagnóstico es intuición disfrazada de estrategia.\n\nQué hacer en la vida real: Completa los campos de todos los módulos anteriores y pega sus resultados aquí. Mientras más completo sea el resumen, más precisa será la radiografía.",
+    fr:"cada dato que escribes aquí es una decisión que ya no tomarás por intuición.",
+    qp:"Un negocio recibe un diagnóstico que solo enumera 12 problemas graves sin mencionar ninguna fortaleza. ¿Por qué ese diagnóstico es incompleto?",
+    qo:["Porque un diagnóstico profesional siempre debe ser positivo para motivar al cliente", "Porque un diagnóstico real es una radiografía equilibrada: muestra lo sano (para construir sobre ello), lo en riesgo (para proteger) y lo enfermo (para corregir). Sin fortalezas, el plan no tiene base real.", "Porque el consultor no leyó bien la información del cliente", "Porque los problemas deben presentarse de menos a más grave, nunca todos juntos"],
+    qc:1,
+    qe:"El Diagnóstico INITIUM es una radiografía equilibrada. Lo sano son las fortalezas sobre las que se construye el plan. Lo en riesgo es lo que hay que proteger. Lo enfermo es lo que hay que corregir. Un diagnóstico sin fortalezas no tiene base para el plan y puede paralizar al cliente sin razón.",
+    ps:5
+  },
+  {
+    c:"11",
+    t:"Plan de Marketing a 1 año",
+    p:`Actua como estratega del modulo 11`,
+    f:`INSTRUCCION: Pega aqui el resumen de TODOS los dashboards completados hasta ahora. Incluye lo mas importante de cada uno.
+
+Dashboard Inicial (Modulo 0): [pegar resultado].
+Dashboard de Diagnostico (Modulo 1): [pegar resultado].
+Dashboard de Mercado (Modulo 2): [pegar resultado].
+Dashboard de Esencia de Marca y Pricing (Modulo 3): [pegar resultado].
+Dashboard de Oferta (Modulo 4): [pegar resultado].
+Dashboard BCG (Modulo 4.5): [pegar resultado].
+Matriz Cliente-Canal (Modulo 5): [pegar resultado].
+Dashboard de Narrativa (Modulo 6): [pegar resultado].
+Parrilla Estrategica (Modulo 7): [pegar resultado].
+Dashboard de Auditoria de Redes (Modulo 7.5): [pegar resultado].
+Dashboard de Metricas (Modulo 7.8): [pegar resultado].
+Dashboard de Ecosistema (Modulo 8): [pegar resultado].
+Dashboard de Ventas y Experiencia (Modulo 9): [pegar resultado].
+Dashboard de Madurez de Medicion (Modulo 9.5): [pegar resultado].
+Dashboard de Inversion y Rentabilidad (Modulo 10): [pegar resultado].
+Diagnostico INITIUM radiografia (Modulo 10.8): [pegar resultado].`,
+    ha:"Lo que te falta: Un plan de marketing que responda a tu diagnóstico real, no a lo que crees que necesitas.\n\nPor qué es un hallazgo: La mayoría de los planes de marketing ignoran el diagnóstico y repiten las mismas tácticas que ya fallaron. Sin un plan que responda a las causas reales, el ciclo se repite.\n\nQué hacer en la vida real: Usa los resultados de todos tus módulos para construir un plan que resuelva el problema raíz, no los síntomas.",
+    fr:"el marketing que funciona no es el más creativo. Es el más claro. Tú logras esa claridad.",
+    qp:"Un negocio tiene diagnóstico completo y decide construir su plan. Su principal problema detectado es 'mensaje confuso en todos los canales'. ¿Cuál debe ser la Fase 1 de su plan estratégico?",
+    qo:["Lanzar pauta en todos los canales para generar reconocimiento mientras se corrige el mensaje", "Contratar una agencia de contenido para producir más piezas con el mismo mensaje", "Corregir la base antes de activar: definir narrativa, mensaje central y propuesta de valor clara antes de cualquier inversión en pauta o contenido", "Abrir nuevos canales donde la competencia sea menor"],
+    qc:2,
+    qe:"El plan estratégico INITIUM responde al diagnóstico. Si el problema raíz es mensaje confuso, la Fase 1 es siempre corrección de base: narrativa, mensaje, propuesta de valor. Pautar un mensaje confuso solo amplifica la confusión y desperdicia presupuesto. Primero construir, luego activar.",
+    ps:5
+  },
+  {
+    c:"11.5",
+    t:"Plan de Ejecución a 6 meses",
+    p:`Actua como estratega del modulo 11.5`,
+    f:`Mi Plan Estrategico de Marketing a un ano (Modulo 11): [pegar resultado].
+Mi nivel de problema es: [Nivel 1, 2 o 3 del Modulo 11].
+Recursos con los que cuento hoy:
+- Equipo interno: [describir o 'solo yo'].
+- Presupuesto mensual aproximado para marketing: [dato].
+- Herramientas actuales: [describir].
+- Tiempo propio disponible: [horas por semana].
+Lo que prefiero hacer yo mismo es: [describir].
+Lo que prefiero delegar o contratar es: [describir].`,
+    ha:"Lo que te falta: Traducir tu estrategia en tareas concretas con responsable, recurso y fecha.\n\nPor qué es un hallazgo: Una estrategia sin plan operativo es solo intención. La mayoría de los planes mueren entre el documento y la ejecución porque nadie sabe exactamente qué hacer, quién lo hace y cuándo.\n\nQué hacer en la vida real: Convierte cada iniciativa del plan en tareas verificables. Sin esto, el plan es papel.",
+    fr:"ya pasaste la mitad. Lo que falta es lo que más transforma.",
+    qp:"Un empresario tiene su plan de marketing aprobado, pero a las 3 semanas nada avanza. El equipo no sabe exactamente qué hacer primero. ¿Qué falta en el plan operativo?",
+    qo:["Más reuniones de seguimiento para que el equipo se alinee", "Tareas concretas con responsable nombrado, recurso asignado, fecha de entrega y métrica de cumplimiento: sin eso, el plan es intención, no ejecución", "Contratar más personas para que el trabajo se distribuya mejor", "Reducir el alcance del plan para que sea más fácil de ejecutar"],
+    qc:1,
+    qe:"El Plan Operativo INITIUM transforma la estrategia en tareas verificables: qué, quién, con qué recurso, para cuándo y cómo saber que se hizo bien. Sin esos elementos, el plan queda como documento. Con ellos, el plan se convierte en acción medible.",
+    ps:5
+  },
+  {
+    c:"12",
+    t:"Cierre e implementación",
+    p:`Actúa como asesor estratégico de implementación y seguimiento para mi Plan Estratégico INITIUM ONE LAB.
+
+Ya tengo mi Diagnóstico, mi Plan Estratégico de Marketing a un año y mi Plan Operativo de Ejecución a seis meses. Necesito que me ayudes a convertirlo en una ruta de implementación realista, priorizada y medible, y a saber cómo contratar y dirigir a quien lo ejecute.
+
+Problema real principal: [pegar resultado del Módulo 11]
+Nivel de problema: [Nivel 1 / Nivel 2 / Nivel 3]
+Línea de negocio prioritaria: [pegar resultado del Módulo 11]
+Cliente prioritario: [pegar resultado del Módulo 11]
+Canal prioritario: [pegar resultado del Módulo 11]
+Mensaje principal: [pegar resultado del Módulo 11]
+CTA principal: [pegar resultado del Módulo 11]
+Plan Estratégico a 6 meses por fases: [pegar resultado del Módulo 11]
+Plan Operativo de Ejecución: [pegar resultado del Módulo 11.5]
+Métricas por fase: [pegar resultado del Módulo 11]
+Recursos disponibles: [tiempo, equipo, presupuesto, herramientas, fotos, videos, web, WhatsApp, CRM, marketplace, ecommerce, etc.]
+Limitaciones actuales: [tiempo, presupuesto, falta de equipo, falta de datos, falta de fotos, falta de web, falta de medición, etc.]
+
+Necesito que me entregues un Cierre Estratégico INITIUM ONE LAB con:
+1. Resumen de mi diagnóstico final en 5 líneas.
+2. Mi prioridad número 1 para los próximos 7 días.
+3. Mis tres prioridades principales para los próximos 30 días.
+4. Qué debo pausar de inmediato.
+5. Qué debo ejecutar primero.
+6. Qué debo medir semanalmente.
+7. Qué recursos debo preparar antes de ejecutar.
+8. Qué errores debo evitar para no volver a improvisar.
+9. Qué señales indican que voy avanzando.
+10. Qué señales indican que debo ajustar.
+11. Qué señales indican que no debo invertir más todavía.
+12. Qué puedo implementar solo si mi problema es Nivel 1.
+13. Qué debería revisar con mirada estratégica si mi problema es Nivel 2.
+14. Qué requeriría acompañamiento profesional si mi problema es Nivel 3.
+15. Checklist de implementación de los primeros 7 días.
+16. Checklist de revisión al día 15.
+17. Checklist de evaluación al día 30.
+18. Qué perfiles o proveedores debería contratar según mi plan (agencia, freelance, community manager, pauta, diseño, web, audiovisual, vendedor u otro) y cuáles NO necesito todavía. Antes de listarlos, dime con honestidad qué NIVEL necesito según mi hallazgo principal: solo ejecución (manos para producir lo que ya tengo claro) o estrategia senior (alguien que ordene y dirija mi negocio porque mi problema es de fondo). Si mi problema es solo de ejecución, dímelo claro y no me sugieras consultoría: sería pagar de más. Si mi problema es estratégico o voy a tomar una decisión estructural como lanzar un producto, indícame que necesito un nivel senior de marketing y dirección. Caso especial: si estoy construyendo o reconstruyendo una marca desde cero, recuérdame que saber vender mi producto no es lo mismo que saber construir una marca, y recomiéndame claramente buscar acompañamiento senior en estrategia de marca para arrancar bien, aunque yo tenga experiencia en mi sector.
+19. Para cada perfil a contratar: qué debo pedirle exactamente, qué entregable debo exigir y qué métrica debe responder.
+20. Cómo dirigir y supervisar a ese proveedor sin ser experto: qué preguntar en cada reunión, qué revisar y qué reportes pedir.
+21. Señales de humo o mala ejecución de un proveedor: qué frases, promesas o entregables deben hacerme desconfiar.
+22. Qué NO debo aceptar pagar sin antes ver claridad de estrategia, mensaje o medición.
+23. Decisión recomendada después de la primera fase de 30 días.
+
+No inventes resultados. No prometas ventas garantizadas. No agregues acciones innecesarias. Prioriza foco, claridad, rentabilidad, medición y ejecución posible.`,
+    f:`Mi problema principal (del Modulo 11): [pegar resultado].
+Mi nivel de problema: [Nivel 1 / Nivel 2 / Nivel 3].
+Mi linea de negocio prioritaria: [pegar resultado del Modulo 11].
+Mi cliente prioritario: [pegar resultado del Modulo 11].
+Mi canal prioritario: [pegar resultado del Modulo 11].
+Mi mensaje principal y CTA: [pegar resultado del Modulo 11].
+Mi plan estrategico 6 meses por fases (Modulo 11): [pegar resultado].
+Mi plan operativo de ejecucion (Modulo 11.5): [pegar resultado].
+Mis metricas por fase (Modulo 11): [pegar resultado].
+Recursos disponibles: [tiempo, equipo, presupuesto, herramientas, fotos, videos, web, WhatsApp, CRM, marketplace, ecommerce, etc.].
+Limitaciones actuales: [tiempo, presupuesto, falta de equipo, falta de datos, falta de fotos, falta de web, falta de medicion, etc.].`,
+    ha:"Lo que te falta: Una ruta de implementación clara que te diga qué hacer primero, qué pausar y cómo dirigir a quien ejecute.\n\nPor qué es un hallazgo: Tener un plan es necesario. Saber cómo implementarlo sin improvisar es lo que marca la diferencia. Muchos dueños terminan el diagnóstico y vuelven a los mismos errores porque no saben dirigir la ejecución.\n\nQué hacer en la vida real: Define tu prioridad número 1 de los próximos 7 días. Empieza por ahí. Nada más.",
+    fr:"el diagnóstico que tienes aquí le tomó años a otros construir. Tú lo tienes ahora.",
+    qp:"Al terminar INITIUM ONE LAB, un alumno tiene diagnóstico y plan. Su nivel de problema es 3 (estructural). ¿Qué tipo de acompañamiento necesita para implementar?",
+    qo:["Solo necesita un community manager para manejar sus redes", "Puede implementar todo solo con las herramientas del curso", "Necesita acompañamiento estratégico senior: su problema es de fondo y requiere dirección experta, no solo ejecución", "Debe contratar una agencia de publicidad de inmediato"],
+    qc:2,
+    qe:"El Nivel 3 indica un problema estructural de negocio: oferta, posicionamiento, modelo de venta o rentabilidad. Ese nivel no se resuelve con más contenido o pauta. Requiere dirección estratégica senior que acompañe la implementación. El curso da el diagnóstico y el plan; el acompañamiento lo ejecuta con método.",
+    ps:5
+  },
+];
+
+
+const VC={"0": 1, "1": 2, "2": 1, "3": 2, "4": 1, "4.5": 1, "5": 2, "6": 1, "7": 2, "7.5": 1, "7.8": 1, "8": 1, "9": 2, "9.5": 1, "10": 2, "10.8": 1, "11": 3, "11.5": 1, "12": 1};
+var tipo=null,caso="",idea="",cur=0;
+var RES={},FV={},COMP={},RPRES={},QA={},VIDW={},SCORE=0,TOTAL=95;
+var NOM="",EMP="";
+var IMGS={},PDFS={};
+var W="https://dry-glitter-d037.movana3103.workers.dev";
+var supMsgs=[];
+
+function primerNombre(){return(NOM.split(" ")[0])||NOM;}
+
+// SISTEMA DE NAVEGACIÓN LIMPIO - sin mezcla de estilos inline y clases
+var PAGES=["pg-bv","pg-idea","pg-app","pg-cert"];
+function show(id){
+  PAGES.forEach(function(p){
+    var e=document.getElementById(p);
+    if(e) e.classList.remove("on");
+  });
+  var t=document.getElementById(id);
+  if(t) t.classList.add("on");
+}
+
+function saveState(){
+  try{localStorage.setItem("initium_v9",JSON.stringify({
+    tipo,caso,idea,cur,RES,FV,COMP,RPRES,QA,VIDW,SCORE,NOM,EMP
+  }));}catch(e){}
+}
+function loadState(){
+  try{
+    var s=localStorage.getItem("initium_v9");
+    if(!s)return false;
+    var d=JSON.parse(s);
+    tipo=d.tipo||null;caso=d.caso||"";idea=d.idea||"";
+    cur=d.cur||0;RES=d.RES||{};FV=d.FV||{};COMP=d.COMP||{};
+    RPRES=d.RPRES||{};QA=d.QA||{};VIDW=d.VIDW||{};SCORE=d.SCORE||0;
+    NOM=d.NOM||"";EMP=d.EMP||"";
+    return !!(tipo&&NOM);
+  }catch(e){return false;}
+}
+
+function parseMarkdown(txt){
+  if(!txt)return "";
+  var h=txt.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/^#### (.+)$/gm,"<h4>$1</h4>").replace(/^### (.+)$/gm,"<h3>$1</h3>")
+    .replace(/^## (.+)$/gm,"<h2>$1</h2>").replace(/^# (.+)$/gm,"<h1>$1</h1>")
+    .replace(/\*\*\*(.+?)\*\*\*/g,"<strong><em>$1</em></strong>")
+    .replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>")
+    .replace(/^---+$/gm,"<hr>").replace(/^&gt; (.+)$/gm,"<blockquote>$1</blockquote>")
+    .replace(/^- (.+)$/gm,"<li>$1</li>").replace(/^[0-9]+\. (.+)$/gm,"<li>$1</li>")
+    .replace(/(<li>.*<\/li>\n?)+/g,function(m){return "<ul>"+m+"</ul>";})
+    .replace(/\n\n/g,"</p><p>").replace(/\n/g,"<br>");
+  return "<p>"+h+"</p>";
+}
+
+async function callAPI(messages,maxTokens){
+  maxTokens=maxTokens||2500;
+  var r=await fetch(W,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:maxTokens,messages:messages})
+  });
+  var dd=await r.json();
+  if(!r.ok||dd.error){
+    var msg=dd.error&&dd.error.message?dd.error.message:"Error "+r.status;
+    throw new Error(msg);
+  }
+  var tx=(dd.content||[]).find(function(b){return b.type==="text";});
+  return tx?tx.text:"Sin respuesta.";
+}
+
+window.addEventListener("load",function(){
+  if(loadState()){
+    document.getElementById("ab").textContent=primerNombre()+(EMP?" · "+EMP:"");
+    document.getElementById("modo-lbl").textContent={marcha:"Negocio en marcha",lanzamiento:"Producto en lanzamiento",cero:"Marca desde cero"}[tipo]||"-";
+    // Solo ir directo al app si el alumno ya estaba trabajando (tiene módulos o resultados)
+    var tieneAvance=Object.keys(COMP).length>0||Object.keys(RES).length>0||Object.keys(QA).length>0;
+    if(tieneAvance){
+      show("pg-app");renderNav();renderMod(cur);
+    } else {
+      // Primera vez con datos guardados: mostrar bienvenida para confirmar perfil
+      show("pg-bv");
+    }
+  } else {
+    show("pg-bv");
+  }
+});
+
+// PASO 2+3: NOMBRE, EMPRESA Y TIPO DE PROYECTO (en la misma pantalla)
+function selCard(c){
+  document.querySelectorAll(".card").forEach(function(x){x.classList.remove("sel");});
+  c.classList.add("sel");
+  tipo=c.dataset.t;
+  document.getElementById("bv-err").style.display="none";
+}
+
+function continuar(){
+  var n=document.getElementById("inp-nom").value.trim();
+  var em=document.getElementById("inp-emp").value.trim();
+  if(!n){document.getElementById("bv-err").style.display="block";return;}
+  if(!tipo){document.getElementById("bv-err").textContent="Selecciona con qué trabajarás.";document.getElementById("bv-err").style.display="block";return;}
+  NOM=n;EMP=em;
+  document.getElementById("bv-err").style.display="none";
+  if(tipo==="cero"){show("pg-idea");}else{startApp();}
+}
+
+function goBackToEntry(){show("pg-bv");}
+
+// PASO 4 (solo "cero"): IDEA
+async function buildCase(){
+  var t=document.getElementById("idea-txt").value.trim();
+  if(!t){document.getElementById("idea-err").style.display="block";return;}
+  idea=t;
+  var btn=document.getElementById("btn-idea");
+  btn.disabled=true;btn.textContent="Construyendo con Método INITIUM...";
+  document.getElementById("idea-err").style.display="none";
+  try{
+    var resp=await callAPI([{role:"user",content:"Eres consultor de negocios para INITIUM ONE LAB. Construye un CASO DE NEGOCIO DE TRABAJO realista para el alumno "+NOM+(EMP?" de "+EMP:"")+".\n\nIdea: "+t+"\n\nFormato:\nNOMBRE DEL NEGOCIO: [...]\nDESCRIPCION: [2-3 lineas]\nPRODUCTO O SERVICIO Y PRECIO: [...]\nCLIENTE IDEAL: [...]\nMODELO DE VENTA: [...]\nCIUDAD: [...]\nTICKET PROMEDIO: [...]\nVENTAS MENSUALES ESTIMADAS: [...]\nCANALES: [...]\nCOSTOS: [...]\nMARGEN: [...]\nPRINCIPAL RETO: [...]\n\nSe especifico y realista para el mercado latinoamericano."}],2000);
+    caso=resp;startApp();
+  }catch(e){
+    btn.disabled=false;btn.textContent="Ingresar al Método INITIUM";
+    alert("Error: "+e.message);
+  }
+}
+
+function startApp(){
+  document.getElementById("ab").textContent=primerNombre()+(EMP?" · "+EMP:"");
+  var lb={marcha:"Negocio en marcha",lanzamiento:"Producto en lanzamiento",cero:"Marca desde cero"};
+  document.getElementById("modo-lbl").textContent=lb[tipo];
+  saveState();show("pg-app");renderNav();renderMod(0);
+}
+
+function renderNav(){
+  var done=Object.keys(COMP).filter(function(k){return COMP[k];}).length;
+  var pct=Math.round(done/19*100);
+  document.getElementById("prog-n").textContent=done+" ("+pct+"%)";
+  document.getElementById("prog-f").style.width=pct+"%";
+  document.getElementById("sc-lbl").textContent="Puntaje: "+SCORE+" / "+TOTAL+" pts";
+  var nav=document.getElementById("nav-list");nav.innerHTML="";
+  M.forEach(function(m,i){
+    var ok=COMP[i],act=i===cur;
+    var b=document.createElement("button");
+    b.className="nb"+(act?" act":"")+(ok?" dn":"");
+    b.innerHTML="<span class='bdg'>"+(ok?"&#10003;":m.c)+"</span><span>"+m.t+"</span>";
+    b.onclick=function(){cur=i;renderNav();renderMod(i);saveState();};
+    nav.appendChild(b);
+  });
+  saveState();
+}
+
+function watchVid(mi,vi){if(!VIDW[mi])VIDW[mi]=0;if(vi===VIDW[mi])VIDW[mi]++;saveState();renderMod(mi);}
+function markAllWatched(mi){VIDW[mi]=VC[M[mi].c]||1;saveState();renderMod(mi);}
+
+function addImage(i){
+  var inp=document.createElement("input");inp.type="file";inp.accept="image/*";
+  inp.onchange=function(){
+    var f=inp.files[0];if(!f)return;
+    if(!IMGS[i])IMGS[i]=[];
+    if(IMGS[i].length>=3){alert("Máximo 3 imágenes por módulo.");return;}
+    var r=new FileReader();
+    r.onload=function(e){IMGS[i].push({name:f.name,data:e.target.result,type:f.type});renderImgP(i);};
+    r.readAsDataURL(f);
+  };inp.click();
+}
+function removeImg(i,idx){if(IMGS[i])IMGS[i].splice(idx,1);renderImgP(i);}
+function renderImgP(i){
+  var c=document.getElementById("ip-"+i);if(!c)return;
+  c.innerHTML=(IMGS[i]||[]).map(function(img,idx){
+    return "<div class='att-preview'><img src='"+img.data+"'/><button class='att-del' onclick='removeImg("+i+","+idx+")'>&#10005;</button></div>";
+  }).join("");
+}
+function addPDF(i){
+  var inp=document.createElement("input");inp.type="file";inp.accept=".pdf,.doc,.docx";
+  inp.onchange=function(){
+    var f=inp.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(e){PDFS[i]={name:f.name,data:e.target.result,type:f.type};renderPDFP(i);};
+    r.readAsDataURL(f);
+  };inp.click();
+}
+function removePDF(i){delete PDFS[i];renderPDFP(i);}
+function renderPDFP(i){
+  var c=document.getElementById("pp-"+i);if(!c)return;
+  var p=PDFS[i];
+  c.innerHTML=p?"<div class='att-file'>&#128196; "+p.name+"<button onclick='removePDF("+i+")'>&#10005;</button></div>":"";
+}
+
+function renderMod(i){
+  var m=M[i];cur=i;
+  var lbTxt={marcha:"Negocio en marcha",lanzamiento:"Producto en lanzamiento",cero:"Marca desde cero"}[tipo];
+  var nv=VC[m.c]||1,vw=VIDW[i]||0,allW=(vw>=nv);
+  var pills="";
+  for(var v=0;v<nv;v++){
+    var dv=(vw>v);
+    pills+="<div class='vp-pill"+(dv?" w":"")+"' onclick='watchVid("+i+","+v+")'>"+"Clase "+(v+1)+(dv?" &#10003;":"")+"</div>";
+  }
+  var videoH="<div class='vp'><span class='vp-icon'>&#9654;</span>"
+    +"<div class='vp-title'>Módulo "+m.c+" INITIUM ONE LAB — Clases</div>"
+    +"<div class='vp-desc'>"+(nv===1?"Ve la clase antes de continuar.":"Ve las "+nv+" clases antes de continuar.")+"</div>"
+    +"<div class='vp-pills'>"+pills+"</div>"
+    +"<button class='btn-vw"+(allW?" done":"")+"' onclick='markAllWatched("+i+")'>"
+    +(allW?"&#10003; Clases vistas — Práctica desbloqueada":"He visto "+(nv===1?"la clase":"todas las clases"))
+    +"</button></div>";
+  var ht=tipo==="cero"?"Copia los campos, completa con tu caso y pega aquí.":tipo==="lanzamiento"?"Incluye datos de tu negocio base y del nuevo producto.":"Copia los campos con los datos de tu negocio y pega aquí.";
+  var casoH="";
+  if(i===0&&tipo==="cero"&&caso){
+    casoH="<div style='background:#FDFAF5;border:1px solid #E8E2D8;border-left:3px solid #D3BC8D;border-radius:3px;padding:14px 16px;margin-bottom:12px'>"
+      +"<div style='font-size:9px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px'>Tu caso — Método INITIUM</div>"
+      +"<div style='font-size:12px;line-height:1.75;white-space:pre-wrap;color:#111111'>"+caso+"</div></div>";
+  }
+  var fH="";if(m.f&&m.f.trim())fH="<div class='mc'><span class='fl'>Datos que necesitas completar</span><div class='fb'>"+m.f.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</div></div>";
+  var resH=RES[i]?"<div class='res-block'><div class='rl'>Análisis Método INITIUM — "+RES[i].f+"</div><div class='md-content'>"+parseMarkdown(RES[i].t)+"</div></div>":"";
+  var attH="<div class='attach-area'><span class='attach-title'>Adjuntos opcionales (logos, capturas de redes, documentos)</span>"
+    +"<div class='attach-row'><button class='attach-btn' onclick='addImage("+i+")'>+ Imágenes (máx. 3)</button>"
+    +"<button class='attach-btn' onclick='addPDF("+i+")'>+ Documento (1)</button>"
+    +"</div>"
+    +"<div class='attach-previews' id='ip-"+i+"'></div><div id='pp-"+i+"'></div></div>";
+  // Módulo 0 especial: sin campos de datos, solo pasos a seguir
+  var esM0=(i===0);
+
+  // PASOS — siempre visibles arriba, distintos para M0 y el resto
+  var pasosH="";
+  if(esM0){
+    pasosH="<div class='mc' style='background:#F7F4EE;border-left:3px solid #D3BC8D;margin-bottom:12px'>"
+      +"<label>Pasos para completar este módulo</label>"
+      +"<ol style='padding-left:18px;font-size:12px;color:#5F5957;line-height:2.1'>"
+      +"<li>Ve la clase de bienvenida y márcala como vista</li>"
+      +"<li>Responde la evaluación del módulo en el panel derecho</li>"
+      +"<li>Cuando termines, da clic en <strong>Marcar como completado</strong> y luego en <strong>Continuar al Módulo 1</strong></li>"
+      +"</ol></div>";
+  }else{
+    pasosH="<div class='mc' style='background:#F7F4EE;border-left:3px solid #D3BC8D;margin-bottom:12px'>"
+      +"<label>Pasos para completar este módulo</label>"
+      +"<ol style='padding-left:18px;font-size:12px;color:#5F5957;line-height:2.1'>"
+      +"<li>Ve las clases del módulo y márcalas como vistas</li>"
+      +"<li>Responde la evaluación del módulo en el panel derecho</li>"
+      +"<li>Completa los datos en el campo de texto y da clic en <strong>Generar análisis con Método INITIUM</strong></li>"
+      +"<li>Copia el resultado y pégalo en el panel derecho para activar tu semáforo y hallazgo</li>"
+      +"<li>Da clic en <strong>Marcar como completado</strong> y luego en <strong>Continuar al siguiente módulo</strong></li>"
+      +"</ol></div>";
+  }
+
+  var pracH="";
+  if(!allW){
+    pracH=pasosH+"<div class='locked'><p>&#128274; <strong>Ve la clase primero.</strong><br>La práctica se desbloquea cuando marques la clase como vista.</p></div>";
+  }else if(esM0){
+    pracH=pasosH+casoH+resH;
+  }else{
+    pracH=pasosH+casoH+fH+attH+"<div class='mc'><label>Escribe aquí tus datos</label><div class='mh'>"+ht+"</div>"
+      +"<textarea class='dt' id='df' placeholder='Pega aquí los campos completados...'>"+(FV[i]||"")+"</textarea>"
+      +"<button class='gb' id='gb' onclick='gen("+i+")'>Generar análisis con Método INITIUM</button>"
+      +"<div class='em' id='em'></div></div>"+resH;
+  }
+  document.getElementById("col-mid").innerHTML=
+    "<div class='ey'>Módulo "+m.c+" · INITIUM ONE LAB</div><div class='mt'>"+m.t+"</div>"
+    +"<div class='mbdg'>"+lbTxt+"</div>"+videoH+pracH;
+  if(allW&&document.getElementById("df")){
+    document.getElementById("df").addEventListener("input",function(){FV[i]=this.value;saveState();});
+  }
+  setTimeout(function(){renderImgP(i);renderPDFP(i);},50);
+  renderRight(i);
+}
+
+function detectSem(t){
+  if(!t||t.length<20)return null;
+  var tl=t.toLowerCase();
+  var r=["crítico","nivel 3","enfermo","sin margen","sin datos","sin canal","problema estructural"].filter(function(w){return tl.indexOf(w)>-1;}).length;
+  var a=["nivel 2","revisar","atención","pendiente","falta claridad","en riesgo"].filter(function(w){return tl.indexOf(w)>-1;}).length;
+  if(r>=2)return "r";if(a>=2||r>=1)return "a";return "v";
+}
+function detectNiv(t){
+  if(!t)return null;
+  var tl=t.toLowerCase();
+  if(tl.indexOf("nivel 3")>-1)return "3";
+  if(tl.indexOf("nivel 2")>-1)return "2";
+  if(tl.indexOf("nivel 1")>-1)return "1";
+  return null;
+}
+function semH(s){
+  if(!s)return "<div class='slocked'>Pega tu resultado para activar el semáforo</div>";
+  var d={v:["sv","sdv","Verde — En control"],a:["sa","sda","Amarillo — Requiere atención"],r:["sr","sdr","Rojo — Corregir ya"]}[s];
+  return "<div class='"+d[0]+"'><span class='sdot "+d[1]+"'></span>"+d[2]+"</div>";
+}
+function nivH(n){
+  if(!n)return "<div style='font-size:10px;color:#9C9281'>Se detecta al pegar tu resultado</div>";
+  var d={1:["nv","Nivel 1 — Desorden de ejecución"],2:["na","Nivel 2 — Problema de estrategia"],3:["nr","Nivel 3 — Problema estructural"]}[n];
+  return "<span class='"+d[0]+"'>"+d[1]+"</span>";
+}
+
+function renderRight(i){
+  var m=M[i];
+  var hasRes=RPRES[i]&&RPRES[i].trim().length>20;
+  var allW=(VIDW[i]||0)>=(VC[m.c]||1);
+  var answered=QA[i]!==undefined,comp=COMP[i]||false;
+  var sem=hasRes?detectSem(RPRES[i]):null,niv=hasRes?detectNiv(RPRES[i]):null;
+  var qH="";
+  if(answered){
+    var ok=QA[i]===m.qc;
+    qH="<div class='qq'>"+m.qp+"</div>";
+    m.qo.forEach(function(opt,idx){
+      var cls="qo disabled"+(idx===m.qc?" correct":(idx===QA[i]&&!ok?" wrong":""));
+      qH+="<div class='"+cls+"'>"+String.fromCharCode(65+idx)+". "+opt+"</div>";
+    });
+    qH+="<div class='qexp show "+(ok?"ok":"fail")+"'>"+(ok?"&#10003; Correcto (+"+m.ps+" pts): ":"&#10007; Incorrecto (0 pts): ")+m.qe+"</div>";
+  }else if(!allW){
+    qH="<div class='hlocked'>&#128274; Ve las clases para desbloquear la evaluación.</div>";
+  }else{
+    qH="<div class='qq'>"+m.qp+"</div>";
+    m.qo.forEach(function(opt,idx){
+      qH+="<button class='qo' onclick='answerQuiz("+i+","+idx+")'>"
+        +String.fromCharCode(65+idx)+". "+opt+"</button>";
+    });
+    qH+="<div style='font-size:10px;color:#9C9281;margin-top:4px'>No puede repetirse una vez respondida.</div>";
+  }
+  document.getElementById("cr-inner").innerHTML=
+    "<div class='rps'><span class='rpl'>Tu momento</span><div class='frase'>Hola "+primerNombre()+"! "+m.fr+"</div></div>"
+    +(m.ha?"<div class='rps'><span class='rpl'>Hallazgo del módulo</span>"+(hasRes?"<div class='hunlocked show'>"+m.ha+"</div>":"<div class='hlocked'>&#128274; Pega tu resultado para desbloquear</div>")+"</div>":"")
+    +"<div class='rps'><span class='rpl'>Semáforo</span>"+semH(sem)+"</div>"
+    +"<div class='rps'><span class='rpl'>Nivel de problema</span>"+nivH(niv)+"</div>"
+    +"<div class='rps'><span class='rpl'>Pega tu resultado aquí</span>"
+    +"<textarea class='rta' id='rp-txt' placeholder='Pega el resultado del análisis. Activa hallazgo, semáforo y nivel.' onchange='onResChange("+i+")' oninput='onResChange("+i+")'>"+(RPRES[i]||"")+"</textarea></div>"
+    +"<div class='rps'><span class='rpl'>Evaluación<span class='pts'>"+m.ps+" pts</span></span>"+qH+"</div>"
+    +"<div style='display:flex;flex-direction:column;gap:7px;padding:0 0 16px 0'>"
+    +(!answered&&!comp?"<div class='wmsg show'>&#9888; Responde la evaluación para que tu puntaje cuente.</div>":"")
+    +"<button class='bc"+(comp?" done":"")+"' onclick='marcarComp("+i+")'>"+(comp?"&#10003; "+primerNombre()+" ha completado este módulo":"Marcar como completado")+"</button>"
+    +"<button class='bsig"+(comp?" show":"")+"' onclick='goNext("+i+")'>"+(i<18?"Continuar al Módulo "+M[i+1].c+" INITIUM ONE LAB &#8594;":"Ver mi certificado INITIUM &#8594;")+"</button>"
+    +(comp?"<div class='mmsg'>&#127775; "+primerNombre()+" va muy bien. ¡Sigue con el Método INITIUM!</div>":"")+"</div>";
+}
+
+function onResChange(i){var t=document.getElementById("rp-txt");if(t){RPRES[i]=t.value;saveState();}if(RPRES[i]&&RPRES[i].trim().length>20)renderRight(i);}
+function answerQuiz(i,c){if(QA[i]!==undefined)return;QA[i]=c;if(c===M[i].qc)SCORE+=M[i].ps;renderNav();renderRight(i);saveState();}
+function marcarComp(i){var t=document.getElementById("rp-txt");if(t&&t.value)RPRES[i]=t.value;COMP[i]=true;renderNav();renderRight(i);saveState();}
+function goNext(i){if(i<18){cur=i+1;renderNav();renderMod(i+1);saveState();}else{showCert();}}
+
+function showCert(){
+  var pct=Math.round(SCORE/TOTAL*100),ok=SCORE>=76;
+  document.getElementById("pg-cert").innerHTML="<div class='cb'>"
+    +"<div style='font-size:10px;color:#444;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px'>INITIUM ONE LAB &middot; Nat Moreno &amp; Co. &middot; 2026</div>"
+    +(ok?"<div style='font-size:20px;font-weight:800;color:#D3BC8D;margin-bottom:8px'>&#127942; Certificado INITIUM ONE LAB</div>":"<div style='font-size:20px;font-weight:800;color:#D3BC8D;margin-bottom:8px'>&#128203; Resultado</div>")
+    +"<div style='font-size:16px;color:#F7F4EE;margin-bottom:18px'>"+NOM+(EMP?" &middot; "+EMP:"")+"</div>"
+    +"<div style='font-size:52px;font-weight:800;color:"+(ok?"#D3BC8D":"#A8453A")+";line-height:1;margin:16px 0 4px;letter-spacing:-2px'>"+SCORE+" / "+TOTAL+"</div>"
+    +"<div style='font-size:13px;font-weight:700;color:"+(ok?"#D3BC8D":"#A8453A")+";margin-bottom:16px'>"+pct+"% — "+(ok?"Aprobado":"Mínimo requerido: 80%")+"</div>"
+    +(ok?"<p>Completaste el diagnóstico real de tu negocio y construiste tu plan estratégico con el Método INITIUM.</p>"
+        :"<p>Revisa los módulos con evaluación incorrecta y solicita tu segunda oportunidad a Nat Moreno &amp; Co.</p>")
+    +"<button class='cbtn' onclick='show(\"pg-app\")'>Volver al Dashboard</button></div>";
+  show("pg-cert");
+}
+
+async function gen(i){
+  var btn=document.getElementById("gb");
+  btn.disabled=true;btn.textContent="Analizando con Método INITIUM...";
+  document.getElementById("em").textContent="";
+  var m=M[i],dfEl=document.getElementById("df"),d=dfEl?dfEl.value:"";
+  var ctx="";
+  var modoLbl={marcha:"Negocio en marcha",lanzamiento:"Producto en lanzamiento",cero:"Marca desde cero"}[tipo]||tipo;
+  var ctxBase="Alumno: "+NOM+(EMP?". Empresa/Proyecto: "+EMP:"")+" | Modo: "+modoLbl;
+
+  // Instrucción de formato universal para todos los módulos
+  var instrFormato="\n\nINSTRUCCIÓN DE FORMATO CRÍTICA: Responde de forma concisa y estratégica. Máximo 600 palabras. "
+    +"Usa solo los puntos más importantes del dashboard solicitado. "
+    +"Sé específico con el negocio del alumno: nombra sus productos, canales y situación real — nunca respondas de forma genérica. "
+    +"En el HALLAZGO: si el área está bien, dilo claramente ('Esta área está en orden, continúa al siguiente módulo'). "
+    +"Si hay un problema, nómbralo con precisión (ej: 'Tu canal principal Instagram no está generando conversión porque...'). "
+    +"Nunca uses frases vacías como 'debes revisar tus canales' sin decir cuál canal y por qué. "
+    +"El análisis de este módulo debe dejar al alumno con la información exacta que necesita para completar el siguiente módulo.";
+
+  if(i===0){
+    var infoDisp=caso?"Caso de negocio INITIUM construido:\n"+caso+"\nIdea original del alumno: "+idea:"Información disponible: "+ctxBase;
+    ctx="CONTEXTO PARA DASHBOARD INICIAL:\n"+ctxBase+"\n\n"+infoDisp+"\n\nINSTRUCCION CRITICA: NO solicites más datos. Genera TODOS los 9 puntos del Dashboard Inicial INITIUM. Usa [PENDIENTE] para datos faltantes.\n\n";
+  }else if(tipo==="cero"&&caso){
+    ctx="CONTEXTO: "+ctxBase+"\nCaso INITIUM:\n"+caso+"\nIdea: "+idea+"\nAnaliza como negocio real. Recuérdale al final que con su negocio real debe volver a este módulo.\n\n";
+  }else if(tipo==="lanzamiento"){
+    ctx="CONTEXTO: "+ctxBase+"\nConsidera la bifurcación entre lo establecido y lo que está en lanzamiento.\n\n";
+  }else{
+    ctx="CONTEXTO: "+ctxBase+"\n\n";
+  }
+  var dFinal=(i===0)?"":d;
+  var textPart=m.p+instrFormato+"\n\n---\n\n"+ctx+(dFinal?"DATOS DEL ALUMNO:\n"+dFinal:"");
+  var content=[];
+  (IMGS[i]||[]).forEach(function(img){
+    var b64=img.data.split(",")[1];
+    content.push({type:"image",source:{type:"base64",media_type:img.type||"image/jpeg",data:b64}});
+  });
+  var pdf=PDFS[i];
+  if(pdf&&pdf.data)content.push({type:"document",source:{type:"base64",media_type:"application/pdf",data:pdf.data.split(",")[1]}});
+  content.push({type:"text",text:textPart});
+  try{
+    var tx=await callAPI([{role:"user",content:content}],2500);
+    RES[i]={t:tx,f:new Date().toLocaleString()};saveState();renderNav();renderMod(i);
+  }catch(e){
+    document.getElementById("em").textContent="Error: "+e.message;
+    btn.disabled=false;btn.textContent="Generar análisis con Método INITIUM";
+  }
+}
+
+// CHAT SOPORTE
+var FAQ=[
+  {q:["no puedo continuar","no avanza","bloqueado","no pasa"],a:"Para continuar necesitas marcar las clases como vistas. Busca el botón 'He visto la clase' en el área de video de cada módulo."},
+  {q:["perdí","se fue","desapareció","avance"],a:"Tu progreso se guarda en este navegador. Si lo perdiste, puede ser que hayas borrado el historial o estés en otro navegador o dispositivo."},
+  {q:["error","failed","no conecta","fetch","no funciona"],a:"Puede ser un problema temporal de conexión. Intenta de nuevo en unos segundos. Si persiste, contacta a soporte en natmorenoandco.com."},
+  {q:["semáforo","hallazgo","nivel","no aparece"],a:"El semáforo, hallazgo y nivel se activan pegando el resultado del análisis en el panel derecho ('Pega tu resultado aquí')."},
+  {q:["certificado","graduarme","aprobar"],a:"Necesitas completar los 19 módulos y obtener mínimo 76 de 95 puntos (80%). Cada evaluación vale 5 puntos."},
+  {q:["video","clase"],a:"Los videos se habilitarán próximamente. Por ahora marca las clases como vistas para desbloquear la práctica."},
+  {q:["pdf","imagen","adjuntar","foto"],a:"Puedes adjuntar hasta 3 imágenes y 1 documento por módulo. Busca el área de adjuntos antes del campo de texto principal."},
+];
+function toggleSupport(){
+  var p=document.getElementById("sup-panel");
+  p.classList.toggle("open");
+  if(p.classList.contains("open")&&supMsgs.length===0){
+    addSupMsg("bot","Hola "+primerNombre()+"! Soy el asistente de soporte de INITIUM ONE LAB. ¿En qué puedo ayudarte?");
+  }
+}
+function addSupMsg(who,txt){supMsgs.push({who,txt});renderSupMsgs();}
+function renderSupMsgs(){
+  var c=document.getElementById("sup-msgs");if(!c)return;
+  c.innerHTML=supMsgs.map(function(m){
+    return "<div class='sup-msg-"+(m.who==="user"?"user":"bot")+"'>"+m.txt+"</div>";
+  }).join("");
+  c.scrollTop=c.scrollHeight;
+}
+async function sendSupport(){
+  var inp=document.getElementById("sup-input");
+  var q=inp.value.trim();if(!q)return;
+  inp.value="";addSupMsg("user",q);
+  var ql=q.toLowerCase(),found=null;
+  for(var i=0;i<FAQ.length;i++){
+    if(FAQ[i].q.some(function(kw){return ql.indexOf(kw)>-1;})){found=FAQ[i].a;break;}
+  }
+  if(found){setTimeout(function(){addSupMsg("bot",found);},400);}
+  else{
+    addSupMsg("bot","Un momento...");
+    try{
+      var resp=await callAPI([{role:"user",content:"Eres el asistente de soporte de INITIUM ONE LAB de Nat Moreno & Co. Responde brevemente (máx 2 oraciones) esta pregunta del alumno "+primerNombre()+": "+q}],300);
+      supMsgs[supMsgs.length-1].txt=resp;renderSupMsgs();
+    }catch(e){supMsgs[supMsgs.length-1].txt="Contacta a soporte en natmorenoandco.com";renderSupMsgs();}
+  }
+}
+document.addEventListener("keydown",function(e){
+  var inp=document.getElementById("sup-input");
+  if(inp&&document.activeElement===inp&&e.key==="Enter")sendSupport();
+});
+
+</script>
+</body>
+</html>
