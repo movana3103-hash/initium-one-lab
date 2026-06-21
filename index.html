@@ -100,7 +100,7 @@ textarea.itxt:focus{outline:none;border-color:#D3BC8D;background:#fff}
 .cl-nav{flex:1;overflow-y:auto;padding:4px 12px}
 nav{display:flex;flex-direction:column;gap:1px}
 .nb{text-align:left;padding:6px 8px;border-radius:2px;border:none;cursor:pointer;font-size:10px;line-height:1.3;display:flex;align-items:flex-start;gap:6px;color:#555;background:transparent;width:100%;transition:all .15s;font-family:inherit}
-.nb:hover{background:#1A1A1A;color:#C9BFA8}.nb.act{background:#D3BC8D;color:#111111;font-weight:700}.nb.dn{color:#888}
+.nb:hover:not(.nb-locked){background:#1A1A1A;color:#C9BFA8}.nb.act{background:#D3BC8D;color:#111111;font-weight:700}.nb.dn{color:#888}.nb-locked{opacity:.35;cursor:not-allowed!important}.nb-locked:hover{background:transparent!important}
 .nb.dn .bdg{background:#3F7D5B;color:#fff}
 .bdg{width:14px;height:14px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;flex-shrink:0;margin-top:1px;color:#555}
 .nb.act .bdg{background:#111111;color:#D3BC8D}
@@ -1547,10 +1547,21 @@ function renderNav(){
   var nav=document.getElementById("nav-list");nav.innerHTML="";
   M.forEach(function(m,i){
     var ok=COMP[i],act=i===cur;
+    // Módulo desbloqueado si es el primero, ya está completado, es el actual, o el anterior está completado
+    var unlocked=(i===0||COMP[i-1]||ok||act);
     var b=document.createElement("button");
-    b.className="nb"+(act?" act":"")+(ok?" dn":"");
-    b.innerHTML="<span class='bdg'>"+(ok?"&#10003;":m.c)+"</span><span>"+m.t+"</span>";
-    b.onclick=function(){cur=i;renderNav();renderMod(i);saveState();};
+    b.className="nb"+(act?" act":"")+(ok?" dn":"")+(unlocked?"":" nb-locked");
+    b.innerHTML="<span class='bdg'>"+(ok?"&#10003;":(unlocked?m.c:"&#128274;"))+"</span><span>"+m.t+"</span>";
+    if(unlocked){
+      b.onclick=function(){cur=i;renderNav();renderMod(i);saveState();};
+    } else {
+      b.onclick=function(){
+        var prevMod=M[i-1];
+        alert("Para acceder al Módulo "+m.c+", primero debes completar el Módulo "+prevMod.c+".
+
+Marca el módulo anterior como completado para continuar.");
+      };
+    }
     nav.appendChild(b);
   });
   saveState();
@@ -1768,7 +1779,7 @@ var MOTI_MSGS=[
   "Tienes la radiografía real de tu negocio. Con esto ya puedes decidir con claridad.",
   "Tienes tu Plan Estratégico. Este documento es tu guía para los próximos 12 meses.",
   "Ya tienes el plan táctico. Ahora sabes qué hacer, quién lo hace y cómo medirlo.",
-  "Lo lograste. Tienes diagnóstico, estrategia y plan. Muy pocos llegan hasta aquí — tú sí."
+  "Lo lograste. El marketing ya no es un gasto a ciegas — es la piedra angular de tu negocio. Tienes diagnóstico, estrategia y plan. Ahora diriges tu marketing con claridad."
 ];
 function getMotiMsg(i){
   return (MOTI_MSGS[i]||"Sigue adelante. Cada módulo completado es una decisión que ya no tomarás a ciegas.");
@@ -1853,9 +1864,13 @@ function renderRight(i){
     +"<div style='display:flex;flex-direction:column;gap:7px;padding:0 0 16px 0'>"
     +(!answered&&!comp?"<div class='wmsg show'>&#9888; Responde la evaluación para que tu puntaje cuente.</div>":"")
     +"<button class='bc"+(comp?" done":"")+"' onclick='marcarComp("+i+")'>"+(comp?"&#10003; "+primerNombre()+" ha completado este módulo":"Marcar como completado")+"</button>"
-    +"<button class='bsig"+(comp?" show":"")+"' onclick='goNext("+i+")'>"+(i<18?"Continuar al Módulo "+M[i+1].c+" INITIUM ONE LAB &#8594;":"Ver mi certificado INITIUM &#8594;")+"</button>"
+    +(i<18
+      ?"<button class='bsig"+(comp?" show":"")+"' onclick='goNext("+i+")'>Continuar al Módulo "+M[Math.min(i+1,18)].c+" INITIUM ONE LAB &#8594;</button>"
+      :"")
     +(comp?"<div class='mmsg' style='background:#111111;color:#F7F4EE;border-left:3px solid #D3BC8D;padding:12px 14px;font-size:12px;font-weight:700;border-radius:4px'>&#127775; "+getMotiMsg(i)+"</div>":"")
-    +(comp&&(m.c==="11"||m.c==="11.5"||m.c==="12")?"<button class='pdf-btn' style='margin-top:10px;width:100%;border-radius:3px;padding:13px;font-size:12px;letter-spacing:.5px' onclick='generatePlan()'>&#11015; Descargar mi Plan Estratégico INITIUM</button>":"")
+    +(i===18&&comp
+      ?"<button class='bsig show' style='margin-top:8px' onclick='showCert()'>&#127942; Ver mi Certificado y Plan Completo INITIUM &#8594;</button>"
+      :"")
     +"</div>"
     +"<div style='text-align:center;padding:12px 0 4px;font-size:9px;color:#9C9281;border-top:1px solid #E8E2D8;margin-top:8px'>© Nat Moreno &amp; Co. 2026 · INITIUM ONE LAB · Todos los derechos reservados</div>";
 }
