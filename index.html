@@ -281,8 +281,6 @@ nav{display:flex;flex-direction:column;gap:1px}
 .pdf-btn.sec{background:#111111;color:#D3BC8D;border:1px solid #333}
 .pdf-btn:hover{opacity:.9}
 </style>
-<!-- SheetJS para generar Excel en navegador -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -2236,10 +2234,17 @@ function closeCert(){
 //  PARRILLA DE CONTENIDO — genera via IA + descarga como .xlsx
 // ===================================================================
 async function generateParrilla(){
-  // Verificar que SheetJS está disponible
+  // Cargar SheetJS dinámicamente si no está disponible
   if(typeof XLSX === "undefined"){
-    alert("Error: la librería de Excel no está disponible. Verifica tu conexión a internet.");
-    return;
+    showXlsxOverlay("Preparando generador de Excel...", "Cargando librerías necesarias.");
+    await new Promise(function(resolve, reject){
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+      s.onload = resolve;
+      s.onerror = function(){ reject(new Error("No se pudo cargar la librería de Excel. Verifica tu conexión.")); };
+      document.head.appendChild(s);
+    }).catch(function(e){ hideXlsxOverlay(); alert(e.message); return Promise.reject(e); });
+    hideXlsxOverlay();
   }
 
   // Recopilar datos del Módulo 7 (índice 8 = Módulo 7 Parrilla)
@@ -2482,9 +2487,17 @@ REGLAS DEL COPY:
 //  GANTT DE EJECUCIÓN — genera via IA + descarga como .xlsx
 // ===================================================================
 async function generateGantt(){
+  // Cargar SheetJS dinámicamente si no está disponible
   if(typeof XLSX === "undefined"){
-    alert("Error: la librería de Excel no está disponible. Verifica tu conexión a internet.");
-    return;
+    showXlsxOverlay("Preparando generador de Excel...", "Cargando librerías necesarias.");
+    await new Promise(function(resolve, reject){
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+      s.onload = resolve;
+      s.onerror = function(){ reject(new Error("No se pudo cargar la librería de Excel. Verifica tu conexión.")); };
+      document.head.appendChild(s);
+    }).catch(function(e){ hideXlsxOverlay(); alert(e.message); return Promise.reject(e); });
+    hideXlsxOverlay();
   }
 
   // Índices reales en array M:
