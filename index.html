@@ -163,6 +163,7 @@ nav{display:flex;flex-direction:column;gap:1px}
 .vp-pills{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
 .vp-pill{background:#1A1A1A;border:1px solid #333;border-radius:2px;padding:5px 12px;font-size:10px;color:#666;cursor:pointer;transition:all .2s}
 .vp-pill.w{border-color:#D3BC8D;color:#D3BC8D;background:#1F1A0F}
+.vp-pill.locked-pill{opacity:.4;cursor:not-allowed;border-color:#222}
 .btn-vw{background:transparent;color:#D3BC8D;border:1.5px solid #D3BC8D;border-radius:3px;padding:9px 22px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.8px;text-transform:uppercase;transition:all .2s;font-family:inherit}
 .btn-vw:hover{background:#D3BC8D;color:#111111}.btn-vw.done{background:#3F7D5B;color:#fff;border-color:#3F7D5B}
 .locked{background:#fff;border:1.5px dashed #DDD5C6;border-radius:3px;padding:22px;text-align:center;margin-bottom:12px}
@@ -337,23 +338,49 @@ nav{display:flex;flex-direction:column;gap:1px}
   </div>
 </div>
 
-<!-- PG 3: IDEA (solo marca desde cero) -->
-<div id="pg-idea" class="pg">
-  <div style="color:#D3BC8D;font-size:12px;cursor:pointer;margin-bottom:20px;align-self:flex-start;max-width:540px;width:100%" onclick="goBackToEntry()">&#8592; Cambiar selección</div>
-  <img src="data:image/jpeg;base64,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" alt="Nat Moreno &amp; Co." style="max-width:160px;height:auto;margin-bottom:16px"/>
-  <div style="font-size:16px;font-weight:700;color:#111111;text-align:center;margin-bottom:8px">Cuéntanos tu idea</div>
-  <div style="font-size:12px;color:#5F5957;line-height:1.65;max-width:520px;text-align:center;margin-bottom:14px">El Método INITIUM construirá un caso de negocio basado en tu idea para que trabajes todos los módulos.</div>
-  <div class="idea-box">
-    <div style="font-size:9px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Incluye en tu descripción:</div>
-    <ul style="padding-left:16px;font-size:11.5px;color:#5F5957;line-height:1.9">
-      <li>Qué quieres vender o hacer</li><li>A quién le quieres vender</li>
-      <li>En qué ciudad o país</li><li>Cómo imaginas que se vende</li><li>Si ya tienes algún precio en mente</li>
-    </ul>
+<!-- PG 3: IDEA (solo marca desde cero) — pantalla dividida -->
+<div id="pg-idea" class="pg" style="flex-direction:row;align-items:stretch;min-height:100vh;padding:0;max-width:100%">
+
+  <!-- IZQUIERDA: Nota importante -->
+  <div style="width:48%;background:#111111;color:#F7F4EE;padding:60px 48px;display:flex;flex-direction:column;justify-content:center">
+    <div style="font-size:9px;color:#D3BC8D;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px">INITIUM ONE LAB · Nat Moreno &amp; Co.</div>
+    <div style="font-size:20px;font-weight:800;color:#D3BC8D;line-height:1.3;margin-bottom:24px">Una nota importante<br/>antes de avanzar</div>
+    <div style="font-size:13px;line-height:1.85;color:#E8DFCE">
+      <p style="margin:0 0 14px">A medida que recorras INITIUM ONE LAB, es posible que encuentres preguntas que no sepas responder: cuál es tu margen real, de dónde viene cada venta, quién es tu cliente exacto o qué te diferencia.</p>
+      <p style="margin:0 0 14px;font-weight:700;color:#F7F4EE">Eso no significa que vas mal.</p>
+      <p style="margin:0 0 14px">Significa que la plataforma está mostrando dónde tu negocio necesita más claridad.</p>
+      <p style="margin:0 0 14px">No inventes respuestas para avanzar. Si algo no lo sabes, anótalo como hallazgo. Cada vacío te indica qué debes revisar, medir, corregir o pedir antes de seguir invirtiendo en marketing.</p>
+      <p style="margin:0 0 14px">Al final, esos hallazgos se convertirán en parte de tu diagnóstico, tu plan estratégico y tu ruta de ejecución.</p>
+      <p style="margin:0 0 20px;font-weight:700;color:#D3BC8D">INITIUM ONE LAB no existe para que hagas todo tu marketing. Existe para que aprendas a entenderlo, dirigirlo, delegarlo y dejar de pagarlo a ciegas.</p>
+      <p style="margin:0;font-style:italic;color:#9C9281;font-size:12px">El marketing es piedra angular del negocio porque, cuando lo entiendes, todo empieza a encontrar su lugar.</p>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-top:28px;padding:14px 16px;background:#1A1A1A;border-radius:4px;border:1px solid #333">
+      <input type="checkbox" id="chk-nota-cero" style="margin-top:3px;accent-color:#D3BC8D;width:16px;height:16px;flex-shrink:0"/>
+      <label for="chk-nota-cero" style="font-size:11px;color:#9C9281;line-height:1.6;cursor:pointer">
+        <strong style="color:#F7F4EE">Entendido.</strong> No inventaré respuestas para avanzar. Usaré los vacíos como hallazgos para trabajar en mi negocio.
+      </label>
+    </div>
+    <div id="nota-cero-err" style="color:#D3BC8D;font-size:10.5px;margin-top:8px;display:none">Debes marcar esta casilla para continuar.</div>
   </div>
-  <textarea id="idea-txt" class="itxt" placeholder="Ej: Quiero crear una línea de jabones artesanales para vender en México..."></textarea>
-  <div style="font-size:10.5px;color:#9C9281;max-width:520px;margin-bottom:12px;font-style:italic">Mientras más detallada sea tu descripción, mejor el análisis en cada módulo.</div>
-  <div style="color:#A8453A;font-size:11px;max-width:520px;margin-bottom:8px;display:none" id="idea-err">Describe tu idea antes de continuar.</div>
-  <button class="btn" id="btn-idea" onclick="buildCase()">Ingresar al Método INITIUM &rarr;</button>
+
+  <!-- DERECHA: Formulario de idea -->
+  <div style="width:52%;background:#F7F4EE;padding:60px 48px;display:flex;flex-direction:column;justify-content:center">
+    <div style="color:#D3BC8D;font-size:11px;cursor:pointer;margin-bottom:28px" onclick="goBackToEntry()">&#8592; Cambiar selección</div>
+    <img src="data:image/jpeg;base64,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" alt="Nat Moreno &amp; Co." style="max-width:140px;height:auto;margin-bottom:20px"/>
+    <div style="font-size:18px;font-weight:800;color:#111111;margin-bottom:8px">Cuéntanos tu idea</div>
+    <div style="font-size:12px;color:#5F5957;line-height:1.65;margin-bottom:16px">El Método INITIUM construirá un caso de negocio basado en tu idea para que trabajes todos los módulos.</div>
+    <div class="idea-box" style="margin-bottom:12px">
+      <div style="font-size:9px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Incluye en tu descripción:</div>
+      <ul style="padding-left:16px;font-size:11.5px;color:#5F5957;line-height:1.9;margin:0">
+        <li>Qué quieres vender o hacer</li><li>A quién le quieres vender</li>
+        <li>En qué ciudad o país</li><li>Cómo imaginas que se vende</li><li>Si ya tienes algún precio en mente</li>
+      </ul>
+    </div>
+    <textarea id="idea-txt" class="itxt" placeholder="Ej: Quiero crear una línea de jabones artesanales para vender en México..." style="min-height:140px"></textarea>
+    <div style="font-size:10.5px;color:#9C9281;margin-bottom:12px;font-style:italic">Mientras más detallada sea tu descripción, mejor el análisis en cada módulo.</div>
+    <div style="color:#A8453A;font-size:11px;margin-bottom:8px;display:none" id="idea-err">Describe tu idea antes de continuar.</div>
+    <button class="btn" id="btn-idea" onclick="buildCase()">Ingresar al Método INITIUM &rarr;</button>
+  </div>
 </div>
 
 <!-- PG 4: APP 3 COLUMNAS -->
@@ -1185,6 +1212,29 @@ Dashboard de Inversion y Rentabilidad (Modulo 10): [pegar resultado].`,
     ps:5
   },
   {
+    c:"10.9",
+    t:"Consolidación de Hallazgos",
+    p:`Actúa como consultor estratégico senior dentro de la metodología INITIUM ONE LAB. El alumno ha completado los módulos 1 al 10.8. En cada módulo se identificaron hallazgos específicos mediante semáforos (🟢 verde, 🟡 amarillo, 🔴 rojo).
+
+Tu trabajo ahora es consolidar TODOS los hallazgos reales detectados módulo a módulo y, para cada uno, dar una solución estratégica concreta — no consejos genéricos. Eres una consultoría senior: tus recomendaciones deben ser específicas, accionables y conectadas a la realidad del negocio del alumno.
+
+REGLAS OBLIGATORIAS:
+1. Solo incluye módulos donde hubo hallazgos reales (amarillo o rojo). Si un módulo está en verde, no lo incluyas — está en orden.
+2. Para cada hallazgo: nombra el problema exacto con el lenguaje del negocio del alumno (sus productos, canales, situación real). Nunca seas genérico.
+3. Para cada hallazgo da: (a) Qué está pasando exactamente, (b) Por qué importa y qué le está costando al negocio, (c) La solución estratégica concreta — qué hacer, en qué orden, con qué criterio.
+4. Al final, prioriza los 3 hallazgos más críticos que el alumno debe resolver ANTES de ejecutar el plan de marketing. Esos son sus "Hallazgos Maestros".
+5. Cierra recordándole que estos hallazgos son la base sobre la que se construirá su Plan Estratégico de Marketing en el Módulo 11.
+
+Aquí están los resultados acumulados de todos sus módulos:`,
+    f:`Pega aquí los resultados de cada módulo. El sistema tomará los hallazgos automáticamente de los módulos completados.`,
+    fr:"tus hallazgos son tu mapa. Saber qué corregir es ya la mitad del camino.",
+    qp:"Un dueño de negocio termina el diagnóstico con 8 hallazgos detectados. ¿Cuál es el primer paso correcto?",
+    qo:["Contratar una agencia para que resuelva todos los hallazgos a la vez","Ignorar los hallazgos menores y enfocarse solo en ventas","Priorizar los 2 o 3 hallazgos de mayor impacto en rentabilidad y canal, resolverlos primero y luego avanzar por fases","Esperar a tener presupuesto para resolver todos los hallazgos antes de ejecutar"],
+    qc:2,
+    qe:"La priorización es la clave. Intentar resolver 8 hallazgos a la vez paraliza el negocio. El Método INITIUM establece que primero se atacan los hallazgos que más afectan la rentabilidad, el canal y la conversión. El resto se trabaja por fases.",
+    ps:5
+  },
+  {
     c:"11",
     t:"Plan de Marketing a 1 año",
     p:`Actua como estratega del modulo 11`,
@@ -1303,7 +1353,7 @@ Limitaciones actuales: [tiempo, presupuesto, falta de equipo, falta de datos, fa
 ];
 
 
-const VC={"0": 1, "1": 2, "2": 1, "3": 2, "4": 1, "4.5": 1, "5": 2, "6": 1, "7": 2, "7.5": 1, "7.8": 1, "8": 1, "9": 2, "9.5": 1, "10": 2, "10.8": 1, "11": 3, "11.5": 1, "12": 1};
+const VC={"0": 1, "1": 2, "2": 1, "3": 2, "4": 1, "4.5": 1, "5": 2, "6": 1, "7": 2, "7.5": 1, "7.8": 1, "8": 1, "9": 2, "9.5": 1, "10": 2, "10.8": 1, "10.9": 1, "11": 3, "11.5": 1, "12": 1};
 var tipo=null,caso="",idea="",cur=0;
 var RES={},FV={},COMP={},RPRES={},QA={},VIDW={},SCORE=0,TOTAL=95;
 var NOM="",EMP="";
@@ -1414,6 +1464,12 @@ function goBackToEntry(){show("pg-bv");}
 
 // PASO 4 (solo "cero"): IDEA
 async function buildCase(){
+  var nota=document.getElementById("chk-nota-cero");
+  if(nota&&!nota.checked){
+    document.getElementById("nota-cero-err").style.display="block";
+    document.getElementById("nota-cero-err").scrollIntoView({behavior:"smooth"});
+    return;
+  }
   var t=document.getElementById("idea-txt").value.trim();
   if(!t){document.getElementById("idea-err").style.display="block";return;}
   idea=t;
@@ -1501,8 +1557,11 @@ function renderMod(i){
   var nv=VC[m.c]||1,vw=VIDW[i]||0,allW=(vw>=nv);
   var pills="";
   for(var v=0;v<nv;v++){
-    var dv=(vw>v);
-    pills+="<div class='vp-pill"+(dv?" w":"")+"' onclick='watchVid("+i+","+v+")'>"+"Clase "+(v+1)+(dv?" &#10003;":"")+"</div>";
+    var dv=(vw>v);      // ya vista
+    var unlocked=(v===0||vw>=v); // desbloqueada: clase 1 siempre, las demás solo si la anterior está vista
+    var pillCls="vp-pill"+(dv?" w":"")+(unlocked?"":" locked-pill");
+    var pillAction=unlocked?"onclick='watchVid("+i+","+v+")'":"onclick='alert(\"Primero marca la clase anterior como vista.\")'";
+    pills+="<div class='"+pillCls+"' "+pillAction+">Clase "+(v+1)+(dv?" &#10003;":(unlocked?"":" 🔒"))+"</div>";
   }
   var videoH="<div class='vp'><span class='vp-icon'>&#9654;</span>"
     +"<div class='vp-title'>Módulo "+m.c+" INITIUM ONE LAB — Clases</div>"
@@ -1519,7 +1578,12 @@ function renderMod(i){
       +"<div style='font-size:12px;line-height:1.75;white-space:pre-wrap;color:#111111'>"+caso+"</div></div>";
   }
   var fH="";if(m.f&&m.f.trim())fH="<div class='mc'><span class='fl'>Datos que necesitas completar</span><div class='fb'>"+m.f.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</div></div>";
-  var resH=RES[i]?"<div class='res-block'><div class='rl'>Análisis Método INITIUM — "+RES[i].f+"</div><div class='md-content'>"+parseMarkdown(RES[i].t)+"</div></div>":"";
+  var resH=RES[i]?"<div class='res-block'>"
+    +"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px'>"
+    +"<div class='rl' style='margin:0'>Análisis Método INITIUM — "+RES[i].f+"</div>"
+    +"<button id='copy-btn-"+i+"' onclick='copyResult("+i+")' style='background:#111111;color:#D3BC8D;border:1px solid #D3BC8D;border-radius:3px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px;flex-shrink:0'>⎘ Copiar análisis</button>"
+    +"</div>"
+    +"<div class='md-content'>"+parseMarkdown(RES[i].t)+"</div></div>":"";
   // Hints de adjuntos específicos por módulo
   var attachHints={
     2:"💡 Sube capturas de tus redes sociales activas para un análisis más preciso.",
@@ -1537,6 +1601,28 @@ function renderMod(i){
     +"<div class='attach-previews' id='ip-"+i+"'></div><div id='pp-"+i+"'></div></div>";
   // Módulo 0 especial: sin campos de datos, solo pasos a seguir
   var esM0=(i===0);
+
+  // Nota importante — solo aparece en módulo 0 para negocio en marcha y lanzamiento
+  var notaH="";
+  if(esM0&&tipo!=="cero"&&!COMP["nota_leida"]){
+    notaH="<div style='background:#111111;border-radius:6px;padding:24px 28px;margin-bottom:20px'>"
+      +"<div style='font-size:9px;color:#D3BC8D;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px'>Antes de avanzar — Léelo completo</div>"
+      +"<div style='font-size:14px;font-weight:800;color:#D3BC8D;margin-bottom:16px'>Una nota importante antes de avanzar</div>"
+      +"<div style='font-size:12.5px;color:#E8DFCE;line-height:1.85'>"
+      +"<p style='margin:0 0 12px'>A medida que recorras INITIUM ONE LAB, es posible que encuentres preguntas que no sepas responder: cuál es tu margen real, de dónde viene cada venta, quién es tu cliente exacto o qué te diferencia.</p>"
+      +"<p style='margin:0 0 12px;font-weight:700;color:#F7F4EE'>Eso no significa que vas mal.</p>"
+      +"<p style='margin:0 0 12px'>Significa que la plataforma está mostrando dónde tu negocio necesita más claridad.</p>"
+      +"<p style='margin:0 0 12px'>No inventes respuestas para avanzar. Si algo no lo sabes, anótalo como hallazgo. Cada vacío te indica qué debes revisar, medir, corregir o pedir antes de seguir invirtiendo en marketing.</p>"
+      +"<p style='margin:0 0 12px'>Al final, esos hallazgos se convertirán en parte de tu diagnóstico, tu plan estratégico y tu ruta de ejecución.</p>"
+      +"<p style='margin:0 0 16px;font-weight:700;color:#D3BC8D'>INITIUM ONE LAB no existe para que hagas todo tu marketing. Existe para que aprendas a entenderlo, dirigirlo, delegarlo y dejar de pagarlo a ciegas.</p>"
+      +"<p style='margin:0;font-style:italic;color:#9C9281;font-size:11px'>El marketing es piedra angular del negocio porque, cuando lo entiendes, todo empieza a encontrar su lugar.</p>"
+      +"</div>"
+      +"<div style='display:flex;align-items:flex-start;gap:10px;margin-top:20px;padding:12px 14px;background:#1A1A1A;border-radius:4px;border:1px solid #333'>"
+      +"<input type='checkbox' id='chk-nota-app' onchange='confirmarNota()' style='margin-top:3px;accent-color:#D3BC8D;width:16px;height:16px;flex-shrink:0'/>"
+      +"<label for='chk-nota-app' style='font-size:11px;color:#9C9281;line-height:1.6;cursor:pointer'>"
+      +"<strong style='color:#F7F4EE'>Entendido.</strong> No inventaré respuestas para avanzar. Usaré los vacíos como hallazgos para trabajar en mi negocio.</label>"
+      +"</div></div>";
+  }
 
   // PASOS — siempre visibles arriba, distintos para M0 y el resto
   var pasosH="";
@@ -1573,7 +1659,7 @@ function renderMod(i){
   }
   document.getElementById("col-mid").innerHTML=
     "<div class='ey'>Módulo "+m.c+" · INITIUM ONE LAB</div><div class='mt'>"+m.t+"</div>"
-    +"<div class='mbdg'>"+lbTxt+"</div>"+videoH+pracH;
+    +"<div class='mbdg'>"+lbTxt+"</div>"+notaH+videoH+pracH;
   if(allW&&document.getElementById("df")){
     document.getElementById("df").addEventListener("input",function(){FV[i]=this.value;saveState();});
   }
@@ -1612,12 +1698,75 @@ function nivH(n){
   return "<span class='"+d[0]+"'>"+d[1]+"</span>";
 }
 
+// Frases motivacionales específicas por módulo
+var MOTI_MSGS=[
+  "Arrancaste. La mayoría nunca llega aquí. El diagnóstico empieza ahora.",
+  "Ya tienes tu primer diagnóstico real. Eso vale más que meses de publicidad sin dirección.",
+  "Conocer tu mercado real es la ventaja que muy pocos tienen. Vas adelante.",
+  "Tu marca ya tiene una base estratégica. Ahora todo lo que comuniques tiene dirección.",
+  "Ya sabes qué vender, a quién y con qué margen. Eso cambia las decisiones para siempre.",
+  "Tu portafolio ya tiene lógica comercial. No todo merece el mismo esfuerzo — y ahora lo sabes.",
+  "Ya sabes dónde está tu cliente y qué canal conviene. Eso elimina el gasto a ciegas.",
+  "Tu mensaje ya tiene columna vertebral. El contenido sin narrativa es solo ruido.",
+  "Tienes un plan de comunicación con dirección. Eso es lo que separa al que publica del que vende.",
+  "Ya auditaste lo que existe. Ahora sabes qué mejorar y qué no repetir.",
+  "Ya sabes qué números importan. La mayoría mide lo que se ve, no lo que decide.",
+  "Tu ecosistema ya tiene lógica. Los canales conectados venden más que los canales solos.",
+  "Ya tienes un flujo de venta real. Eso convierte más sin invertir más.",
+  "Entiendes ROAS y ROI. Eso te protege de invertir a ciegas y de caer en promesas vacías.",
+  "Ya sabes si tu inversión es rentable. Eso es lo que más duele ver — y lo más valioso de saber.",
+  "Tienes la radiografía real de tu negocio. Con esto ya puedes decidir con claridad.",
+  "Tienes tu Plan Estratégico. Este documento es tu guía para los próximos 12 meses.",
+  "Ya tienes el plan táctico. Ahora sabes qué hacer, quién lo hace y cómo medirlo.",
+  "Lo lograste. Tienes diagnóstico, estrategia y plan. Muy pocos llegan hasta aquí — tú sí."
+];
+function getMotiMsg(i){
+  return (MOTI_MSGS[i]||"Sigue adelante. Cada módulo completado es una decisión que ya no tomarás a ciegas.");
+}
+
+// Copiar al portapapeles
+function copyResult(i){
+  var txt=RES[i]&&RES[i].t?RES[i].t:"";
+  if(!txt)return;
+  navigator.clipboard.writeText(txt).then(function(){
+    var btn=document.getElementById("copy-btn-"+i);
+    if(btn){btn.textContent="✓ Copiado";setTimeout(function(){btn.textContent="⎘ Copiar análisis";},2000);}
+  }).catch(function(){
+    var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);
+    var btn=document.getElementById("copy-btn-"+i);
+    if(btn){btn.textContent="✓ Copiado";setTimeout(function(){btn.textContent="⎘ Copiar análisis";},2000);}
+  });
+}
+
+// Extrae el HALLAZGO DEL MÓDULO del texto real generado por la IA
+function extractHallazgo(txt){
+  if(!txt||txt.length<30)return null;
+  // Busca la sección de hallazgo con varios formatos posibles
+  var patrones=[
+    /HALLAZGO DEL MÓDULO[:\s]*\n?([\s\S]{80,600}?)(?=\n[A-ZÁÉÍÓÚÑ]{3,}[\s:]|NIVEL DE PROBLEMA|$)/i,
+    /HALLAZGO[:\s]*\n?([\s\S]{80,600}?)(?=\n[A-ZÁÉÍÓÚÑ]{3,}[\s:]|NIVEL DE PROBLEMA|$)/i,
+    /hallazgo del módulo[:\s]*\n?([\s\S]{80,600}?)(?=\n[a-záéíóúñA-ZÁÉÍÓÚÑ]{3,}[\s:]|nivel de problema|$)/i,
+  ];
+  for(var p=0;p<patrones.length;p++){
+    var m=txt.match(patrones[p]);
+    if(m&&m[1]&&m[1].trim().length>40){
+      return m[1].trim().replace(/\n{3,}/g,"\n\n");
+    }
+  }
+  // Si no encuentra sección específica, busca texto después de "Hallazgo:"
+  var m2=txt.match(/hallazgo[:\s]+([^\n]{60,300})/i);
+  if(m2&&m2[1])return m2[1].trim();
+  return null;
+}
+
 function renderRight(i){
   var m=M[i];
   var hasRes=RPRES[i]&&RPRES[i].trim().length>20;
   var allW=(VIDW[i]||0)>=(VC[m.c]||1);
   var answered=QA[i]!==undefined,comp=COMP[i]||false;
   var sem=hasRes?detectSem(RPRES[i]):null,niv=hasRes?detectNiv(RPRES[i]):null;
+  // Hallazgo extraído dinámicamente del texto real de la IA
+  var hallazgoReal=hasRes?extractHallazgo(RPRES[i]):null;
   var qH="";
   if(answered){
     var ok=QA[i]===m.qc;
@@ -1638,8 +1787,14 @@ function renderRight(i){
     qH+="<div style='font-size:10px;color:#9C9281;margin-top:4px'>No puede repetirse una vez respondida.</div>";
   }
   document.getElementById("cr-inner").innerHTML=
-    "<div class='rps'><span class='rpl'>Tu momento</span><div class='frase'>Hola "+primerNombre()+"! "+m.fr+"</div></div>"
-    +(m.ha?"<div class='rps'><span class='rpl'>Hallazgo del módulo</span>"+(hasRes?"<div class='hunlocked show'>"+m.ha+"</div>":"<div class='hlocked'>&#128274; Pega tu resultado para desbloquear</div>")+"</div>":"")
+    "<div class='rps' style='background:#111111;border-radius:6px;padding:14px 16px;margin-bottom:2px'><span class='rpl' style='color:#D3BC8D'>Tu momento</span><div class='frase' style='color:#F7F4EE;font-weight:700;font-size:13px;line-height:1.6'>"+primerNombre()+", "+m.fr+"</div></div>"
+    +"<div class='rps'><span class='rpl'>Hallazgo del módulo</span>"
+    +(hallazgoReal
+      ?"<div class='hunlocked show' style='font-size:12px;line-height:1.7;color:#111;white-space:pre-wrap'>"+hallazgoReal+"</div>"
+      :(hasRes
+        ?"<div class='hunlocked show' style='font-size:11px;color:#5F5957;font-style:italic'>El análisis no identificó hallazgos críticos en este módulo. Esta área está en orden — continúa al siguiente.</div>"
+        :"<div class='hlocked'>&#128274; Pega tu resultado para activar el hallazgo</div>")
+    )+"</div>"
     +"<div class='rps'><span class='rpl'>Semáforo</span>"+semH(sem)+"</div>"
     +"<div class='rps'><span class='rpl'>Nivel de problema</span>"+nivH(niv)+"</div>"
     +"<div class='rps'><span class='rpl'>Pega tu resultado aquí</span>"
@@ -1649,7 +1804,7 @@ function renderRight(i){
     +(!answered&&!comp?"<div class='wmsg show'>&#9888; Responde la evaluación para que tu puntaje cuente.</div>":"")
     +"<button class='bc"+(comp?" done":"")+"' onclick='marcarComp("+i+")'>"+(comp?"&#10003; "+primerNombre()+" ha completado este módulo":"Marcar como completado")+"</button>"
     +"<button class='bsig"+(comp?" show":"")+"' onclick='goNext("+i+")'>"+(i<18?"Continuar al Módulo "+M[i+1].c+" INITIUM ONE LAB &#8594;":"Ver mi certificado INITIUM &#8594;")+"</button>"
-    +(comp?"<div class='mmsg'>&#127775; "+primerNombre()+" va muy bien. ¡Sigue con el Método INITIUM!</div>":"")
+    +(comp?"<div class='mmsg' style='background:#111111;color:#F7F4EE;border-left:3px solid #D3BC8D;padding:12px 14px;font-size:12px;font-weight:700;border-radius:4px'>&#127775; "+getMotiMsg(i)+"</div>":"")
     +(comp&&(m.c==="11"||m.c==="11.5"||m.c==="12")?"<button class='pdf-btn' style='margin-top:10px;width:100%;border-radius:3px;padding:13px;font-size:12px;letter-spacing:.5px' onclick='generatePlan()'>&#11015; Descargar mi Plan Estratégico INITIUM</button>":"")
     +"</div>"
     +"<div style='text-align:center;padding:12px 0 4px;font-size:9px;color:#9C9281;border-top:1px solid #E8E2D8;margin-top:8px'>© Nat Moreno &amp; Co. 2026 · INITIUM ONE LAB · Todos los derechos reservados</div>";
@@ -1658,6 +1813,11 @@ function renderRight(i){
 function onResChange(i){var t=document.getElementById("rp-txt");if(t){RPRES[i]=t.value;saveState();}if(RPRES[i]&&RPRES[i].trim().length>20)renderRight(i);}
 function answerQuiz(i,c){if(QA[i]!==undefined)return;QA[i]=c;if(c===M[i].qc)SCORE+=M[i].ps;renderNav();renderRight(i);saveState();}
 function marcarComp(i){var t=document.getElementById("rp-txt");if(t&&t.value)RPRES[i]=t.value;COMP[i]=true;renderNav();renderRight(i);saveState();}
+function confirmarNota(){
+  var chk=document.getElementById("chk-nota-app");
+  if(chk&&chk.checked){COMP["nota_leida"]=true;saveState();}
+}
+
 function goNext(i){
   if(i<18){
     cur=i+1;renderNav();renderMod(i+1);saveState();
@@ -1809,23 +1969,37 @@ async function gen(i){
   var ctxBase="Alumno: "+NOM+(EMP?". Empresa/Proyecto: "+EMP:"")+" | Modo: "+modoLbl;
 
   // Tokens dinámicos según módulo (módulos pesados necesitan más espacio)
-  var modTokens={11:4000,12:4000,"10.8":3500,"11.5":3500,7:3000,9:3000,10:3000};
+  var modTokens={11:4000,12:4000,"10.8":3500,"10.9":3500,"11.5":3500,7:3000,9:3000,10:3000};
   var tokensUsar=modTokens[m.c]||2500;
 
   // Instrucción de formato universal
-  var instrFormato="\n\nINSTRUCCIÓN DE FORMATO CRÍTICA:\n"
-    +"1. Sé específico con el negocio del alumno: nombra sus productos reales, canales reales y situación real. NUNCA respondas de forma genérica.\n"
-    +"2. En tu análisis incluye un SEMÁFORO POR ÁREA con emojis: 🟢 Verde (sin problema), 🟡 Amarillo (requiere atención), 🔴 Rojo (corregir ya).\n"
-    +"3. Al final incluye una sección llamada HALLAZGO DEL MÓDULO que debe:\n"
-    +"   - Si TODO está en verde: decir exactamente 'Esta área está en orden para "+NOM+". No hay hallazgos críticos en este módulo. Continúa al siguiente.'\n"
-    +"   - Si hay áreas en amarillo o rojo: nombrar EXACTAMENTE cuál área específica está en problema, por qué, y qué debe hacer el alumno antes del siguiente módulo. Ejemplo: 'Hallazgo: Tu proceso de venta por WhatsApp no tiene seguimiento estructurado. Estás perdiendo entre un 40-60% de prospectos por falta de respuesta a tiempo.'\n"
-    +"4. Incluye también: NIVEL DE PROBLEMA: Nivel 1 (desorden de ejecución), Nivel 2 (problema de estrategia) o Nivel 3 (problema estructural).\n"
-    +"5. El análisis debe dejar al alumno con la información exacta que necesita para completar el siguiente módulo.\n"
-    +"6. No cortes el texto. Completa todos los puntos solicitados.";
+  var instrFormato="\n\nINSTRUCCIÓN DE FORMATO — OBLIGATORIA:\n"
+    +"DESTINATARIO: Dueño de empresa o directivo. Tu análisis debe ser magistral, senior y estratégico.\n"
+    +"ESTRUCTURA: Usa títulos en MAYÚSCULAS con guión (ej: DIAGNÓSTICO BREVE). Sin líneas en blanco entre párrafos — solo entre secciones principales.\n"
+    +"SEMÁFORO: Incluye SEMÁFORO POR ÁREA con 🟢 Verde 🟡 Amarillo 🔴 Rojo para cada área analizada.\n"
+    +"HALLAZGO DEL MÓDULO: Sección obligatoria al final. Si todo verde → 'Esta área está en orden para [nombre]. Continúa al siguiente módulo.' Si hay amarillo/rojo → nombra el problema con precisión: qué área, por qué, qué hace perder dinero o clientes, qué debe corregir antes del siguiente módulo.\n"
+    +"NIVEL DE PROBLEMA: Nivel 1 (desorden de ejecución) / Nivel 2 (problema de estrategia) / Nivel 3 (problema estructural).\n"
+    +"PROHIBIDO: espacios en blanco excesivos, frases vacías, respuestas genéricas, cortar el análisis antes de terminarlo.\n"
+    +"OBLIGATORIO: completar TODOS los puntos solicitados. Si no alcanza el espacio, prioriza los puntos de mayor impacto estratégico.\n"
+    +"Sé específico con el negocio del alumno: nombra sus productos reales, canales reales y situación real.";
 
   if(i===0){
     var infoDisp=caso?"Caso de negocio INITIUM construido:\n"+caso+"\nIdea original del alumno: "+idea:"Información disponible: "+ctxBase;
     ctx="CONTEXTO PARA DASHBOARD INICIAL:\n"+ctxBase+"\n\n"+infoDisp+"\n\nINSTRUCCION CRITICA: NO solicites más datos. Genera TODOS los 9 puntos del Dashboard Inicial INITIUM. Usa [PENDIENTE] para datos faltantes.\n\n";
+  }else if(m.c==="10.9"){
+    // Módulo 10.9: auto-poblar con todos los resultados pegados en paneles derechos
+    var modNames=["Módulo 0 — Bienvenida","Módulo 1 — Diagnóstico","Módulo 2 — Mercado","Módulo 3 — Esencia de Marca","Módulo 4 — Oferta","Módulo 4.5 — BCG","Módulo 5 — Cliente/Canal","Módulo 6 — Narrativa","Módulo 7 — Parrilla","Módulo 7.5 — Auditoría Redes","Módulo 7.8 — Métricas","Módulo 8 — Ecosistema","Módulo 9 — Ventas","Módulo 9.5 — ROAS/ROI","Módulo 10 — Rentabilidad","Módulo 10.8 — Diagnóstico INITIUM"];
+    var resumenAcum="RESULTADOS ACUMULADOS POR MÓDULO (con hallazgos y semáforos detectados):\n\n";
+    for(var mi=0;mi<16;mi++){
+      var rpMod=RPRES[mi];
+      var rMod=RES[mi];
+      if(rpMod&&rpMod.trim().length>30){
+        resumenAcum+=modNames[mi]+":\n"+rpMod.substring(0,600)+(rpMod.length>600?"...":"")+"\n\n";
+      }else if(rMod&&rMod.t){
+        resumenAcum+=modNames[mi]+" (análisis generado):\n"+rMod.t.substring(0,400)+"...\n\n";
+      }
+    }
+    ctx="CONTEXTO: "+ctxBase+"\n\n"+resumenAcum;
   }else if(tipo==="cero"&&caso){
     ctx="CONTEXTO: "+ctxBase+"\nCaso INITIUM:\n"+caso+"\nIdea: "+idea+"\nAnaliza como negocio real. Recuérdale al final que con su negocio real debe volver a este módulo.\n\n";
   }else if(tipo==="lanzamiento"){
