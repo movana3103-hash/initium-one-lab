@@ -172,7 +172,7 @@ nav{display:flex;flex-direction:column;gap:1px}
 .cr-inner{padding:14px;display:flex;flex-direction:column;gap:11px}
 .rps{background:#F7F4EE;border-radius:3px;padding:12px 13px}
 .rpl{font-size:8.5px;font-weight:700;color:#8A6D2B;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px;display:block}
-.frase{font-size:11.5px;color:#5F5957;line-height:1.7;font-style:italic;border-left:2px solid #D3BC8D;padding-left:10px}
+.frase{font-size:13px;color:#F7F4EE;line-height:1.6;font-weight:700;font-style:normal;border-left:none;padding-left:0}
 .hlocked{font-size:11px;color:#9C9281;text-align:center;padding:14px;border:1.5px dashed #DDD5C6;border-radius:3px}
 .hunlocked{font-size:11.5px;color:#111111;line-height:1.75;background:#fff;border:1px solid #E8E2D8;border-left:2px solid #D3BC8D;border-radius:3px;padding:12px 13px;display:none;white-space:pre-line}
 .hunlocked.show{display:block}
@@ -354,7 +354,7 @@ nav{display:flex;flex-direction:column;gap:1px}
       <p style="margin:0 0 20px;font-weight:700;color:#D3BC8D">INITIUM ONE LAB no existe para que hagas todo tu marketing. Existe para que aprendas a entenderlo, dirigirlo, delegarlo y dejar de pagarlo a ciegas.</p>
       <p style="margin:0;font-style:italic;color:#9C9281;font-size:12px">El marketing es piedra angular del negocio porque, cuando lo entiendes, todo empieza a encontrar su lugar.</p>
     </div>
-    <div style="display:flex;align-items:flex-start;gap:10px;margin-top:28px;padding:14px 16px;background:#1A1A1A;border-radius:4px;border:1px solid #333">
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-top:28px;padding:12px 14px;background:#F0EDE6;border-radius:4px;border:1px solid #DDD5C6">
       <input type="checkbox" id="chk-nota-cero" style="margin-top:3px;accent-color:#D3BC8D;width:16px;height:16px;flex-shrink:0"/>
       <label for="chk-nota-cero" style="font-size:11px;color:#9C9281;line-height:1.6;cursor:pointer">
         <strong style="color:#F7F4EE">Entendido.</strong> No inventaré respuestas para avanzar. Usaré los vacíos como hallazgos para trabajar en mi negocio.
@@ -393,7 +393,7 @@ nav{display:flex;flex-direction:column;gap:1px}
       <div class="mbd">Modo: <span id="modo-lbl">—</span></div>
       <div class="pw">
         <div class="pl2">Avance del programa</div>
-        <div class="pn"><span id="prog-n">0</span> / 19</div>
+        <div class="pn"><span id="prog-n">0</span> / 20</div>
         <div class="psc" id="sc-lbl">Puntaje: 0 / 95 pts</div>
         <div class="pb"><div class="pf" id="prog-f" style="width:0%"></div></div>
       </div>
@@ -1355,7 +1355,7 @@ Limitaciones actuales: [tiempo, presupuesto, falta de equipo, falta de datos, fa
 
 const VC={"0": 1, "1": 2, "2": 1, "3": 2, "4": 1, "4.5": 1, "5": 2, "6": 1, "7": 2, "7.5": 1, "7.8": 1, "8": 1, "9": 2, "9.5": 1, "10": 2, "10.8": 1, "10.9": 1, "11": 3, "11.5": 1, "12": 1};
 var tipo=null,caso="",idea="",cur=0;
-var RES={},FV={},COMP={},RPRES={},QA={},VIDW={},SCORE=0,TOTAL=95;
+var RES={},FV={},COMP={},RPRES={},QA={},VIDW={},SCORE=0,TOTAL=100;
 var NOM="",EMP="";
 var IMGS={},PDFS={};
 var W="https://dry-glitter-d037.movana3103.workers.dev";
@@ -1426,12 +1426,12 @@ window.addEventListener("load",function(){
   if(loadState()){
     document.getElementById("ab").textContent=primerNombre()+(EMP?" · "+EMP:"");
     document.getElementById("modo-lbl").textContent={marcha:"Negocio en marcha",lanzamiento:"Producto en lanzamiento",cero:"Marca desde cero"}[tipo]||"-";
-    // Solo ir directo al app si el alumno ya estaba trabajando (tiene módulos o resultados)
-    var tieneAvance=Object.keys(COMP).length>0||Object.keys(RES).length>0||Object.keys(QA).length>0;
+    var tieneAvance=Object.keys(COMP).filter(function(k){return k!=="nota_leida";}).length>0||Object.keys(RES).length>0||Object.keys(QA).length>0;
     if(tieneAvance){
+      // Forzar nota_leida a false para que siempre aparezca la nota en módulo 0
+      // si el alumno nunca la marcó explícitamente
       show("pg-app");renderNav();renderMod(cur);
     } else {
-      // Primera vez con datos guardados: mostrar bienvenida para confirmar perfil
       show("pg-bv");
     }
   } else {
@@ -1602,25 +1602,29 @@ function renderMod(i){
   // Módulo 0 especial: sin campos de datos, solo pasos a seguir
   var esM0=(i===0);
 
-  // Nota importante — solo aparece en módulo 0 para negocio en marcha y lanzamiento
+  // Nota importante — módulo 0 para negocio en marcha y lanzamiento
+  // Se muestra siempre hasta que el alumno marque el checkbox
+  var notaLeida=COMP["nota_leida"]||false;
+  // La nota siempre aparece la primera vez en cada sesión (se resetea al cargar)
+  if(esM0&&tipo!=="cero"){COMP["nota_leida"]=false;notaLeida=false;}
   var notaH="";
-  if(esM0&&tipo!=="cero"&&!COMP["nota_leida"]){
-    notaH="<div style='background:#111111;border-radius:6px;padding:24px 28px;margin-bottom:20px'>"
-      +"<div style='font-size:9px;color:#D3BC8D;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px'>Antes de avanzar — Léelo completo</div>"
-      +"<div style='font-size:14px;font-weight:800;color:#D3BC8D;margin-bottom:16px'>Una nota importante antes de avanzar</div>"
-      +"<div style='font-size:12.5px;color:#E8DFCE;line-height:1.85'>"
+  if(esM0&&tipo!=="cero"&&!notaLeida){
+    notaH="<div id='bloque-nota' style='background:#FDFAF5;border:2px solid #D3BC8D;border-radius:6px;padding:24px 28px;margin-bottom:20px'>"
+      +"<div style='font-size:9px;color:#D3BC8D;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;font-weight:700'>Antes de avanzar — Léelo completo</div>"
+      +"<div style='font-size:15px;font-weight:800;color:#111111;margin-bottom:16px'>Una nota importante antes de avanzar</div>"
+      +"<div style='font-size:12.5px;color:#3A3230;line-height:1.9'>"
       +"<p style='margin:0 0 12px'>A medida que recorras INITIUM ONE LAB, es posible que encuentres preguntas que no sepas responder: cuál es tu margen real, de dónde viene cada venta, quién es tu cliente exacto o qué te diferencia.</p>"
-      +"<p style='margin:0 0 12px;font-weight:700;color:#F7F4EE'>Eso no significa que vas mal.</p>"
+      +"<p style='margin:0 0 12px;font-weight:800;color:#111111'>Eso no significa que vas mal.</p>"
       +"<p style='margin:0 0 12px'>Significa que la plataforma está mostrando dónde tu negocio necesita más claridad.</p>"
       +"<p style='margin:0 0 12px'>No inventes respuestas para avanzar. Si algo no lo sabes, anótalo como hallazgo. Cada vacío te indica qué debes revisar, medir, corregir o pedir antes de seguir invirtiendo en marketing.</p>"
       +"<p style='margin:0 0 12px'>Al final, esos hallazgos se convertirán en parte de tu diagnóstico, tu plan estratégico y tu ruta de ejecución.</p>"
-      +"<p style='margin:0 0 16px;font-weight:700;color:#D3BC8D'>INITIUM ONE LAB no existe para que hagas todo tu marketing. Existe para que aprendas a entenderlo, dirigirlo, delegarlo y dejar de pagarlo a ciegas.</p>"
+      +"<p style='margin:0 0 16px;font-weight:800;color:#8A6D2B'>INITIUM ONE LAB no existe para que hagas todo tu marketing. Existe para que aprendas a entenderlo, dirigirlo, delegarlo y dejar de pagarlo a ciegas.</p>"
       +"<p style='margin:0;font-style:italic;color:#9C9281;font-size:11px'>El marketing es piedra angular del negocio porque, cuando lo entiendes, todo empieza a encontrar su lugar.</p>"
       +"</div>"
-      +"<div style='display:flex;align-items:flex-start;gap:10px;margin-top:20px;padding:12px 14px;background:#1A1A1A;border-radius:4px;border:1px solid #333'>"
+      +"<div style='display:flex;align-items:flex-start;gap:10px;margin-top:20px;padding:12px 14px;background:#F0EDE6;border-radius:4px;border:1px solid #DDD5C6'>"
       +"<input type='checkbox' id='chk-nota-app' onchange='confirmarNota()' style='margin-top:3px;accent-color:#D3BC8D;width:16px;height:16px;flex-shrink:0'/>"
-      +"<label for='chk-nota-app' style='font-size:11px;color:#9C9281;line-height:1.6;cursor:pointer'>"
-      +"<strong style='color:#F7F4EE'>Entendido.</strong> No inventaré respuestas para avanzar. Usaré los vacíos como hallazgos para trabajar en mi negocio.</label>"
+      +"<label for='chk-nota-app' style='font-size:11px;color:#5F5957;line-height:1.6;cursor:pointer'>"
+      +"<strong style='color:#111111'>Entendido.</strong> No inventaré respuestas para avanzar. Usaré los vacíos como hallazgos para trabajar en mi negocio.</label>"
       +"</div></div>";
   }
 
@@ -1885,7 +1889,7 @@ function generatePlan(){
   html+="</table>"
     +"<div style='margin-top:20px;padding:14px 16px;background:#F7F4EE;border-left:3px solid #D3BC8D;font-size:11px;color:#5F5957;line-height:1.8'>"
     +"<strong>Puntaje obtenido:</strong> "+SCORE+" / "+TOTAL+" pts ("+Math.round(SCORE/TOTAL*100)+"%) &nbsp;·&nbsp; "
-    +"<strong>Módulos completados:</strong> "+Object.keys(COMP).filter(function(k){return COMP[k];}).length+" / 19"
+    +"<strong>Módulos completados:</strong> "+Object.keys(COMP).filter(function(k){return COMP[k];}).length+" / 20"
     +"</div></div>";
 
   // Sección por módulo
@@ -2033,7 +2037,7 @@ var FAQ=[
   {q:["perdí","se fue","desapareció","avance"],a:"Tu progreso se guarda en este navegador. Si lo perdiste, puede ser que hayas borrado el historial o estés en otro navegador o dispositivo."},
   {q:["error","failed","no conecta","fetch","no funciona"],a:"Puede ser un problema temporal de conexión. Intenta de nuevo en unos segundos. Si persiste, contacta a soporte en natmorenoandco.com."},
   {q:["semáforo","hallazgo","nivel","no aparece"],a:"El semáforo, hallazgo y nivel se activan pegando el resultado del análisis en el panel derecho ('Pega tu resultado aquí')."},
-  {q:["certificado","graduarme","aprobar"],a:"Necesitas completar los 19 módulos y obtener mínimo 76 de 95 puntos (80%). Cada evaluación vale 5 puntos."},
+  {q:["certificado","graduarme","aprobar"],a:"Necesitas completar los 20 módulos y obtener mínimo 80 de 100 puntos (80%). Cada evaluación vale 5 puntos."},
   {q:["video","clase"],a:"Los videos se habilitarán próximamente. Por ahora marca las clases como vistas para desbloquear la práctica."},
   {q:["pdf","imagen","adjuntar","foto"],a:"Puedes adjuntar hasta 3 imágenes y 1 documento por módulo. Busca el área de adjuntos antes del campo de texto principal."},
 ];
