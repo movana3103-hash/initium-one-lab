@@ -117,7 +117,7 @@ nav{display:flex;flex-direction:column;gap:1px}
 .sup-input:focus{outline:none}
 .sup-send{background:#D3BC8D;color:#111111;border:none;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:700}
 .af{padding:8px 12px;font-size:7px;color:#333;border-top:1px solid #1A1A1A;line-height:1.7}
-.cm{flex:1;padding:22px 28px;background:#F7F4EE;overflow-y:auto;min-width:0}
+.cm{flex:1;padding:22px 28px;background:#F7F4EE;overflow-y:auto;min-width:0;max-width:780px}
 .ey{font-size:9px;color:#D3BC8D;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;margin-bottom:4px}
 .mt{font-size:20px;font-weight:800;color:#111111;margin-bottom:12px;letter-spacing:-.4px;line-height:1.15}
 .mbdg{display:inline-flex;align-items:center;background:#111111;border-radius:2px;padding:3px 10px;font-size:9px;color:#D3BC8D;font-weight:700;margin-bottom:16px;letter-spacing:.8px;text-transform:uppercase}
@@ -1427,9 +1427,14 @@ window.addEventListener("load",function(){
     document.getElementById("modo-lbl").textContent={marcha:"Negocio en marcha",lanzamiento:"Producto en lanzamiento",cero:"Marca desde cero"}[tipo]||"-";
     var tieneAvance=Object.keys(COMP).filter(function(k){return k!=="nota_leida";}).length>0||Object.keys(RES).length>0||Object.keys(QA).length>0;
     if(tieneAvance){
-      // Forzar nota_leida a false para que siempre aparezca la nota en módulo 0
-      // si el alumno nunca la marcó explícitamente
-      show("pg-app");renderNav();renderMod(cur);
+      // Si el alumno ya completó el último módulo, mostrar pantalla de entregables
+      var modulosTotal=M.length;
+      var completados=Object.keys(COMP).filter(function(k){return k!=="nota_leida"&&COMP[k];}).length;
+      if(completados>=modulosTotal-1||COMP[modulosTotal-1]){
+        showCert();
+      }else{
+        show("pg-app");renderNav();renderMod(cur);
+      }
     } else {
       show("pg-bv");
     }
@@ -1437,6 +1442,38 @@ window.addEventListener("load",function(){
     show("pg-bv");
   }
 });
+
+// ── DESCARGA ZIP DE TODOS LOS ENTREGABLES ──────────────────────────────────
+async function downloadAllZip(btn){
+  if(btn){btn.disabled=true;btn.textContent="\u23f3 Generando todos los entregables...";}
+  try{
+    // Generar parrilla y gantt como blobs HTML
+    var alumno=NOM||"Alumno";
+    var empresa=EMP||"";
+    var fecha=new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"});
+
+    // Avisar al alumno que los PDFs se abren por separado
+    alert("Los documentos PDF (Plan Estrat\u00e9gico, Diagn\u00f3stico y Certificado) se abrir\u00e1n en nuevas ventanas para que los guardes como PDF con Cmd+P / Ctrl+P.\n\nLa Parrilla y el Gantt se descargar\u00e1n directamente.\n\nHaz clic en Aceptar para continuar.");
+
+    // Abrir PDFs en nueva ventana
+    generatePlan();
+    await new Promise(function(r){setTimeout(r,1500);});
+    generateDiagnostico();
+    await new Promise(function(r){setTimeout(r,1500);});
+    generateCertificate();
+
+    // Descargar parrilla y gantt
+    await new Promise(function(r){setTimeout(r,1000);});
+    generateParrilla({target:null});
+    await new Promise(function(r){setTimeout(r,2000);});
+    generateGantt({target:null});
+
+  }catch(e){
+    alert("Error al generar entregables: "+e.message);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="\ud83d\udcbe Descargar todos los entregables (ZIP)";}
+  }
+}
 
 // PASO 2+3: NOMBRE, EMPRESA Y TIPO DE PROYECTO (en la misma pantalla)
 function selCard(c){
@@ -1868,98 +1905,99 @@ var MODTITLES=[
   "Certificación y Ruta de Implementación"
 ];
 
-function generatePlan(){
+async function generatePlan(){
   var fecha=new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"});
   var modoLbl={marcha:"Negocio en marcha",lanzamiento:"Producto en lanzamiento",cero:"Marca desde cero"}[tipo]||tipo;
-
-  var html="<div class='pdf-cover'>"
-    +"<div class='pdf-cover-logo'>INITIUM ACADEMY &nbsp;·&nbsp; Nat Moreno &amp; Co.</div>"
-    +"<div>"
-    +"<div style='font-size:11px;color:#D3BC8D;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px'>Plan Estratégico INITIUM ONE LAB</div>"
-    +"<div class='pdf-cover-title'>Diagnóstico y Plan<br/>Estratégico de Marketing</div>"
-    +"<div class='pdf-cover-sub'>Documento maestro construido módulo a módulo con el<br/><strong style='color:#F7F4EE'>Método INITIUM by Nat Moreno &amp; Co.</strong><br/>El marketing no empieza en redes. Empieza en la estrategia del negocio.</div>"
-    +"<div class='pdf-cover-alumno'>"+NOM+"</div>"
-    +(EMP?"<div class='pdf-cover-emp'>"+EMP+"</div>":"")
-    +"<div style='font-size:11px;color:#666;margin-top:8px'>Modo: "+modoLbl+"</div>"
-    +"</div>"
-    +"<div class='pdf-cover-footer'>"
-    +"Generado el "+fecha+"&nbsp;&nbsp;·&nbsp;&nbsp;INITIUM ONE LAB&nbsp;&nbsp;·&nbsp;&nbsp;© Nat Moreno &amp; Co. 2026. Todos los derechos reservados.<br/>"
-    +"Este documento es de uso exclusivo del alumno. Queda prohibida su reproducción o distribución sin autorización escrita."
-    +"</div>"
-    +"</div>";
-
-  // Índice
-  html+="<div class='pdf-section' style='page-break-before:always'>"
-    +"<div class='pdf-mod-label'>Contenido del Documento</div>"
-    +"<div class='pdf-mod-title'>Índice del Plan Estratégico</div>"
-    +"<table style='width:100%;border-collapse:collapse;font-size:12px'>";
-  MODTITLES.forEach(function(t,i){
-    var tiene=RES[i]&&RES[i].t;
-    html+="<tr><td style='padding:8px 10px;border-bottom:1px solid #E8E2D8;color:#111;font-weight:"+(i>=15?"700":"400")+"'>"
-      +"Módulo "+M[i].c+" — "+t+"</td>"
-      +"<td style='padding:8px 10px;border-bottom:1px solid #E8E2D8;text-align:right;font-size:10px;color:"+(tiene?"#3F7D5B":"#9C9281")+"'>"
-      +(tiene?"✓ Completado":"— Pendiente")+"</td></tr>";
-  });
-  html+="</table>"
-    +"<div style='margin-top:20px;padding:14px 16px;background:#F7F4EE;border-left:3px solid #D3BC8D;font-size:11px;color:#5F5957;line-height:1.8'>"
-    +"<strong>Puntaje obtenido:</strong> "+SCORE+" / "+TOTAL+" pts ("+Math.round(SCORE/TOTAL*100)+"%) &nbsp;·&nbsp; "
-    +"<strong>Módulos completados:</strong> "+Object.keys(COMP).filter(function(k){return COMP[k];}).length+" / 20"
-    +"</div></div>";
-
-  // Sección por módulo
-  MODTITLES.forEach(function(t,i){
-    var res=RES[i];
-    var rpres=RPRES[i];
-    html+="<div class='pdf-section'>"
-      +"<div class='pdf-mod-label'>Módulo "+M[i].c+" · INITIUM ONE LAB</div>"
-      +"<div class='pdf-mod-title'>"+t+"</div>";
-
-    if(res&&res.t){
-      html+="<div class='pdf-mod-content'>"+parseMarkdown(res.t)+"</div>";
-    }else{
-      html+="<div class='pdf-mod-empty'>Este módulo aún no ha sido completado en la plataforma.</div>";
-    }
-
-    // Si hay resultado pegado en el panel derecho (hallazgo/semáforo)
-    if(rpres&&rpres.trim().length>30){
-      html+="<div style='margin-top:20px;padding:14px 16px;background:#FDFAF5;border:1px solid #E8E2D8;border-left:3px solid #D3BC8D;border-radius:3px'>"
-        +"<div style='font-size:9px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-family:-apple-system,sans-serif'>Análisis registrado por el alumno</div>"
-        +"<div style='font-size:11.5px;line-height:1.8;color:#333;white-space:pre-wrap'>"+rpres.substring(0,800)+(rpres.length>800?"…":"")+"</div>"
-        +"</div>";
-    }
-    html+="</div>";
-  });
-
-  // Página de cierre
-  html+="<div class='pdf-section' style='text-align:center;padding:80px 60px;background:#111111;color:#F7F4EE'>"
-    +"<div style='font-size:11px;color:#D3BC8D;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px'>INITIUM ONE LAB · Nat Moreno &amp; Co.</div>"
-    +"<div style='font-size:28px;font-weight:800;color:#D3BC8D;margin-bottom:16px'>Strategy. Execution. Results. Soul.</div>"
-    +"<div style='font-size:13px;color:#9C9281;line-height:1.85;max-width:480px;margin:0 auto 32px'>"
-    +"Este documento es el resultado de tu trabajo con el Método INITIUM.<br/>"
-    +"Úsalo para dirigir tu marketing, contratar con criterio y crecer con claridad.</div>"
-    +"<div style='font-size:11px;color:#555;border-top:1px solid #333;padding-top:20px;margin-top:20px'>"
-    +"© Nat Moreno &amp; Co. 2026 · Todos los derechos reservados · natmorenoandco.com<br/>"
-    +"Prohibida la reproducción, distribución o uso comercial sin autorización escrita.</div>"
-    +"</div>";
-
-  // Botones flotantes
-  html+="<div class='pdf-btn-bar no-print'>"
-    +"<button class='pdf-btn sec' onclick='closePlan()'>← Volver al Dashboard</button>"
-    +"<button class='pdf-btn' onclick='window.print()'>⬇ Descargar PDF</button>"
-    +"</div>";
-
   var pg=document.getElementById("pg-print");
-  pg.innerHTML=html;
+  pg.innerHTML="<div style='min-height:100vh;background:#F7F4EE;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px'>"
+    +"<div style='font-size:11px;color:#D3BC8D;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px'>INITIUM ONE LAB &middot; Nat Moreno &amp; Co.</div>"
+    +"<div style='font-size:20px;font-weight:800;color:#111;margin-bottom:10px;text-align:center'>Generando tu Plan Estrat\u00e9gico\u2026</div>"
+    +"<div style='font-size:12px;color:#5F5957;max-width:380px;text-align:center;line-height:1.7'>El M\u00e9todo INITIUM est\u00e1 interpretando y jerarquizando todo tu trabajo para producir tu documento ejecutivo personalizado. Esto puede tomar entre 20 y 40 segundos.</div>"
+    +"<div style='margin-top:28px;width:48px;height:48px;border:3px solid #E8E2D8;border-top-color:#D3BC8D;border-radius:50%;animation:spin .9s linear infinite'></div>"
+    +"<style>@keyframes spin{to{transform:rotate(360deg)}}</style>"
+    +"</div>";
   pg.style.display="block";
-  // Ocultar todo lo demás
   document.querySelectorAll(".pg").forEach(function(el){el.style.display="none";});
   window.scrollTo(0,0);
-}
 
+  var modNombres=["M\u00f3dulo 0 \u2014 Bienvenida y M\u00e9todo INITIUM","M\u00f3dulo 1 \u2014 Diagn\u00f3stico Real del Negocio","M\u00f3dulo 2 \u2014 Mercado, Competencia y Consumidor","M\u00f3dulo 3 \u2014 Esencia de Marca y Posicionamiento","M\u00f3dulo 4 \u2014 Oferta y L\u00edneas de Negocio","M\u00f3dulo 4.5 \u2014 Portafolio y Matriz BCG","M\u00f3dulo 5 \u2014 Cliente, Intenci\u00f3n y Canales","M\u00f3dulo 6 \u2014 Narrativa Comercial","M\u00f3dulo 7 \u2014 Parrilla Estrat\u00e9gica Multicanal","M\u00f3dulo 7.5 \u2014 Auditor\u00eda de Redes Sociales","M\u00f3dulo 7.8 \u2014 M\u00e9tricas que s\u00ed Importan","M\u00f3dulo 8 \u2014 Ecosistema Conectado","M\u00f3dulo 9 \u2014 Ventas, Seguimiento y Experiencia","M\u00f3dulo 9.5 \u2014 Fundamentos ROAS y ROI","M\u00f3dulo 10 \u2014 Inversi\u00f3n y Rentabilidad Real","M\u00f3dulo 10.8 \u2014 Diagn\u00f3stico INITIUM","M\u00f3dulo 11 \u2014 Plan Estrat\u00e9gico de Marketing","M\u00f3dulo 11.5 \u2014 Plan Operativo de Ejecuci\u00f3n","M\u00f3dulo 12 \u2014 Certificaci\u00f3n y Ruta de Implementaci\u00f3n"];
+  var resumenAcum="";
+  for(var mi=0;mi<19;mi++){
+    var rpMod=RPRES[mi]&&RPRES[mi].trim().length>30?RPRES[mi]:"";
+    var rMod=RES[mi]&&RES[mi].t?RES[mi].t:"";
+    var contenido=rpMod.length>30?rpMod.substring(0,700):rMod.substring(0,500);
+    if(contenido.length>20)resumenAcum+=modNombres[mi]+":\n"+contenido+(contenido.length>=500?"...":"")+"\n\n";
+  }
+
+  var p=[];
+  p.push("Eres consultor estrat\u00e9gico senior de Nat Moreno & Co. \u2014 INITIUM Academy.");
+  p.push("Tu tarea es producir el PLAN ESTRAT\u00c9GICO DE MARKETING del alumno. La autor\u00eda metodol\u00f3gica pertenece a Nat Moreno & Co. / INITIUM Academy. NO menciones que la IA redact\u00f3 este documento.");
+  p.push("ALUMNO: "+NOM+"\nEMPRESA: "+(EMP||"No especificada")+"\nMODO: "+modoLbl+"\nFECHA: "+fecha);
+  p.push("INFORMACI\u00d3N ACUMULADA DEL CURSO INITIUM ONE LAB:\n"+resumenAcum);
+  p.push("INSTRUCCIONES OBLIGATORIAS:");
+  p.push("- NO copies los m\u00f3dulos completos. INTERPRETA, DEPURA, JERARQUIZA y CONVIERTE en documento ejecutivo.");
+  p.push("- TONO: ejecutivo, estrat\u00e9gico, sobrio, claro, profesional, sin humo, sin promesas m\u00e1gicas.");
+  p.push("- Si falta informaci\u00f3n, decl\u00e1rala como Dato pendiente por validar.");
+  p.push("- No inventes datos. No prometas ventas garantizadas.");
+  p.push("ESTRUCTURA OBLIGATORIA - desarrolla cada secci\u00f3n con profundidad y criterio estrat\u00e9gico:");
+  p.push("RESUMEN EJECUTIVO\nSintetiza en m\u00e1ximo 12 l\u00edneas: tipo de negocio, etapa actual, mayor fortaleza, mayor riesgo, qu\u00e9 priorizar en 30 d\u00edas, qu\u00e9 corregir antes de invertir m\u00e1s, canales prioritarios, qu\u00e9 dejar de hacer, resultado estrat\u00e9gico que persigue el plan.");
+  p.push("SITUACI\u00d3N ACTUAL DEL NEGOCIO\nModelo de negocio, l\u00edneas actuales, producto o l\u00ednea prioritaria, ticket promedio, margen aproximado, canales actuales, situaci\u00f3n comercial, recursos disponibles, limitaciones reales. Convi\u00e9rtelo en lectura estrat\u00e9gica, no copies respuestas del alumno.");
+  p.push("DIAGN\u00d3STICO ESTRAT\u00c9GICO\nQu\u00e9 funciona, qu\u00e9 desgasta resultados, d\u00f3nde se pierde foco, d\u00f3nde se pierde dinero, qu\u00e9 decisiones se tomaron sin claridad. Distingue s\u00edntoma de causa. Distingue errores internos de errores de proveedores.");
+  p.push("HALLAZGOS PRIORITARIOS\nPara cada hallazgo cr\u00edtico: nombre del hallazgo / qu\u00e9 se detect\u00f3 / por qu\u00e9 importa / qu\u00e9 puede pasar si no se corrige / c\u00f3mo mejorarlo / Prioridad: Alta o Media o Baja / Plazo: Inmediato o 30 d\u00edas o 90 d\u00edas o 6 meses.");
+  p.push("CLIENTE IDEAL Y MERCADO\nPerfil del cliente prioritario, comportamiento de compra, canales donde est\u00e1, por qu\u00e9 compra, por qu\u00e9 no compra, objeciones principales.");
+  p.push("POSICIONAMIENTO Y ESENCIA DE MARCA\nEsencia en una frase, propuesta de valor, diferenciadores reales, territorio de posicionamiento, tono de voz recomendado, coherencias e incoherencias actuales.");
+  p.push("OFERTA Y L\u00cdNEAS DE NEGOCIO\nFunci\u00f3n comercial de cada l\u00ednea (entrada / margen / recurrencia / posicionamiento). Cu\u00e1l priorizar. Cu\u00e1l pausar. Cu\u00e1l puede debilitar el posicionamiento.");
+  p.push("CANALES PRIORITARIOS\nCanal de descubrimiento, de confianza, de conversi\u00f3n, de cierre, de recompra. Qu\u00e9 canal NO priorizar y por qu\u00e9.");
+  p.push("NARRATIVA COMERCIAL\nMensaje principal de marca. Beneficio racional y emocional por l\u00ednea prioritaria. CTA por etapa. Qu\u00e9 piezas de contenido debe tener antes de pautar.");
+  p.push("ESTRATEGIA DE VENTAS Y SEGUIMIENTO\nFlujo de venta recomendado. Manejo de objeciones. Seguimiento a 24 y 48 horas. Experiencia post-compra. Estrategia de recompra y referidos.");
+  p.push("M\u00c9TRICAS, ROAS, ROI Y RENTABILIDAD\nQu\u00e9 medir y con qu\u00e9 frecuencia. ROAS m\u00ednimo aceptable. Par\u00e1metros para pausar, ajustar o escalar. Se\u00f1ales de alarma.");
+  p.push("PLAN ESTRAT\u00c9GICO A 12 MESES\nTrimestre 1 Validaci\u00f3n y posicionamiento / Trimestre 2 Tracci\u00f3n y prueba social / Trimestre 3 Escalamiento / Trimestre 4 Optimizaci\u00f3n y consolidaci\u00f3n. Cada trimestre: objetivo, prioridades, canales, contenido, ventas, m\u00e9tricas.");
+  p.push("PLAN OPERATIVO DE EJECUCI\u00d3N A 6 MESES\nFase 1 Mes 1 Correcci\u00f3n y base / Fase 2 Meses 2-3 Activaci\u00f3n y tracci\u00f3n / Fase 3 Meses 4-6 Escalamiento y optimizaci\u00f3n. Cada fase: tareas concretas, responsables, entregables esperados.");
+  p.push("RECOMENDACIONES DE CONTRATACI\u00d3N O DELEGACI\u00d3N\nQu\u00e9 perfiles contratar. Qu\u00e9 pedir en el brief. Qu\u00e9 entregable exigir. Se\u00f1ales de humo que deben hacer desconfiar de un proveedor.");
+  p.push("PRIORIDADES INMEDIATAS\nPrioridad 1 para los pr\u00f3ximos 7 d\u00edas. Las 3 prioridades para los pr\u00f3ximos 30 d\u00edas. Qu\u00e9 pausar de inmediato.");
+  p.push("CIERRE ESTRAT\u00c9GICO\nLectura breve, sobria y potente. Qu\u00e9 debe entender el due\u00f1o. Qu\u00e9 no debe volver a hacer. Qu\u00e9 debe medir. Cierra con: El marketing no empieza en redes. Empieza en la estrategia del negocio.");
+  p.push("CRITERIO DE CALIDAD: El documento debe parecer consultor\u00eda profesional, NO copia de m\u00f3dulos. Debe tener resumen ejecutivo. Los hallazgos deben explicar qu\u00e9 pasa, por qu\u00e9 importa y c\u00f3mo corregir. Las recomendaciones deben ser accionables.");
+  var promptPlan=p.join("\n\n");
+
+  var LOGO_PLAN="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCABQAT8DASIAAhEBAxEB/8QAGwABAAMBAQEBAAAAAAAAAAAAAAEEBQMCBgf/xAA5EAABAwIEAwYEBQQBBQAAAAABAAIDBBEFEiExQVKREyJRYXGBBhShwSMyM0KxFXLR8CU1NmLh8f/EABkBAQEBAQEBAAAAAAAAAAAAAAABAgMEBf/EACURAAICAgICAgEFAAAAAAAAAAABAhEDEiExE0FRYRQycYGRof/aAAwDAQACEQMRAD8A+9REXxj2hERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREBew/DTXiQiUMyW3be91VqIH0074ZBZzTb189";
+
+  try{
+    var planTexto=await callAPI([{role:"user",content:promptPlan}],4000);
+    var styles="<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;background:#F7F4EE;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover{min-height:100vh;background:#111111;color:#F7F4EE;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 40px;page-break-after:always}.cover img{max-width:130px;width:130px;height:80px;object-fit:contain;object-position:center;margin-bottom:20px;background:transparent}.cover .tag{font-size:9px;color:#D3BC8D;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:28px}.cover h1{font-size:36px;font-weight:800;color:#F7F4EE;margin-bottom:16px;line-height:1.15;letter-spacing:-.5px}.cover .sub{font-size:13px;color:#9C9281;line-height:1.85;max-width:460px;margin:0 auto 28px}.cover .alumno{font-size:18px;font-weight:700;color:#D3BC8D;margin-bottom:4px}.cover .emp{font-size:13px;color:#9C9281}.cover .footer{font-size:9px;color:#444;border-top:1px solid #333;padding-top:16px;margin-top:32px;line-height:1.7}.section{background:#fff;border:1px solid #E8E2D8;border-radius:4px;padding:36px 40px;margin:20px 40px;page-break-inside:avoid}.section h2{font-size:15px;font-weight:800;color:#111;text-transform:uppercase;letter-spacing:.8px;border-bottom:2px solid #D3BC8D;padding-bottom:10px;margin-bottom:18px}.section .body{font-size:12.5px;line-height:1.85;color:#333;white-space:pre-wrap}.close-section{min-height:12cm;background:#111;color:#F7F4EE;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:50px 40px;page-break-before:always}.close-section h2{font-size:26px;font-weight:800;color:#D3BC8D;margin-bottom:14px}.close-section .frase{font-size:12px;color:#9C9281;line-height:1.85;max-width:440px;margin:0 auto 24px}.close-section .footer{font-size:9px;color:#444;border-top:1px solid #333;padding-top:14px;margin-top:20px}.no-print{display:none}@page{margin:18mm 15mm 22mm 15mm}.page-footer{position:fixed;bottom:0;left:0;right:0;height:18mm;display:flex;align-items:center;justify-content:center;font-family:-apple-system,Arial,sans-serif;font-size:7.5px;color:#9C9281;border-top:1px solid #E8E2D8;background:#fff;padding:0 20px;text-align:center;line-height:1.5}@media print{.no-print{display:none!important}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.page-footer{position:fixed;bottom:0}}</style>";
+    var docHtml="<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'/><title>Plan Estrat\u00e9gico INITIUM \u2014 "+NOM+"</title>"+styles+"</head><body>";
+    docHtml+="<div class='cover'><img src='"+LOGO_PLAN+"'/><div class='tag'>INITIUM ONE LAB &middot; Nat Moreno &amp; Co. &middot; 2026</div><h1>Plan Estrat\u00e9gico<br/>de Marketing</h1><div class='sub'>Documento ejecutivo construido bajo el <strong style='color:#F7F4EE'>M\u00e9todo INITIUM</strong> by Nat Moreno &amp; Co.<br/>El marketing no empieza en redes. Empieza en la estrategia del negocio.</div><div class='alumno'>"+NOM+"</div>"+(EMP?"<div class='emp'>"+EMP+"</div>":"")+"<div style='font-size:11px;color:#666;margin-top:6px'>Modo: "+modoLbl+"</div><div class='footer'>Generado el "+fecha+" &middot; INITIUM ONE LAB &middot; &copy; Nat Moreno &amp; Co. 2026. Todos los derechos reservados.<br/>Documento de uso exclusivo del alumno. Prohibida su reproducci\u00f3n o distribuci\u00f3n sin autorizaci\u00f3n escrita.</div></div>";
+    docHtml+="<div style='padding:20px 0'>";
+    var bloques=planTexto.split(/\n\n+/);
+    var seccionActual="";var tituloActual="";
+    bloques.forEach(function(bloque){
+      var bTrim=bloque.trim();if(!bTrim)return;
+      var esT=bTrim.length<80&&bTrim===bTrim.toUpperCase()&&/[A-Z\u00c1\u00c9\u00cd\u00d3\u00da\u00d1]/.test(bTrim)&&!bTrim.includes(".");
+      if(esT){
+        if(tituloActual&&seccionActual){docHtml+="<div class='section'><h2>"+tituloActual+"</h2><div class='body'>"+seccionActual.trim()+"</div></div>";}
+        tituloActual=bTrim;seccionActual="";
+      }else{seccionActual+=bTrim+"\n\n";}
+    });
+    if(tituloActual&&seccionActual){docHtml+="<div class='section'><h2>"+tituloActual+"</h2><div class='body'>"+seccionActual.trim()+"</div></div>";}
+    else if(seccionActual){docHtml+="<div class='section'><div class='body'>"+seccionActual.trim()+"</div></div>";}
+    docHtml+="</div>";
+    docHtml+="<div style='margin:0 40px 20px;padding:14px 16px;background:#F7F4EE;border:1px solid #E8E2D8;border-left:3px solid #D3BC8D;border-radius:3px;font-size:10px;color:#5F5957;line-height:1.7'><strong>Aviso legal:</strong> Este documento fue generado dentro de INITIUM ONE LAB, plataforma metodol\u00f3gica de marketing estrat\u00e9gico de INITIUM Academy by Nat Moreno &amp; Co. No sustituye asesor\u00eda personalizada, financiera, legal, contable ni fiscal.</div>";
+    docHtml+="<div class='close-section'><h2>Strategy. Execution. Results. Soul.</h2><div class='frase'>Este plan es el resultado de tu trabajo con el M\u00e9todo INITIUM.<br/>Usa\u0301lo para dirigir tu marketing, contratar con criterio y crecer con claridad.</div><div class='footer'>&copy; Nat Moreno &amp; Co. 2026 &middot; INITIUM ONE LAB &middot; INITIUM Academy &middot; Todos los derechos reservados &middot; natmorenoandco.com<br/>Queda prohibida la reproducci\u00f3n, distribuci\u00f3n, venta, adaptaci\u00f3n o uso comercial sin autorizaci\u00f3n escrita de Nat Moreno &amp; Co. / INITIUM Academy.</div></div>";
+    docHtml+="<div class='no-print' style='position:fixed;bottom:20px;right:20px;display:flex;gap:10px;z-index:9999'><button onclick='window.close()' style='background:#333;color:#D3BC8D;border:1px solid #444;padding:10px 18px;font-size:11px;cursor:pointer;border-radius:3px'>\u2190 Cerrar</button><button onclick='window.print()' style='background:#D3BC8D;color:#111;border:none;padding:10px 18px;font-size:11px;font-weight:700;cursor:pointer;border-radius:3px'>\u2b07 Descargar PDF</button></div>";
+    docHtml+="</body></html>";
+    var w=window.open("","_blank");
+    if(w){w.document.write(docHtml);w.document.close();}
+    pg.style.display="none";
+    show("pg-cert");
+  }catch(e){
+    pg.innerHTML="<div style='min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center'><div style='font-size:16px;font-weight:700;color:#A8453A;margin-bottom:10px'>Error al generar el Plan Estrat\u00e9gico</div><div style='font-size:12px;color:#5F5957;margin-bottom:20px'>"+e.message+"<br/>Verifica tu conexi\u00f3n e intenta de nuevo.</div><button onclick='showCert()' style='background:#D3BC8D;color:#111;border:none;padding:12px 24px;font-size:12px;font-weight:700;cursor:pointer;border-radius:3px'>\u2190 Volver a entregables</button></div>";
+    pg.style.display="block";
+    document.querySelectorAll(".pg").forEach(function(el){el.style.display="none";});
+  }
+}
 function closePlan(){
   document.getElementById("pg-print").style.display="none";
   document.querySelectorAll(".pg").forEach(function(el){el.style.display="none";});
-  document.getElementById("pg-app").style.display="flex";
+  show("pg-cert");
   window.scrollTo(0,0);
 }
 
@@ -2048,336 +2086,235 @@ function generateCertificate(){
 // ============================================================
 async function generateParrilla(){
   var btn=event&&event.target;
-  if(btn){btn.disabled=true;btn.textContent="Generando parrilla con IA...";}
+  if(btn){btn.disabled=true;btn.textContent="Generando con M\u00e9todo INITIUM...";}
   try{
-    // Obtener contexto del módulo 7 (Parrilla Estratégica)
-    var ctxMod7=RPRES[8]||"";// índice 8 = módulo 7 (orden: 0,1,2,3,4,4.5,5,6,7...)
+    var ctxMod7=RPRES[8]||"";
     var ctxMod7alt=RES[8]&&RES[8].t?RES[8].t:"";
     var ctxParrilla=ctxMod7.length>30?ctxMod7:(ctxMod7alt.length>30?ctxMod7alt:"");
-    var alumno=NOM||(EMP?"Alumno INITIUM":"");
-    var empresa=EMP||"";
+    var ctxMod3=(RPRES[3]&&RPRES[3].trim().length>30?RPRES[3]:(RES[3]&&RES[3].t?RES[3].t:"")).substring(0,250);
+    var ctxMod6=(RPRES[7]&&RPRES[7].trim().length>30?RPRES[7]:(RES[7]&&RES[7].t?RES[7].t:"")).substring(0,250);
+    var alumno=NOM||"Alumno";var empresa=EMP||"";
     var hoy=new Date();
-    var meses=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     var mesNombres=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-    var diaInicio=hoy.getDate();
-    var mesIdx=hoy.getMonth();
-    var anio=hoy.getFullYear();
-    var periodoStr=(diaInicio)+" "+mesNombres[mesIdx]+" – "+(diaInicio+14)+" "+mesNombres[mesIdx]+" "+anio;
-    // Generar 15 filas de parrilla con IA
-    var prompt="Eres estratega de contenido senior. Alumno: "+alumno+(empresa?" | Empresa: "+empresa:"")+". ";
-    prompt+="Contexto del negocio (Módulo 7): "+(ctxParrilla.substring(0,800)||"No disponible")+". ";
-    prompt+="Genera exactamente 15 filas de parrilla de contenido estratégico. ";
-    prompt+="Para cada fila proporciona EXACTAMENTE estos 9 campos separados por PIPE (|): ";
-    prompt+="TIPO_CONTENIDO|DIA_FECHA|RED_SOCIAL|COPY_PRINCIPAL|HASHTAGS|ELEMENTOS_GRAFICOS|OBJETIVO_FASE|FORMATO|CALL_TO_ACTION. ";
-    prompt+="Usa 3 fases: Días 1-5=Conocimiento y Autoridad, Días 6-10=Confianza y Activación, Días 11-15=Venta y Cierre. ";
-    prompt+="DIA_FECHA formato: 'Día N  DD MMM YYYY'. ";
-    prompt+="COPY_PRINCIPAL: copy real y específico para el negocio del alumno (2-3 oraciones). ";
-    prompt+="No pongas headers ni explicaciones. Solo las 15 líneas separadas por pipe. Una línea por fila. ";
-    prompt+="Sé específico con el negocio real del alumno — no uses ejemplos genéricos.";
-    var filas=await callAPI([{role:"user",content:prompt}],3000);
-    // Parsear respuesta
-    var lineas=filas.split("\n").filter(function(l){return l.trim().length>5&&l.includes("|");});
-    // Cargar SheetJS de forma lazy
-    if(typeof XLSX==="undefined"){
-      await new Promise(function(resolve,reject){
-        var s=document.createElement("script");
-        s.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
-        s.onload=resolve;s.onerror=reject;
-        document.head.appendChild(s);
-      });
-    }
-    // Construir workbook exactamente como el diseño aprobado
-    var wb=XLSX.utils.book_new();
-    var wsData=[];
-    // Fila 1: Encabezado principal
-    wsData.push(["PARRILLA DE CONTENIDO REDES SOCIALES INITIUM ACADEMY  ·  INITIUM ONE LAB  ·  by Nat Moreno & Co.","","","","","","","","",""]);
-    // Fila 2: Info alumno y período
-    var lineaPrioritaria="";
-    if(ctxParrilla.length>10){var lp=ctxParrilla.match(/l[ií]nea prioritaria[:\s]+([^\n\.]+)/i);if(lp)lineaPrioritaria=lp[1].trim().substring(0,40);}
-    wsData.push(["Alumno: "+alumno+"   ·   Empresa/Proyecto: "+empresa,"","","","","Período: "+periodoStr+"   ·   Línea prioritaria: "+(lineaPrioritaria||"INITIUM ONE LAB"),"","","",""]);
-    // Fila 3: Instrucciones
-    wsData.push(["📌 INSTRUCCIONES DE USO: 1. Esta parrilla cubre 15 días de contenido estratégico organizado en 3 fases. Cada fila representa una pieza de contenido con copy listo para publicar. 2. FASES: Fase 1 (Días 1–5) = Conocimiento y Autoridad  ·  Fase 2 (Días 6–10) = Confianza y Activación  ·  Fase 3 (Días 11–15) = Venta y Cierre 3. APROBACIÓN: Marca ✓ Sí cuando el contenido esté aprobado y listo para programar. El copy puede adaptarse al tono de la marca pero debe mantener el mensaje estratégico definido.","","","","","","","","",""]);
-    // Fila 4: Indicadores de fase
-    wsData.push(["● FASE 1 — Conocimiento y Autoridad  (Días 1–5)","","","","● FASE 2 — Confianza y Activación  (Días 6–10)","","","","● FASE 3 — Venta y Cierre  (Días 11–15)",""]);
-    // Fila 5: Headers de columnas
-    wsData.push(["TIPO DE CONTENIDO","DÍA / FECHA","RED SOCIAL","COPY PRINCIPAL","HASHTAGS","ELEMENTOS GRÁFICOS","OBJETIVO / FASE","FORMATO","CALL TO ACTION","APROBACIÓN ✓"]);
-    // Filas de contenido generadas por IA
-    var diaNum=1;
-    var fechaBase=new Date(hoy);
-    lineas.slice(0,15).forEach(function(linea){
-      var partes=linea.split("|").map(function(p){return p.trim();});
-      while(partes.length<9)partes.push("");
-      // Calcular fecha del día
-      var fechaDia=new Date(fechaBase);
-      fechaDia.setDate(fechaBase.getDate()+diaNum-1);
-      var diaStr="Día "+diaNum+"  "+fechaDia.getDate()+" "+mesNombres[fechaDia.getMonth()]+" "+fechaDia.getFullYear();
-      wsData.push([
-        partes[0]||"Contenido educativo",
-        diaStr,
-        partes[2]||"Instagram",
-        partes[3]||"",
-        partes[4]||"",
-        partes[5]||"",
-        partes[6]||"",
-        partes[7]||"",
-        partes[8]||"",
-        "□ Sí □ No"
-      ]);
-      diaNum++;
+    var periodoStr=hoy.getDate()+" "+mesNombres[hoy.getMonth()]+" \u2013 "+(hoy.getDate()+14)+" "+mesNombres[hoy.getMonth()]+" "+hoy.getFullYear();
+    var prompt=[];
+    prompt.push("Eres estratega de contenido senior de Nat Moreno & Co. \u2014 INITIUM Academy.");
+    prompt.push("ALUMNO: "+alumno+(empresa?" | EMPRESA: "+empresa:"")+". CONTEXTO: Parrilla m\u00f3dulo 7: "+(ctxParrilla.substring(0,400)||"No disponible")+". Marca m\u00f3dulo 3: "+(ctxMod3||"No disponible")+". Narrativa m\u00f3dulo 6: "+(ctxMod6||"No disponible")+".");
+    prompt.push("REGLAS: Contenido 100% personalizado. Copy listo para publicar. Sin promesas falsas ni frases gen\u00e9ricas. PROHIBIDO mencionar IA.");
+    prompt.push("Genera EXACTAMENTE 15 filas separadas por PIPE con 9 campos: TIPO|DIA_FECHA|RED_SOCIAL|COPY_PRINCIPAL|HASHTAGS|ELEMENTOS_GRAFICOS|OBJETIVO_FASE|FORMATO|CALL_TO_ACTION");
+    prompt.push("FASES: D\u00edas 1-5=Conocimiento y Autoridad | D\u00edas 6-10=Confianza y Activaci\u00f3n | D\u00edas 11-15=Venta y Cierre. DIA_FECHA: 'D\u00eda N  DD MMM YYYY'. Sin headers. Solo 15 l\u00edneas.");
+    var filas=await callAPI([{role:"user",content:prompt.join("\n\n")}],3000);
+    var lineas=filas.split("\n").filter(function(l){return l.trim().length>5&&l.includes("|");}).slice(0,15);
+    var rowsHtml="";
+    lineas.forEach(function(linea,idx){
+      var pts=linea.split("|").map(function(x){return x.trim();});
+      while(pts.length<9)pts.push("");
+      var fechaDia=new Date(hoy);fechaDia.setDate(hoy.getDate()+idx);
+      var diaStr="D\u00eda "+(idx+1)+"  "+fechaDia.getDate()+" "+mesNombres[fechaDia.getMonth()]+" "+fechaDia.getFullYear();
+      var fc=idx<5?"fi1":idx<10?"fi2":"fi3";
+      rowsHtml+="<tr class='"+fc+"'><td><strong>"+pts[0]+"</strong></td><td>"+diaStr+"</td><td>"+pts[2]+"</td><td>"+pts[3]+"</td><td><small>"+pts[4]+"</small></td><td><small>"+pts[5]+"</small></td><td><small>"+pts[6]+"</small></td><td>"+pts[7]+"</td><td>"+pts[8]+"</td><td style='text-align:center;color:#D3BC8D'>&#9633; S\u00ed<br/>&#9633; No</td></tr>";
     });
-    // Relleno si menos de 15 filas
-    while(diaNum<=15){
-      var fechaDia=new Date(fechaBase);fechaDia.setDate(fechaBase.getDate()+diaNum-1);
-      wsData.push(["Contenido estratégico","Día "+diaNum+"  "+fechaDia.getDate()+" "+mesNombres[fechaDia.getMonth()]+" "+fechaDia.getFullYear(),"Instagram","Contenido específico para "+alumno+".","#INITIUM #MarketingEstrategico","Paleta negra y dorada.","Según fase","Post","Visita el link en bio.","□ Sí □ No"]);
-      diaNum++;
-    }
-    // Fila de copyright
-    wsData.push(["© Nat Moreno & Co. 2026  ·  INITIUM ONE LAB  ·  Todos los derechos reservados  ·  Documento de uso exclusivo del alumno registrado en el programa. Queda estrictamente prohibida su reproducción, distribución, venta o uso comercial sin autorización escrita de Nat Moreno & Co. / INITIUM Academy.","","","","","","","","",""]);
-    var ws=XLSX.utils.aoa_to_sheet(wsData);
-    // Anchos de columna
-    ws["!cols"]=[{wch:24},{wch:20},{wch:16},{wch:55},{wch:35},{wch:30},{wch:22},{wch:18},{wch:30},{wch:14}];
-    // Merge encabezado principal
-    ws["!merges"]=[
-      {s:{r:0,c:0},e:{r:0,c:9}},
-      {s:{r:1,c:0},e:{r:1,c:4}},
-      {s:{r:1,c:5},e:{r:1,c:9}},
-      {s:{r:2,c:0},e:{r:2,c:9}},
-      {s:{r:3,c:0},e:{r:3,c:3}},
-      {s:{r:3,c:4},e:{r:3,c:7}},
-      {s:{r:3,c:8},e:{r:3,c:9}},
-      {s:{r:wsData.length-1,c:0},e:{r:wsData.length-1,c:9}}
-    ];
-    XLSX.utils.book_append_sheet(wb,ws,"Parrilla 15 Días");
-    XLSX.writeFile(wb,"INITIUM_Parrilla_Contenido_"+alumno.replace(/\s+/g,"_")+".xlsx");
-  }catch(e){
-    alert("Error generando la parrilla: "+e.message+". Verifica tu conexión e inténtalo de nuevo.");
-  }finally{
-    if(btn){btn.disabled=false;btn.textContent="⬇ Descargar Parrilla de Contenido 15 días";}
-  }
+    var LOGO="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCABQAT8DASIAAhEBAxEB/8QAGwABAAMBAQEBAAAAAAAAAAAAAAEEBQMCBgf/xAA5EAABAwIEAwYEBQQBBQAAAAABAAIDBBEFEiExQVKREyJRYXGBBhShwSMyM0KxFXLR8CU1NmLh8f/EABkBAQEBAQEBAAAAAAAAAAAAAAABAgMEBf/EACURAAICAgICAgEFAAAAAAAAAAABAhEDEiExE0FRYRQycYGRof/aAAwDAQACEQMRAD8A+9REXxj2hERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREBew/DTXiQiUMyW3be91VqIH0074ZBZzTb189";
+    var EST="<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,Arial,sans-serif;background:#fff;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}.ph{background:#111;color:#D3BC8D;padding:28px 36px}.ph img{max-width:100px;height:auto;margin-bottom:10px}.ph h1{font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:1px}.ph p{font-size:10px;color:#9C9281;margin-top:4px}.pa{background:#5F5957;color:#fff;padding:10px 36px;font-size:10px;display:flex;justify-content:space-between}.ins{background:#FDFAF5;border-left:3px solid #D3BC8D;padding:14px 36px;font-size:10px;color:#3A3230;line-height:1.75}.fb{display:flex}.f1{background:#8A6D2B;color:#fff;padding:8px 16px;font-size:9px;font-weight:700;flex:1;text-align:center}.f2{background:#5F5957;color:#fff;padding:8px 16px;font-size:9px;font-weight:700;flex:1;text-align:center}.f3{background:#111;color:#D3BC8D;padding:8px 16px;font-size:9px;font-weight:700;flex:1;text-align:center}table{width:100%;border-collapse:collapse}th{background:#111;color:#D3BC8D;padding:8px 10px;font-size:9px;font-weight:700;text-align:left;border:1px solid #333}td{padding:10px;font-size:10px;color:#111;border:1px solid #E8E2D8;vertical-align:top;line-height:1.55}tr:nth-child(even) td{background:#FDFAF5}tr:nth-child(odd) td{background:#fff}.fi1 td:first-child{border-left:4px solid #8A6D2B!important}.fi2 td:first-child{border-left:4px solid #5F5957!important}.fi3 td:first-child{border-left:4px solid #111!important}.fd{background:#111;color:#D3BC8D;text-align:center;padding:14px;font-size:9px}.btns{position:fixed;bottom:20px;right:20px;display:flex;gap:8px;z-index:9999}.bv{background:#1A1A1A;color:#D3BC8D;border:1px solid #444;padding:10px 16px;font-size:11px;cursor:pointer;border-radius:3px;font-family:inherit}.bd{background:#D3BC8D;color:#111;border:none;padding:10px 18px;font-size:11px;font-weight:700;cursor:pointer;border-radius:3px;font-family:inherit}@media print{.btns{display:none!important}}</style>";
+    var html="<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'/><title>Parrilla \u2014 "+alumno+"</title>"+EST+"</head><body>";
+    html+="<div class='ph'><img src='"+LOGO+"' alt='Nat Moreno &amp; Co.'/><h1>Parrilla de Contenido Redes Sociales</h1><p>INITIUM ACADEMY &nbsp;\u00b7&nbsp; INITIUM ONE LAB &nbsp;\u00b7&nbsp; by Nat Moreno &amp; Co.</p></div>";
+    html+="<div class='pa'><span><strong>Alumno:</strong> "+alumno+(empresa?" &nbsp;\u00b7&nbsp; <strong>Empresa:</strong> "+empresa:"")+"</span><span><strong>Per\u00edodo:</strong> "+periodoStr+"</span></div>";
+    html+="<div class='ins'><strong>Instrucciones:</strong> 15 d\u00edas de contenido en 3 fases con copy listo para publicar. FASES: D\u00edas 1\u20135 Conocimiento y Autoridad &nbsp;\u00b7&nbsp; D\u00edas 6\u201310 Confianza y Activaci\u00f3n &nbsp;\u00b7&nbsp; D\u00edas 11\u201315 Venta y Cierre. Aprobaci\u00f3n: Marca S\u00ed cuando est\u00e9 listo para programar.</div>";
+    html+="<div class='fb'><div class='f1'>FASE 1 \u2014 Conocimiento y Autoridad</div><div class='f2'>FASE 2 \u2014 Confianza y Activaci\u00f3n</div><div class='f3'>FASE 3 \u2014 Venta y Cierre</div></div>";
+    html+="<table><thead><tr><th>TIPO</th><th>D\u00cdA / FECHA</th><th>RED</th><th>COPY PRINCIPAL</th><th>HASHTAGS</th><th>GR\u00c1FICOS</th><th>OBJETIVO</th><th>FORMATO</th><th>CTA</th><th>\u2713</th></tr></thead><tbody>"+rowsHtml+"</tbody></table>";
+    html+="<div class='fd'>&copy; Nat Moreno &amp; Co. 2026 &nbsp;\u00b7&nbsp; INITIUM ONE LAB &nbsp;\u00b7&nbsp; Todos los derechos reservados &nbsp;\u00b7&nbsp; Documento exclusivo del alumno. Prohibida su reproducci\u00f3n sin autorizaci\u00f3n escrita.</div>";
+    html+="<div class='btns'><button class='bv' onclick='window.close()'>\u2190 Volver a entregables</button><button class='bd' onclick='window.print()'>\u2b07 Guardar como PDF</button></div>";
+    html+="<div class=\'page-footer\'>© Nat Moreno & Co. 2026 · INITIUM ONE LAB · INITIUM Academy · Todos los derechos reservados. Documento de uso exclusivo del alumno registrado. Queda prohibida su reproducción, distribución, venta, adaptación, copia parcial o uso comercial sin autorización escrita de Nat Moreno & Co. / INITIUM Academy.</div>";html+="</body></html>";
+    var w=window.open("","_blank");if(w){w.document.write(html);w.document.close();}
+  }catch(e){alert("Error generando la parrilla: "+e.message);}
+  finally{if(btn){btn.disabled=false;btn.textContent="\u2b07 Descargar Parrilla de Contenido 15 d\u00edas";}}
 }
 
-// ============================================================
-// FUNCIÓN: generateGantt() — Excel Gantt de Ejecución
-// ============================================================
 async function generateGantt(){
   var btn=event&&event.target;
-  if(btn){btn.disabled=true;btn.textContent="Generando Gantt con IA...";}
+  if(btn){btn.disabled=true;btn.textContent="Generando con M\u00e9todo INITIUM...";}
   try{
-    // Contexto de módulos 11, 11.5 y 10.9
     var getMod=function(idx){return (RPRES[idx]&&RPRES[idx].trim().length>30)?RPRES[idx]:(RES[idx]&&RES[idx].t?RES[idx].t:"");};
-    var ctx11=getMod(15).substring(0,600);// módulo 11 (índice 15)
-    var ctx115=getMod(16).substring(0,400);// módulo 11.5 (índice 16)
-    var ctx109=getMod(14).substring(0,400);// módulo 10.8/diagnóstico (índice 14)
+    var ctx11=getMod(15).substring(0,500);
+    var ctx115=getMod(16).substring(0,350);
+    var ctx109=getMod(14).substring(0,350);
     var alumno=NOM||"Alumno";var empresa=EMP||"";
-    // Fecha de inicio: 1 del mes siguiente
     var hoy=new Date();
+    var mesesNombres=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
     var inicio=new Date(hoy.getFullYear(),hoy.getMonth()+1,1);
     var fin=new Date(hoy.getFullYear(),hoy.getMonth()+7,0);
-    var mesesNombres=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-    var periodoStr=mesesNombres[inicio.getMonth()]+" – "+mesesNombres[fin.getMonth()]+" "+inicio.getFullYear();
-    // Generar tareas con IA
-    var prompt="Eres consultor senior de implementación de marketing. Alumno: "+alumno+(empresa?" | Empresa: "+empresa:"")+". ";
-    prompt+="Plan Estratégico (Módulo 11): "+(ctx11||"No disponible")+". ";
-    prompt+="Plan Operativo (Módulo 11.5): "+(ctx115||"No disponible")+". ";
-    prompt+="Diagnóstico (Módulo 10.8): "+(ctx109||"No disponible")+". ";
-    prompt+="Genera exactamente 18 tareas de ejecución en 3 fases para 6 meses. ";
-    prompt+="Para cada tarea proporciona EXACTAMENTE estos 8 campos separados por PIPE (|): ";
-    prompt+="FASE|TAREA|RESPONSABLE|ESTATUS|INICIO_DD_MM_YYYY|ENTREGA_DD_MM_YYYY|DURACION|PORCENTAJE. ";
-    prompt+="FASE: 'FASE 1 Corrección y Base' (6 tareas), 'FASE 2 Activación y Tracción' (6 tareas), 'FASE 3 Escalamiento y Optimización' (6 tareas). ";
-    prompt+="ESTATUS: 'SIN REALIZAR' para todas. DURACION: '2 sem.' o '4 sem.' o '6 sem.' o '8 sem.'. PORCENTAJE: '0%'. ";
-    prompt+="RESPONSABLE: perfil apropiado (Dueño del negocio, Equipo técnico, Agencia, etc.). ";
-    prompt+="INICIO_DD_MM_YYYY y ENTREGA_DD_MM_YYYY: fechas reales a partir del 01/"+(inicio.getMonth()+1).toString().padStart(2,"0")+"/"+inicio.getFullYear()+". ";
-    prompt+="No pongas headers ni explicaciones. Solo las 18 líneas. Sé específico con el negocio del alumno.";
-    var tareasRaw=await callAPI([{role:"user",content:prompt}],2500);
-    var lineas=tareasRaw.split("\n").filter(function(l){return l.trim().length>5&&l.includes("|");});
-    // Cargar SheetJS
-    if(typeof XLSX==="undefined"){
-      await new Promise(function(resolve,reject){
-        var s=document.createElement("script");
-        s.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
-        s.onload=resolve;s.onerror=reject;
-        document.head.appendChild(s);
-      });
-    }
-    var wb=XLSX.utils.book_new();
-    var wsData=[];
-    // Fila 1: Encabezado
-    wsData.push(["DIAGRAMA DE GANTT — PLAN DE EJECUCIÓN INITIUM ACADEMY  ·  INITIUM ONE LAB  ·  by Nat Moreno & Co.","","","","","","","","","","","","","","","","","","","","","","","","","","",""]);
-    // Fila 2: Alumno y período
-    wsData.push(["Alumno: "+alumno+"   ·   Empresa: "+empresa,"","","","Plan de Ejecución: 6 meses  ·  "+periodoStr.charAt(0).toUpperCase()+periodoStr.slice(1),"","","","","","","","","","","","","","","","","","","","","","",""]);
-    // Fila 3: Instrucciones
-    wsData.push(["📌 INSTRUCCIONES: Este Gantt muestra el plan de ejecución en 3 fases. Cada barra de color representa la duración de la tarea en semanas. ESTATUS: SIN REALIZAR = tarea pendiente  ·  EN PROCESO = en ejecución  ·  HECHO = completado. FASES: Fase 1 Mes 1 = Corrección y Base  ·  Fase 2 Meses 2-3 = Activación y Tracción  ·  Fase 3 Meses 4-6 = Escalamiento y Optimización.","","","","","","","","","","","","","","","","","","","","","","","","","","",""]);
-    // Fila 4: Indicadores
-    wsData.push(["INDICADORES:","","■  SIN REALIZAR","■  EN PROCESO","■  HECHO","","","","","","","","","","","","","","","","","","","","","","",""]);
-    // Fila 5: Headers
-    var semHeaders=[];
-    for(var s2=1;s2<=24;s2++)semHeaders.push("S"+s2);
-    wsData.push(["FASE","TAREA","RESPONSABLE","ESTATUS","INICIO","ENTREGA","DURACIÓN","% AVANCE","MES 1 — CORRECCIÓN Y BASE","","","","MESES 2–3 — ACTIVACIÓN Y TRACCIÓN","","","","","","","","MESES 4–6 — ESCALAMIENTO Y OPTIMIZACIÓN","","","","","","","",""]);
-    // Tareas
-    var faseActual="";
-    lineas.slice(0,18).forEach(function(linea){
-      var p=linea.split("|").map(function(x){return x.trim();});
-      while(p.length<8)p.push("");
-      var esFaseFila=p[0]&&p[0].toUpperCase().indexOf("FASE")>=0&&p[0]!==faseActual;
-      if(esFaseFila)faseActual=p[0];
-      var row=[
-        p[0]||"",p[1]||"",p[2]||"Dueño del negocio",
-        p[3]||"SIN REALIZAR",p[4]||"",p[5]||"",p[6]||"",p[7]||"0%",
-        "","","","","","","","","","","","","","","","","","","",""
-      ];
-      wsData.push(row);
+    var periodoStr=mesesNombres[inicio.getMonth()]+" \u2013 "+mesesNombres[fin.getMonth()]+" "+inicio.getFullYear();
+    var p2=[];
+    p2.push("Eres consultor senior de implementaci\u00f3n de Nat Moreno & Co. \u2014 INITIUM Academy.");
+    p2.push("ALUMNO: "+alumno+(empresa?" | EMPRESA: "+empresa:"")+". CONTEXTO: Plan estrat\u00e9gico: "+(ctx11||"No disponible")+". Plan operativo: "+(ctx115||"No disponible")+". Diagn\u00f3stico: "+(ctx109||"No disponible")+".");
+    p2.push("REGLAS: 18 tareas personalizadas del diagn\u00f3stico real del alumno. NADA gen\u00e9rico. Cada tarea concreta. ESTATUS de todas: SIN REALIZAR. PROHIBIDO mencionar IA.");
+    p2.push("Genera EXACTAMENTE 18 l\u00edneas pipe con 7 campos: FASE|TAREA|RESPONSABLE|ESTATUS|INICIO_DD/MM/YYYY|ENTREGA_DD/MM/YYYY|DURACION");
+    p2.push("FASES: Fase 1 Correcci\u00f3n y Base (6 tareas Mes 1) | Fase 2 Activaci\u00f3n y Tracci\u00f3n (6 tareas Meses 2-3) | Fase 3 Escalamiento y Optimizaci\u00f3n (6 tareas Meses 4-6). Fechas desde "+(inicio.getDate()+"/"+(inicio.getMonth()+1)+"/"+inicio.getFullYear())+". Sin headers. Solo 18 l\u00edneas.");
+    var tareasRaw=await callAPI([{role:"user",content:p2.join("\n\n")}],2500);
+    var lineas=tareasRaw.split("\n").filter(function(l){return l.trim().length>5&&l.includes("|");}).slice(0,18);
+    var rowsHtml="";var faseActual="";var faseNum=0;
+    var fhCls=["fh1","fh2","fh3"];var gbCls=["gb1","gb2","gb3"];
+    lineas.forEach(function(linea){
+      var pts=linea.split("|").map(function(x){return x.trim();});
+      while(pts.length<7)pts.push("");
+      var fase=pts[0]||"";
+      if(fase&&fase!==faseActual){faseActual=fase;rowsHtml+="<tr class='"+(fhCls[faseNum]||"fh1")+"' ><td colspan='7'><strong>"+fase+"</strong></td></tr>";faseNum++;}
+      var eCls=pts[3]==="HECHO"?"ec-h":pts[3]==="EN PROCESO"?"ec-p":"ec-s";
+      var durN=parseInt(pts[6])||2;var bW=Math.min(durN*18,100)+"px";var bC=gbCls[Math.max(0,faseNum-1)]||"gb1";
+      rowsHtml+="<tr><td></td><td>"+pts[1]+"</td><td><small>"+pts[2]+"</small></td><td class='"+eCls+"'>"+pts[3]+"</td><td><small>"+pts[4]+"</small></td><td><small>"+pts[5]+"</small></td><td><span class='"+bC+"' style='display:inline-block;height:14px;border-radius:2px;width:"+bW+"'></span><small style='margin-left:6px'>"+pts[6]+"</small></td></tr>";
     });
-    // Copyright
-    wsData.push(["© Nat Moreno & Co. 2026  ·  INITIUM ONE LAB  ·  Todos los derechos reservados  ·  Documento de uso exclusivo del alumno registrado en el programa. Queda estrictamente prohibida su reproducción, distribución, venta o uso comercial sin autorización escrita de Nat Moreno & Co. / INITIUM Academy.","","","","","","","","","","","","","","","","","","","","","","","","","","",""]);
-    var ws=XLSX.utils.aoa_to_sheet(wsData);
-    ws["!cols"]=[{wch:22},{wch:45},{wch:22},{wch:14},{wch:12},{wch:12},{wch:9},{wch:9}];
-    for(var ci=8;ci<28;ci++)ws["!cols"].push({wch:4});
-    ws["!merges"]=[
-      {s:{r:0,c:0},e:{r:0,c:27}},
-      {s:{r:1,c:0},e:{r:1,c:3}},
-      {s:{r:1,c:4},e:{r:1,c:27}},
-      {s:{r:2,c:0},e:{r:2,c:27}},
-      {s:{r:3,c:0},e:{r:3,c:27}},
-      {s:{r:4,c:8},e:{r:4,c:11}},
-      {s:{r:4,c:12},e:{r:4,c:19}},
-      {s:{r:4,c:20},e:{r:4,c:27}},
-      {s:{r:wsData.length-1,c:0},e:{r:wsData.length-1,c:27}}
-    ];
-    XLSX.utils.book_append_sheet(wb,ws,"Gantt INITIUM ONE LAB");
-    XLSX.writeFile(wb,"INITIUM_Gantt_Ejecucion_"+alumno.replace(/\s+/g,"_")+".xlsx");
-  }catch(e){
-    alert("Error generando el Gantt: "+e.message+". Verifica tu conexión e inténtalo de nuevo.");
-  }finally{
-    if(btn){btn.disabled=false;btn.textContent="⬇ Descargar Gantt de Ejecución";}
-  }
+    var LOGO2="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCABQAT8DASIAAhEBAxEB/8QAGwABAAMBAQEBAAAAAAAAAAAAAAEEBQMCBgf/xAA5EAABAwIEAwYEBQQBBQAAAAABAAIDBBEFEiExQVKREyJRYXGBBhShwSMyM0KxFXLR8CU1NmLh8f/EABkBAQEBAQEBAAAAAAAAAAAAAAABAgMEBf/EACURAAICAgICAgEFAAAAAAAAAAABAhEDEiExE0FRYRQycYGRof/aAAwDAQACEQMRAD8A+9REXxj2hERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREBew/DTXiQiUMyW3be91VqIH0074ZBZzTb189";
+    var EST2="<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,Arial,sans-serif;background:#fff;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}.gh{background:#111;color:#D3BC8D;padding:28px 36px;display:flex;align-items:center;gap:20px}.gh img{max-width:80px;height:auto}.ghtxt h1{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:1px}.ghtxt p{font-size:10px;color:#9C9281;margin-top:4px}.ga{background:#5F5957;color:#fff;padding:10px 36px;font-size:10px}.gi{background:#FDFAF5;border-left:3px solid #D3BC8D;padding:14px 36px;font-size:10px;color:#3A3230;line-height:1.75}.gind{display:flex;gap:24px;padding:10px 36px;background:#F0EDE6;font-size:10px}.ec-s{color:#5F5957;font-weight:700}.ec-p{color:#B07D2B;font-weight:700}.ec-h{color:#3F7D5B;font-weight:700}table{width:100%;border-collapse:collapse}th{background:#111;color:#D3BC8D;padding:8px 10px;font-size:9px;font-weight:700;text-align:left;border:1px solid #333}td{padding:9px 10px;font-size:10px;color:#111;border:1px solid #E8E2D8;vertical-align:middle}tr:nth-child(even) td{background:#FDFAF5}tr:nth-child(odd) td{background:#fff}.fh1 td{background:#8A6D2B!important;color:#fff!important;font-weight:700!important}.fh2 td{background:#5F5957!important;color:#fff!important;font-weight:700!important}.fh3 td{background:#111!important;color:#D3BC8D!important;font-weight:700!important}.gb1{background:#8A6D2B}.gb2{background:#5F5957}.gb3{background:#111}.fd{background:#111;color:#D3BC8D;text-align:center;padding:14px;font-size:9px}.btns{position:fixed;bottom:20px;right:20px;display:flex;gap:8px;z-index:9999}.bv{background:#1A1A1A;color:#D3BC8D;border:1px solid #444;padding:10px 16px;font-size:11px;cursor:pointer;border-radius:3px;font-family:inherit}.bd{background:#D3BC8D;color:#111;border:none;padding:10px 18px;font-size:11px;font-weight:700;cursor:pointer;border-radius:3px;font-family:inherit}@media print{.btns{display:none!important}}</style>";
+    var html2="<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'/><title>Gantt \u2014 "+alumno+"</title>"+EST2+"</head><body>";
+    html2+="<div class='gh'><img src='"+LOGO2+"' alt='NM&amp;Co.'/><div class='ghtxt'><h1>Diagrama de Gantt \u2014 Plan de Ejecuci\u00f3n</h1><p>INITIUM ACADEMY &nbsp;\u00b7&nbsp; INITIUM ONE LAB &nbsp;\u00b7&nbsp; by Nat Moreno &amp; Co.</p></div></div>";
+    html2+="<div class='ga'><strong>Alumno:</strong> "+alumno+(empresa?" &nbsp;\u00b7&nbsp; <strong>Empresa:</strong> "+empresa:"")+" &nbsp;\u00b7&nbsp; <strong>Plan:</strong> 6 meses &nbsp;\u00b7&nbsp; "+periodoStr.charAt(0).toUpperCase()+periodoStr.slice(1)+"</div>";
+    html2+="<div class='gi'><strong>Instrucciones:</strong> Plan de ejecuci\u00f3n en 3 fases. ESTATUS: SIN REALIZAR = pendiente &nbsp;\u00b7&nbsp; EN PROCESO = en ejecuci\u00f3n &nbsp;\u00b7&nbsp; HECHO = completado.</div>";
+    html2+="<div class='gind'><span class='ec-s'>\u25a0 SIN REALIZAR</span><span class='ec-p'>\u25a0 EN PROCESO</span><span class='ec-h'>\u25a0 HECHO</span></div>";
+    html2+="<table><thead><tr><th>FASE</th><th>TAREA</th><th>RESPONSABLE</th><th>ESTATUS</th><th>INICIO</th><th>ENTREGA</th><th>DURACI\u00d3N</th></tr></thead><tbody>"+rowsHtml+"</tbody></table>";
+    html2+="<div class='fd'>&copy; Nat Moreno &amp; Co. 2026 &nbsp;\u00b7&nbsp; INITIUM ONE LAB &nbsp;\u00b7&nbsp; Todos los derechos reservados &nbsp;\u00b7&nbsp; Documento exclusivo del alumno. Prohibida su reproducci\u00f3n sin autorizaci\u00f3n escrita.</div>";
+    html2+="<div class='btns'><button class='bv' onclick='window.close()'>\u2190 Volver a entregables</button><button class='bd' onclick='window.print()'>\u2b07 Guardar como PDF</button></div>";
+    html2+="</body></html>";
+    var w=window.open("","_blank");if(w){w.document.write(html2);w.document.close();}
+  }catch(e){alert("Error generando el Gantt: "+e.message);}
+  finally{if(btn){btn.disabled=false;btn.textContent="\u2b07 Descargar Gantt de Ejecuci\u00f3n";}}
 }
 
 // ============================================================
 // FUNCIÓN: generateDiagnostico() — PDF Diagnóstico INITIUM
 // ============================================================
-function generateDiagnostico(){
+async function generateDiagnostico(){
   var fecha=new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"});
-  var LOGO_B64="data:image/jpeg;base64,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";
   var modoLbl={marcha:"Negocio en marcha",lanzamiento:"Producto en lanzamiento",cero:"Marca desde cero"}[tipo]||tipo;
-  var modDiagTitles=[
-    "Módulo 0 — Bienvenida y Método INITIUM",
-    "Módulo 1 — Diagnóstico Real del Negocio",
-    "Módulo 2 — Mercado, Competencia y Consumidor",
-    "Módulo 3 — Esencia de Marca y Posicionamiento",
-    "Módulo 4 — Oferta y Líneas de Negocio",
-    "Módulo 4.5 — Portafolio BCG",
-    "Módulo 5 — Cliente, Intención y Canales",
-    "Módulo 6 — Narrativa Comercial",
-    "Módulo 7 — Parrilla Estratégica",
-    "Módulo 7.5 — Auditoría de Redes Sociales",
-    "Módulo 7.8 — Métricas y Datos",
-    "Módulo 8 — Ecosistema Comercial",
-    "Módulo 9 — Ventas y Experiencia del Cliente",
-    "Módulo 9.5 — ROAS, ROI y Medición",
-    "Módulo 10 — Rentabilidad Real",
-    "Módulo 10.8 — Diagnóstico INITIUM: Radiografía del Negocio"
-  ];
-  var styles="<style>"
-    +"@page{size:letter;margin:1.2cm 1.5cm}"
-    +"*{box-sizing:border-box;margin:0;padding:0}"
-    +"body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;color:#111;background:#fff;font-size:11px;line-height:1.7}"
-    +".cover{width:100%;min-height:26cm;background:#111;color:#F7F4EE;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 40px;page-break-after:always}"
-    +".cover img{max-width:180px;margin-bottom:20px}"
-    +".cover .tag{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#D3BC8D;margin-bottom:20px}"
-    +".cover h1{font-size:36px;font-weight:800;color:#D3BC8D;line-height:1.15;margin-bottom:16px;letter-spacing:-.5px}"
-    +".cover .sub{font-size:12px;color:#9C9281;line-height:1.85;max-width:480px;margin:0 auto 28px}"
-    +".cover .alumno{font-size:22px;font-weight:700;color:#F7F4EE;margin-bottom:6px}"
-    +".cover .emp{font-size:13px;color:#9C9281}"
-    +".cover .footer{font-size:9px;color:#444;border-top:1px solid #333;padding-top:16px;margin-top:36px}"
-    +".section{padding:28px 0;border-bottom:1px solid #E8E2D8;page-break-inside:avoid}"
-    +".mod-label{font-size:8.5px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:Arial,sans-serif}"
-    +".mod-title{font-size:20px;font-weight:800;color:#111;margin-bottom:14px;letter-spacing:-.3px;line-height:1.2}"
-    +".mod-content{font-size:11px;color:#333;line-height:1.8;white-space:pre-wrap;font-family:-apple-system,'Segoe UI',Arial,sans-serif}"
-    +".mod-rpres{margin-top:16px;padding:12px 14px;background:#FDFAF5;border:1px solid #E8E2D8;border-left:3px solid #D3BC8D;border-radius:2px}"
-    +".mod-rpres .rp-label{font-size:8px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}"
-    +".mod-rpres .rp-text{font-size:10.5px;color:#333;line-height:1.75;white-space:pre-wrap}"
-    +".mod-empty{font-size:11px;color:#9C9281;font-style:italic;padding:12px 0}"
-    +".close-section{width:100%;min-height:12cm;background:#111;color:#F7F4EE;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:50px 40px;page-break-before:always}"
-    +".close-section h2{font-size:26px;font-weight:800;color:#D3BC8D;margin-bottom:14px}"
-    +".close-section .frase{font-size:12px;color:#9C9281;line-height:1.85;max-width:440px;margin:0 auto 24px}"
-    +".close-section .footer{font-size:9px;color:#444;border-top:1px solid #333;padding-top:14px;margin-top:20px}"
-    +".no-print{display:none}"
-    +"@media print{.no-print{display:none!important}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}"
-    +"</style>";
-  var html="<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'/><title>Diagnóstico INITIUM — "+NOM+"</title>"+styles+"</head><body>";
-  // Portada
-  html+="<div class='cover'><img src='"+LOGO_B64+"'/>"
-    +"<div class='tag'>INITIUM ONE LAB · Nat Moreno &amp; Co. · 2026</div>"
-    +"<h1>Diagnóstico INITIUM<br/>Radiografía del Negocio</h1>"
-    +"<div class='sub'>Análisis estratégico módulo a módulo construido con el <strong style='color:#F7F4EE'>Método INITIUM</strong> by Nat Moreno &amp; Co.<br/>El marketing no empieza en redes. Empieza en la estrategia del negocio.</div>"
-    +"<div class='alumno'>"+NOM+"</div>"
-    +(EMP?"<div class='emp'>"+EMP+"</div>":"")
-    +"<div style='font-size:11px;color:#666;margin-top:6px'>Modo: "+modoLbl+"</div>"
-    +"<div class='footer'>Generado el "+fecha+"&nbsp;&nbsp;·&nbsp;&nbsp;INITIUM ONE LAB&nbsp;&nbsp;·&nbsp;&nbsp;© Nat Moreno &amp; Co. 2026. Todos los derechos reservados.<br/>Documento de uso exclusivo del alumno. Prohibida su reproducción o distribución sin autorización escrita.</div>"
-    +"</div>";
-  // Sección por módulo (solo los 16 primeros = diagnóstico)
-  for(var i=0;i<16;i++){
-    var res=RES[i];var rpres=RPRES[i];
-    html+="<div class='section'>"
-      +"<div class='mod-label'>Módulo "+M[i].c+" &middot; INITIUM ONE LAB &middot; "+modDiagTitles[i]+"</div>"
-      +"<div class='mod-title'>"+modDiagTitles[i]+"</div>";
-    if(res&&res.t){
-      html+="<div class='mod-content'>"+res.t.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</div>";
-    }else{
-      html+="<div class='mod-empty'>Este módulo aún no ha sido completado en la plataforma.</div>";
-    }
-    if(rpres&&rpres.trim().length>30){
-      html+="<div class='mod-rpres'><div class='rp-label'>Análisis registrado por el alumno</div>"
-        +"<div class='rp-text'>"+rpres.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</div></div>";
-    }
-    html+="</div>";
-  }
-  // Cierre
-  html+="<div class='close-section'>"
-    +"<h2>Strategy. Execution. Results. Soul.</h2>"
-    +"<div class='frase'>Este diagnóstico es la radiografía real de tu negocio.<br/>Úsalo como base para construir tu Plan Estratégico y tomar decisiones con criterio.</div>"
-    +"<div class='footer'>© Nat Moreno &amp; Co. 2026 · INITIUM ONE LAB · Todos los derechos reservados · natmorenoandco.com<br/>Prohibida la reproducción, distribución o uso comercial sin autorización escrita.</div>"
-    +"</div>";
-  html+="<div class='no-print' style='position:fixed;bottom:20px;right:20px;display:flex;gap:10px;z-index:9999'>"
-    +"<button onclick='window.close()' style='background:#333;color:#D3BC8D;border:1px solid #444;padding:10px 18px;font-size:11px;cursor:pointer;border-radius:3px'>← Cerrar</button>"
-    +"<button onclick='window.print()' style='background:#D3BC8D;color:#111;border:none;padding:10px 18px;font-size:11px;font-weight:700;cursor:pointer;border-radius:3px'>⬇ Descargar PDF</button>"
-    +"</div></body></html>";
   var w=window.open("","_blank");
-  w.document.write(html);
+  if(!w){alert("Por favor permite ventanas emergentes para este sitio.");return;}
+  w.document.write("<!DOCTYPE html><html><head><meta charset='UTF-8'/><title>Generando Diagn\u00f3stico INITIUM...</title><style>body{font-family:-apple-system,sans-serif;background:#111;color:#F7F4EE;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:40px}.sp{width:48px;height:48px;border:3px solid #333;border-top-color:#D3BC8D;border-radius:50%;animation:spin .9s linear infinite;margin:24px auto}@keyframes spin{to{transform:rotate(360deg)}}</style></head><body><div style='font-size:9px;color:#D3BC8D;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px'>INITIUM ONE LAB &middot; Nat Moreno &amp; Co.</div><div style='font-size:20px;font-weight:800;margin-bottom:10px'>Generando tu Diagn\u00f3stico INITIUM\u2026</div><div style='font-size:12px;color:#9C9281;max-width:380px;line-height:1.7'>El M\u00e9todo INITIUM est\u00e1 construyendo la radiograf\u00eda estrat\u00e9gica de tu negocio. Esto puede tomar entre 20 y 40 segundos.</div><div class='sp'></div></body></html>");
   w.document.close();
-  setTimeout(function(){w.print();},1000);
-}
 
+  var modNombres=["M\u00f3dulo 0 \u2014 Bienvenida","M\u00f3dulo 1 \u2014 Diagn\u00f3stico Real","M\u00f3dulo 2 \u2014 Mercado y Competencia","M\u00f3dulo 3 \u2014 Esencia de Marca","M\u00f3dulo 4 \u2014 Oferta y L\u00edneas de Negocio","M\u00f3dulo 4.5 \u2014 Portafolio BCG","M\u00f3dulo 5 \u2014 Cliente y Canales","M\u00f3dulo 6 \u2014 Narrativa Comercial","M\u00f3dulo 7 \u2014 Parrilla Estrat\u00e9gica","M\u00f3dulo 7.5 \u2014 Auditor\u00eda de Redes","M\u00f3dulo 7.8 \u2014 M\u00e9tricas","M\u00f3dulo 8 \u2014 Ecosistema Conectado","M\u00f3dulo 9 \u2014 Ventas y Experiencia","M\u00f3dulo 9.5 \u2014 ROAS y ROI","M\u00f3dulo 10 \u2014 Inversi\u00f3n y Rentabilidad","M\u00f3dulo 10.8 \u2014 Diagn\u00f3stico INITIUM"];
+  var resumenAcum="";
+  for(var mi=0;mi<16;mi++){
+    var rpMod=RPRES[mi]&&RPRES[mi].trim().length>30?RPRES[mi]:"";
+    var rMod=RES[mi]&&RES[mi].t?RES[mi].t:"";
+    var contenido=rpMod.length>30?rpMod.substring(0,600):rMod.substring(0,450);
+    if(contenido.length>20)resumenAcum+=modNombres[mi]+":\n"+contenido+(contenido.length>=450?"...":"")+"\n\n";
+  }
+
+  var p=[];
+  p.push("Eres consultor estrat\u00e9gico senior de Nat Moreno & Co. \u2014 INITIUM Academy.");
+  p.push("Tu tarea es producir el DIAGN\u00d3STICO INITIUM: la radiograf\u00eda estrat\u00e9gica completa del negocio del alumno. La autor\u00eda metodol\u00f3gica pertenece a Nat Moreno & Co. / INITIUM Academy. NO menciones que la IA redact\u00f3 este documento.");
+  p.push("ALUMNO: "+NOM+"\nEMPRESA: "+(EMP||"No especificada")+"\nMODO: "+modoLbl+"\nFECHA: "+fecha);
+  p.push("INFORMACI\u00d3N ACUMULADA (M\u00f3dulos 0 al 10.8):\n"+resumenAcum);
+  p.push("INSTRUCCIONES OBLIGATORIAS:");
+  p.push("- NO copies los dashboards completos. INTERPRETA, DEPURA y ORGANIZA como consultor\u00eda estrat\u00e9gica.");
+  p.push("- REGLA DE ORO: muestra lo bueno y lo malo con la misma honestidad. Esto es una radiograf\u00eda, no una sentencia.");
+  p.push("- TONO: ejecutivo, diagn\u00f3stico, honesto, directo, constructivo. Sin atacar. Sin sobrevalorar.");
+  p.push("- No inventes datos. Si falta informaci\u00f3n, decl\u00e1rala como Dato pendiente por validar.");
+  p.push("ESTRUCTURA OBLIGATORIA - desarrolla cada secci\u00f3n con profundidad y criterio estrat\u00e9gico:");
+  p.push("LECTURA GENERAL DEL NEGOCIO\nEn m\u00e1ximo 8 l\u00edneas: qu\u00e9 es el negocio, en qu\u00e9 etapa est\u00e1, qu\u00e9 tiene a favor, cu\u00e1l es su mayor riesgo hoy.");
+  p.push("SEMAFORO ESTRATEGICO GENERAL\nTabla con columnas: Area | Estado (SANO / EN RIESGO / ENFERMO) | Nivel de riesgo (Alto/Medio/Bajo) | Comentario estrat\u00e9gico breve.\nAreas: Oferta, Cliente, Mercado, Marca, Canales, Narrativa, Contenido, Ventas, M\u00e9tricas, Rentabilidad, Ecosistema digital, Capacidad de ejecuci\u00f3n.");
+  p.push("HALLAZGOS PRINCIPALES\nPara cada hallazgo cr\u00edtico: NOMBRE DEL HALLAZGO / Qu\u00e9 se detect\u00f3 / Por qu\u00e9 es un hallazgo / Qu\u00e9 problema puede causar / C\u00f3mo puede mejorar / Sugerencia INITIUM / Prioridad: Alta o Media o Baja / Plazo: Inmediato o 30 d\u00edas o 90 d\u00edas o 6 meses.");
+  p.push("CAUSAS RAIZ\nAgrupa los problemas por causa real, NO por m\u00f3dulo. Solo incluye las categor\u00edas donde hay problemas detectados: claridad estrat\u00e9gica / oferta / canal / comunicaci\u00f3n / venta / medici\u00f3n / rentabilidad / ejecuci\u00f3n.");
+  p.push("FORTALEZAS REALES DEL NEGOCIO\nQu\u00e9 s\u00ed est\u00e1 funcionando. Qu\u00e9 activos reales tiene el negocio. Sobre qu\u00e9 puede construir.");
+  p.push("RIESGOS ANTES DE INVERTIR MAS\nQu\u00e9 no debe acelerarse. Qu\u00e9 no debe pautarse. Qu\u00e9 no debe delegarse. Qu\u00e9 debe corregirse antes de gastar m\u00e1s. Qu\u00e9 puede generar p\u00e9rdida de dinero.");
+  p.push("NIVEL DE PROBLEMA GENERAL\nNivel 1 Desorden de ejecuci\u00f3n / Nivel 2 Problema de estrategia / Nivel 3 Problema estructural. Indica el nivel con justificaci\u00f3n en 3-4 l\u00edneas.");
+  p.push("PRIORIDADES DE CORRECCI\u00d3N\nLas 3-5 acciones m\u00e1s urgentes, ordenadas por impacto.");
+  p.push("QUE CONTRATAR, DELEGAR O RESOLVER INTERNAMENTE\nQu\u00e9 puede hacer el due\u00f1o solo. Qu\u00e9 necesita especialista. Qu\u00e9 perfil. Qu\u00e9 nivel: solo ejecuci\u00f3n o estrategia senior.");
+  p.push("RECOMENDACI\u00d3N FINAL\nDirecto, sobrio, sin rodeos. Qu\u00e9 debe hacer primero. Qu\u00e9 debe medir. Qu\u00e9 debe dejar de hacer. Qu\u00e9 decisi\u00f3n tomar antes de invertir m\u00e1s.");
+  p.push("CRITERIO DE CALIDAD: El documento debe parecer consultor\u00eda profesional. Los hallazgos deben explicar qu\u00e9 pasa, por qu\u00e9 importa y c\u00f3mo corregir. Debe ser honesto mostrando tanto fortalezas como problemas.");
+  var promptDiag=p.join("\n\n");
+
+  var LOGO_DIAG="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCABQAT8DASIAAhEBAxEB/8QAGwABAAMBAQEBAAAAAAAAAAAAAAEEBQMCBgf/xAA5EAABAwIEAwYEBQQBBQAAAAABAAIDBBEFEiExQVKREyJRYXGBBhShwSMyM0KxFXLR8CU1NmLh8f/EABkBAQEBAQEBAAAAAAAAAAAAAAABAgMEBf/EACURAAICAgICAgEFAAAAAAAAAAABAhEDEiExE0FRYRQycYGRof/aAAwDAQACEQMRAD8A+9REXxj2hERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREBew/DTXiQiUMyW3be91VqIH0074ZBZzTb189";
+
+  try{
+    var diagTexto=await callAPI([{role:"user",content:promptDiag}],3500);
+    var styles="<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;background:#F7F4EE;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover{min-height:100vh;background:#111111;color:#F7F4EE;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 40px;page-break-after:always}.cover img{max-width:130px;width:130px;height:80px;object-fit:contain;object-position:center;margin-bottom:20px;background:transparent}.cover .tag{font-size:9px;color:#D3BC8D;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:28px}.cover h1{font-size:36px;font-weight:800;color:#F7F4EE;margin-bottom:16px;line-height:1.15}.cover .sub{font-size:13px;color:#9C9281;line-height:1.85;max-width:460px;margin:0 auto 28px}.cover .alumno{font-size:18px;font-weight:700;color:#D3BC8D;margin-bottom:4px}.cover .emp{font-size:13px;color:#9C9281}.cover .footer{font-size:9px;color:#444;border-top:1px solid #333;padding-top:16px;margin-top:32px;line-height:1.7}.section{background:#fff;border:1px solid #E8E2D8;border-radius:4px;padding:36px 40px;margin:20px 40px;page-break-inside:avoid}.section h2{font-size:15px;font-weight:800;color:#111;text-transform:uppercase;letter-spacing:.8px;border-bottom:2px solid #D3BC8D;padding-bottom:10px;margin-bottom:18px}.section .body{font-size:12.5px;line-height:1.85;color:#333;white-space:pre-wrap}.close-section{min-height:10cm;background:#111;color:#F7F4EE;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:50px 40px;page-break-before:always}.close-section h2{font-size:24px;font-weight:800;color:#D3BC8D;margin-bottom:14px}.close-section .frase{font-size:12px;color:#9C9281;line-height:1.85;max-width:440px;margin:0 auto 24px}.close-section .footer{font-size:9px;color:#444;border-top:1px solid #333;padding-top:14px;margin-top:20px}.no-print{display:none}@page{margin:18mm 15mm 22mm 15mm}.page-footer{position:fixed;bottom:0;left:0;right:0;height:18mm;display:flex;align-items:center;justify-content:center;font-family:-apple-system,Arial,sans-serif;font-size:7.5px;color:#9C9281;border-top:1px solid #E8E2D8;background:#fff;padding:0 20px;text-align:center;line-height:1.5}@media print{.no-print{display:none!important}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.page-footer{position:fixed;bottom:0}}</style>";
+    var docHtml="<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'/><title>Diagn\u00f3stico INITIUM \u2014 "+NOM+"</title>"+styles+"</head><body>";
+    docHtml+="<div class='cover'><img src='"+LOGO_DIAG+"'/><div class='tag'>INITIUM ONE LAB &middot; Nat Moreno &amp; Co. &middot; 2026</div><h1>Diagn\u00f3stico INITIUM<br/>Radiograf\u00eda del Negocio</h1><div class='sub'>An\u00e1lisis estrat\u00e9gico construido bajo el <strong style='color:#F7F4EE'>M\u00e9todo INITIUM</strong> by Nat Moreno &amp; Co.<br/>El marketing no empieza en redes. Empieza en la estrategia del negocio.</div><div class='alumno'>"+NOM+"</div>"+(EMP?"<div class='emp'>"+EMP+"</div>":"")+"<div style='font-size:11px;color:#666;margin-top:6px'>Modo: "+modoLbl+"</div><div class='footer'>Generado el "+fecha+" &middot; INITIUM ONE LAB &middot; &copy; Nat Moreno &amp; Co. 2026. Todos los derechos reservados.<br/>Documento de uso exclusivo del alumno. Prohibida su reproducci\u00f3n o distribuci\u00f3n sin autorizaci\u00f3n escrita.</div></div>";
+    docHtml+="<div style='padding:20px 0'>";
+    var bloques=diagTexto.split(/\n\n+/);
+    var seccionActual="";var tituloActual="";
+    bloques.forEach(function(bloque){
+      var bTrim=bloque.trim();if(!bTrim)return;
+      var esT=bTrim.length<80&&bTrim===bTrim.toUpperCase()&&/[A-Z\u00c1\u00c9\u00cd\u00d3\u00da\u00d1]/.test(bTrim)&&!bTrim.includes(".");
+      if(esT){
+        if(tituloActual&&seccionActual){docHtml+="<div class='section'><h2>"+tituloActual+"</h2><div class='body'>"+seccionActual.trim()+"</div></div>";}
+        tituloActual=bTrim;seccionActual="";
+      }else{seccionActual+=bTrim+"\n\n";}
+    });
+    if(tituloActual&&seccionActual){docHtml+="<div class='section'><h2>"+tituloActual+"</h2><div class='body'>"+seccionActual.trim()+"</div></div>";}
+    else if(seccionActual){docHtml+="<div class='section'><div class='body'>"+seccionActual.trim()+"</div></div>";}
+    docHtml+="</div>";
+    docHtml+="<div style='margin:0 40px 20px;padding:14px 16px;background:#F7F4EE;border:1px solid #E8E2D8;border-left:3px solid #D3BC8D;border-radius:3px;font-size:10px;color:#5F5957;line-height:1.7'><strong>Aviso legal:</strong> Este documento fue generado dentro de INITIUM ONE LAB, plataforma metodol\u00f3gica de marketing estrat\u00e9gico de INITIUM Academy by Nat Moreno &amp; Co. No sustituye asesor\u00eda personalizada, financiera, legal, contable ni fiscal.</div>";
+    docHtml+="<div class='close-section'><h2>Strategy. Execution. Results. Soul.</h2><div class='frase'>Este diagn\u00f3stico es la radiograf\u00eda real de tu negocio.<br/>Usa\u0301lo como base para construir tu Plan Estrat\u00e9gico y tomar decisiones con criterio.</div><div class='footer'>&copy; Nat Moreno &amp; Co. 2026 &middot; INITIUM ONE LAB &middot; INITIUM Academy &middot; Todos los derechos reservados &middot; natmorenoandco.com<br/>Prohibida la reproducci\u00f3n, distribuci\u00f3n o uso comercial sin autorizaci\u00f3n escrita.</div></div>";
+    docHtml+="<div class='no-print' style='position:fixed;bottom:20px;right:20px;display:flex;gap:10px;z-index:9999'><button onclick='window.close()' style='background:#333;color:#D3BC8D;border:1px solid #444;padding:10px 18px;font-size:11px;cursor:pointer;border-radius:3px'>\u2190 Cerrar</button><button onclick='window.print()' style='background:#D3BC8D;color:#111;border:none;padding:10px 18px;font-size:11px;font-weight:700;cursor:pointer;border-radius:3px'>\u2b07 Descargar PDF</button></div>";
+    docHtml+="</body></html>";
+    w.document.open();w.document.write(docHtml);w.document.close();
+  }catch(e){
+    w.document.open();
+    w.document.write("<html><body style='font-family:sans-serif;padding:40px;background:#111;color:#F7F4EE'><h2 style='color:#A8453A'>Error al generar el Diagn\u00f3stico</h2><p style='margin:12px 0;color:#9C9281'>"+e.message+"</p><button onclick='window.close()' style='background:#D3BC8D;color:#111;border:none;padding:10px 20px;cursor:pointer;margin-top:16px'>Cerrar</button></body></html>");
+    w.document.close();
+  }
+}
 function showCert(){
   var pct=Math.round(SCORE/TOTAL*100),ok=SCORE>=76;
-  var fecha=new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"});
-  document.getElementById("pg-cert").innerHTML="<div class='cb'>"
-    +"<div style='font-size:10px;color:#D3BC8D;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px'>INITIUM ONE LAB &middot; Nat Moreno &amp; Co. &middot; 2026</div>"
-    +(ok
-      ?"<div style='font-size:22px;font-weight:800;color:#D3BC8D;margin-bottom:6px'>&#127942; ¡Lo lograste, "+primerNombre()+"!</div>"
-      :"<div style='font-size:22px;font-weight:800;color:#D3BC8D;margin-bottom:6px'>&#128203; Resultado del programa</div>")
-    +"<div style='font-size:14px;color:#9C9281;margin-bottom:18px'>"+NOM+(EMP?" &middot; "+EMP:"")+"</div>"
-    +"<div style='font-size:56px;font-weight:800;color:"+(ok?"#D3BC8D":"#A8453A")+";line-height:1;margin:12px 0 4px;letter-spacing:-2px'>"+SCORE+" / "+TOTAL+"</div>"
-    +"<div style='font-size:13px;font-weight:700;color:"+(ok?"#D3BC8D":"#A8453A")+";margin-bottom:16px'>"+pct+"% &nbsp;—&nbsp; "+(ok?"Programa completado &nbsp;&#10003;":"Mínimo requerido: 80%")+"</div>"
-    +(ok
-      ?"<p style='font-size:12px;color:#9C9281;line-height:1.7;max-width:420px;margin:0 auto 24px'>Completaste el diagnóstico real de tu negocio y construiste tu plan estratégico con el Método INITIUM. Aquí están todos tus entregables.</p>"
-      :"<p style='font-size:12px;color:#9C9281;line-height:1.7;max-width:420px;margin:0 auto 24px'>Revisa los módulos con evaluación incorrecta y solicita tu segunda oportunidad a Nat Moreno &amp; Co.</p>")
-    // Botones de descarga — solo si aprobó
-    +(ok
-      ?"<div style='display:flex;flex-direction:column;gap:10px;width:100%;max-width:380px;margin:0 auto 20px'>"
-        +"<button class='cbtn' style='background:#D3BC8D;color:#111;font-size:12px' onclick='generatePlan()'>&#11015; Descargar Plan Estratégico de Marketing</button>"
-        +"<button class='cbtn' style='background:#1A1A1A;color:#D3BC8D;border:1px solid #333;font-size:12px' onclick='generateDiagnostico()'>&#11015; Descargar Diagnóstico INITIUM</button>"
-        +"<button class='cbtn' style='background:#1A1A1A;color:#D3BC8D;border:1px solid #333;font-size:12px' onclick='generateParrilla()'>&#11015; Descargar Parrilla de Contenido 15 días</button>"
-        +"<button class='cbtn' style='background:#1A1A1A;color:#D3BC8D;border:1px solid #333;font-size:12px' onclick='generateGantt()'>&#11015; Descargar Gantt de Ejecución</button>"
-        +"<button class='cbtn' style='background:#D3BC8D;color:#111;font-size:12px' onclick='generateCertificate()'>&#127891; Descargar mi Certificado INITIUM</button>"
-      :"")
-    +"<button class='cbtn' style='background:transparent;border:1px solid #333;color:#666;font-size:11px;margin-top:8px' onclick='show(\"pg-app\")'>&#8592; Volver al Dashboard</button>"
-    +"<div style='margin-top:24px;font-size:9px;color:#444;border-top:1px solid #222;padding-top:12px'>"
-    +"&copy; Nat Moreno &amp; Co. 2026 &nbsp;&middot;&nbsp; INITIUM ONE LAB &nbsp;&middot;&nbsp; Todos los derechos reservados</div>"
-    +"</div>";
+  var emailContacto="hola@natmorenoandco.com";
+  var asuntoEmail="Soporte%20INITIUM%20ONE%20LAB%20%E2%80%94%20"+encodeURIComponent(NOM||"Alumno");
+  var cuerpoEmail="Hola%20Nat%2C%0A%0ASoy%20"+encodeURIComponent(NOM||"")+(EMP?"%20de%20"+encodeURIComponent(EMP):"")+"%20y%20necesito%20soporte%20con%20INITIUM%20ONE%20LAB.%0A%0AMi%20puntaje%20fue%3A%20"+SCORE+"%20%2F%20"+TOTAL+"%20("+pct+"%25).%0A%0A";
+  var mailtoLink="mailto:"+emailContacto+"?subject="+asuntoEmail+"&body="+cuerpoEmail;
+  var htmlCert="<div class='cb' style='max-width:520px;margin:0 auto;padding:32px 24px 40px'>";
+  htmlCert+="<div style='font-size:9px;color:#D3BC8D;text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;text-align:center'>INITIUM ONE LAB &nbsp;&middot;&nbsp; Nat Moreno &amp; Co. &nbsp;&middot;&nbsp; 2026</div>";
+  if(ok){
+    htmlCert+="<div style='text-align:center;margin-bottom:28px'>"
+      +"<div style='font-size:36px;margin-bottom:8px'>&#127942;</div>"
+      +"<div style='font-size:22px;font-weight:800;color:#D3BC8D;margin-bottom:6px;line-height:1.2'>&#161;Felicidades, "+primerNombre()+"!</div>"
+      +"<div style='font-size:13px;color:#9C9281;margin-bottom:12px'>"+NOM+(EMP?" &nbsp;&middot;&nbsp; "+EMP:"")+"</div>"
+      +"<div style='font-size:48px;font-weight:800;color:#D3BC8D;line-height:1;letter-spacing:-2px;margin:8px 0 2px'>"+SCORE+" / "+TOTAL+"</div>"
+      +"<div style='font-size:12px;font-weight:700;color:#D3BC8D;margin-bottom:16px'>"+pct+"% &nbsp;&#10003;&nbsp; Programa completado</div>"
+      +"<div style='font-size:12px;color:#9C9281;line-height:1.75;max-width:400px;margin:0 auto 8px'>"
+      +"Completaste el M&eacute;todo INITIUM de principio a fin. Construiste el diagn&oacute;stico real de tu negocio y tu Plan Estrat&eacute;gico de Marketing. Eso es exactamente lo que muy pocos due&ntilde;os de empresa tienen &mdash; y t&uacute; ahora s&iacute;.<br/><br/>"
+      +"<strong style='color:#F7F4EE'>A continuaci&oacute;n descarga tus 5 entregables finales.</strong></div>"
+      +"</div>";
+    htmlCert+="<div style='background:#1A1A1A;border:1px solid #333;border-left:3px solid #D3BC8D;border-radius:4px;padding:14px 16px;margin-bottom:22px;text-align:left'>"
+      +"<div style='font-size:9px;font-weight:700;color:#D3BC8D;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px'>&#128203; C&oacute;mo descargar tus entregables</div>"
+      +"<div style='font-size:11px;color:#9C9281;line-height:1.85'>"
+      +"<strong style='color:#F7F4EE'>Plan Estrat&eacute;gico y Diagn&oacute;stico (PDF):</strong> Al hacer clic el Método INITIUM genera tu documento personalizado en una nueva ventana (20-40 seg). Luego usa <strong style='color:#F7F4EE'>Archivo &rarr; Imprimir &rarr; Guardar como PDF</strong>. En Mac: <strong style='color:#F7F4EE'>Cmd+P</strong>. En Windows: <strong style='color:#F7F4EE'>Ctrl+P</strong>. Selecciona &ldquo;Guardar como PDF&rdquo; como destino.<br/>"
+      +"<strong style='color:#F7F4EE'>Parrilla y Gantt (Excel):</strong> El Método INITIUM genera tu archivo y se descarga automáticamente. Ábrelo en Excel o Google Sheets.<br/>"
+      +"<strong style='color:#F7F4EE'>Certificado (PDF):</strong> Se abre en nueva ventana. Usa Cmd+P / Ctrl+P y guarda como PDF."
+      +"</div></div>";
+    htmlCert+="<div style='display:flex;flex-direction:column;gap:10px;width:100%;margin-bottom:20px'>"
+      +"<button class='cbtn' style='background:#D3BC8D;color:#111;font-size:12px;font-weight:700' onclick='generatePlan()'>&#11015;&nbsp; Plan Estrat&eacute;gico de Marketing</button>"
+      +"<button class='cbtn' style='background:#1A1A1A;color:#D3BC8D;border:1px solid #444;font-size:12px' onclick='generateDiagnostico()'>&#11015;&nbsp; Diagn&oacute;stico INITIUM &mdash; Radiograf&iacute;a del Negocio</button>"
+      +"<button class='cbtn' style='background:#1A1A1A;color:#D3BC8D;border:1px solid #444;font-size:12px' onclick='generateParrilla(event)'>&#11015;&nbsp; Parrilla de Contenido 15 d&iacute;as</button>"
+      +"<button class='cbtn' style='background:#1A1A1A;color:#D3BC8D;border:1px solid #444;font-size:12px' onclick='generateGantt(event)'>&#11015;&nbsp; Gantt de Ejecuci&oacute;n 6 meses</button>"
+      +"<button class='cbtn' style='background:#D3BC8D;color:#111;font-size:12px;font-weight:700' onclick='generateCertificate()'>&#127891;&nbsp; Mi Certificado INITIUM ONE LAB</button>"
+      +"<button class='cbtn' id='btn-zip-all' style='background:#F7F4EE;color:#111;border:1px solid #D3BC8D;font-size:11px;font-weight:700;margin-top:4px' onclick='downloadAllZip(this)'>&#128190;&nbsp; Descargar todos los entregables (ZIP)</button>"
+      +"</div>";
+    htmlCert+="<div style='font-size:9.5px;color:#444;border-top:1px solid #222;padding-top:14px;line-height:1.7;text-align:center'>"
+      +"&copy; Nat Moreno &amp; Co. 2026 &nbsp;&middot;&nbsp; INITIUM ONE LAB &nbsp;&middot;&nbsp; Todos los derechos reservados<br/>"
+      +"Documento de uso exclusivo del alumno registrado. Prohibida su reproducci&oacute;n o distribuci&oacute;n sin autorizaci&oacute;n escrita."
+      +"</div>";
+  }else{
+    htmlCert+="<div style='text-align:center;margin-bottom:28px'>"
+      +"<div style='font-size:32px;margin-bottom:8px'>&#128203;</div>"
+      +"<div style='font-size:20px;font-weight:800;color:#D3BC8D;margin-bottom:6px'>Resultado del programa</div>"
+      +"<div style='font-size:13px;color:#9C9281;margin-bottom:12px'>"+NOM+(EMP?" &nbsp;&middot;&nbsp; "+EMP:"")+"</div>"
+      +"<div style='font-size:48px;font-weight:800;color:#A8453A;line-height:1;letter-spacing:-2px;margin:8px 0 2px'>"+SCORE+" / "+TOTAL+"</div>"
+      +"<div style='font-size:12px;font-weight:700;color:#A8453A;margin-bottom:20px'>"+pct+"% &nbsp;&mdash;&nbsp; M&iacute;nimo requerido: 80%</div>"
+      +"<div style='font-size:12px;color:#9C9281;line-height:1.75;max-width:400px;margin:0 auto 24px'>"
+      +"A&uacute;n no alcanzas el puntaje m&iacute;nimo para acceder a tus entregables. Revisa los m&oacute;dulos con evaluaci&oacute;n incorrecta y cont&aacute;ctanos para solicitar tu segunda oportunidad."
+      +"</div></div>";
+    htmlCert+="<div style='display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px;margin:0 auto 20px'>"
+      +"<a href='"+mailtoLink+"' style='display:block;text-align:center;background:#D3BC8D;color:#111;border:none;border-radius:3px;padding:13px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;text-transform:uppercase;letter-spacing:.8px'>&#9993;&nbsp; Contactar a Nat Moreno &amp; Co.</a>"
+      +"<div style='font-size:10px;color:#5F5957;text-align:center;line-height:1.6'>Si el bot&oacute;n no abre tu correo, escr&iacute;benos directamente a:<br/><strong style='color:#D3BC8D;user-select:all'>hola@natmorenoandco.com</strong></div>"
+      +"</div>";
+    htmlCert+="<div style='font-size:9.5px;color:#444;border-top:1px solid #222;padding-top:14px;line-height:1.7;text-align:center;margin-top:16px'>"
+      +"&copy; Nat Moreno &amp; Co. 2026 &nbsp;&middot;&nbsp; INITIUM ONE LAB &nbsp;&middot;&nbsp; Todos los derechos reservados"
+      +"</div>";
+  }
+  htmlCert+="</div>";
+  document.getElementById("pg-cert").innerHTML=htmlCert;
   show("pg-cert");
 }
-
 async function gen(i){
   var btn=document.getElementById("gb");
   btn.disabled=true;btn.textContent="Analizando con Método INITIUM...";
