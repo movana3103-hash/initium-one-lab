@@ -112,3 +112,13 @@ La evaluación aparece al concluir la lección y práctica. Puede reexplicar sin
 - Contraste, móvil y teclado comprobados con pruebas.
 - Resultados completos, evidencia y referencias entre módulos.
 - Demo sin facturación ni exposición de secretos; producción sin cambios hasta QA.
+
+## Primera implementación visual en rama de pruebas (2026-11-07)
+- CSS de marca y navegación: `initium-ui.css` (base corporativa + violeta INITIUM + lavanda claro propuesto).
+- Motor UX de cuatro etapas: `initium-ux.js`, ejecutado al renderizar Módulo 1.
+- Campus actualizado para cargar CSS y JS y mostrar Aprender / Practicar / Aplicar / Resultados de forma progresiva sin cambiar prompts.
+- Progreso general corregido para calcular porcentaje sobre 23 módulos, sin el divisor antiguo 19.
+- Vista previa autónoma: `preview-campus.html`. No usa cuentas, expedientes reales ni API, así que es únicamente validación visual y pedagógica.
+- El logo vertical original fue localizado visualmente en biblioteca, pero la biblioteca no permitió materializar el archivo binario para incorporarlo a GitHub. **Bloqueado hasta disponer de bytes autorizados.** El código no lo sustituye por un logo generado.
+- El retrato editorial de Nat está aprobado como dirección visual, pero pendiente de una fotografía de referencia autorizada; el tutor se presenta textualmente y no finge ser Nat en persona.
+- Verificación efectuada: sintaxis de scripts principales y externos; comparación del bloque de 23 prompts exactamente igual entre `main` y la rama. No se han ejecutado pruebas de navegador real ni end-to-end, ni se ha publicado a `main`.
