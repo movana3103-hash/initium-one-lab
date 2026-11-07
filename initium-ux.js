@@ -54,6 +54,7 @@ function initiumUXBuild(){
    el.classList.add("iux-application");
    applicationStarted=true;
  }
+ if(!right.querySelector("#iux-result-toolbar")){const nav=document.createElement("div");nav.id="iux-result-toolbar";nav.innerHTML=initiumUXNav();right.prepend(nav);}
  const header=document.getElementById("iux-result-header")||document.createElement("div");
  if(!header.id){header.id="iux-result-header";header.className="iux-result-header";header.textContent="Tu diagnóstico · Hallazgos y resultados";right.prepend(header);}
  initiumUXActivate();
@@ -71,7 +72,7 @@ function initiumUXActivate(){
  const app=document.getElementById("pg-app"),middle=document.getElementById("col-mid");
  if(!app||!middle||!app.classList.contains("iux-mode"))return;
  INITIUM_UX_STEPS.forEach(function(step){app.classList.toggle("iux-"+step.id,initiumUXStep===step.id);});
- for(const tab of middle.querySelectorAll(".iux-tab")){
+ for(const tab of app.querySelectorAll(".iux-tab")){
    const selected=tab.getAttribute("data-iux-step")===initiumUXStep;
    if(selected)tab.setAttribute("aria-current","step");else tab.removeAttribute("aria-current");
  }
@@ -81,6 +82,7 @@ function initiumUXActivate(){
  }
  const aula=middle.querySelector(".initium-aula"),tutor=middle.querySelector(".initium-tutor");
  if(aula)aula.style.display=(initiumUXStep==="learn"||initiumUXStep==="simulate")?"":"none";
+ if(initiumUXStep==="simulate"&&initiumAulaReady()){initiumUXStep="apply";initiumUXActivate();return;}
  if(tutor)tutor.style.display=(initiumUXStep==="learn"||initiumUXStep==="simulate")?"":"none";
  if(aula)for(const el of aula.querySelectorAll("[data-iux-learn]")){
    el.style.display=initiumUXStep==="simulate"?"none":"";
