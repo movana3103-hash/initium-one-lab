@@ -133,7 +133,7 @@ function deliverablesView(){
 function footer(){return '<footer class="pilot-footer">INITIUM ONE LAB · Versión visual V2 de desarrollo · Sin pagos, sin datos privados, sin análisis de IA en vivo. © Nat Moreno &amp; Co.</footer>';}
 function stopAudio(){if("speechSynthesis" in window)window.speechSynthesis.cancel();state.speaking=false;}
 function audioToggle(){
- if(!("speechSynthesis" in window){alert("Este navegador no admite narración automática.");return;}
+ if(!("speechSynthesis" in window)){alert("Este navegador no admite narración automática.");return;}
  if(state.speaking){stopAudio();render();return;}
  const l=LESSONS[state.lesson],u=new SpeechSynthesisUtterance(l.title+". "+l.detail+". Ideas clave: "+l.facts.map(x=>x.join(". ")).join(". "));
  u.lang="es-MX";u.rate=state.rate;u.onend=()=>{state.speaking=false;render()};u.onerror=()=>{state.speaking=false;render()};
