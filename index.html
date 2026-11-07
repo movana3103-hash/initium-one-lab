@@ -419,6 +419,7 @@ nav{display:flex;flex-direction:column;gap:1px}
 <!-- PG 5: CERTIFICADO -->
 <div id="pg-cert" class="pg" style="background:#111111;align-items:center;justify-content:center;padding:32px 16px"></div>
 
+<script src="./aula-initium.js"></script>
 <script>
 const M=[
   {
@@ -1820,7 +1821,7 @@ function renderPDFP(i){
 function renderMod(i){
   var m=M[i];cur=i;
   var lbTxt={marcha:"Negocio en marcha",lanzamiento:"Producto en lanzamiento",cero:"Marca desde cero"}[tipo];
-  var nv=VC[m.c]||1,vw=VIDW[i]||0,allW=(vw>=nv);
+  var nv=VC[m.c]||1,vw=VIDW[i]||0,allW=(i===1?initiumAulaReady():vw>=nv);
   var pills="";
   for(var v=0;v<nv;v++){
     var dv=(vw>v);      // ya vista
@@ -1836,6 +1837,7 @@ function renderMod(i){
     +"<button class='btn-vw"+(allW?" done":"")+"' onclick='markAllWatched("+i+")'>"
     +(allW?"&#10003; Clases vistas — Práctica desbloqueada":"He visto "+(nv===1?"la clase":"todas las clases"))
     +"</button></div></div>";
+  if(i===1){videoH=initiumAulaMarkup();}
   var ht=tipo==="cero"?"Copia los campos, completa con tu caso y pega aquí.":tipo==="lanzamiento"?"Incluye datos de tu negocio base y del nuevo producto.":"Copia los campos con los datos de tu negocio y pega aquí.";
   var casoH="";
   if(i===0&&tipo==="cero"&&caso){
@@ -2032,7 +2034,7 @@ function extractHallazgo(txt){
 function renderRight(i){
   var m=M[i];
   var hasRes=RPRES[i]&&RPRES[i].trim().length>20;
-  var allW=(VIDW[i]||0)>=(VC[m.c]||1);
+  var allW=(i===1?initiumAulaReady():(VIDW[i]||0)>=(VC[m.c]||1));
   var answered=QA[i]!==undefined,comp=COMP[i]||false;
   var sem=hasRes?detectSem(RPRES[i]):null,niv=hasRes?detectNiv(RPRES[i]):null;
   // Hallazgo extraído dinámicamente del texto real de la IA
@@ -2090,7 +2092,7 @@ function renderRight(i){
 
 function onResChange(i){var t=document.getElementById("rp-txt");if(t){RPRES[i]=t.value;saveState();}if(RPRES[i]&&RPRES[i].trim().length>20)renderRight(i);}
 function answerQuiz(i,c){if(QA[i]!==undefined)return;QA[i]=c;if(c===M[i].qc)SCORE+=M[i].ps;renderNav();renderRight(i);saveState();}
-function marcarComp(i){var t=document.getElementById("rp-txt");if(t&&t.value)RPRES[i]=t.value;COMP[i]=true;renderNav();renderRight(i);saveState();}
+function marcarComp(i){if(i===1&&!initiumAulaReady()){alert("Completa primero las seis lecciones interactivas.");return;}if(i===1&&(QA[i]===undefined||!((RPRES[i]&&RPRES[i].trim().length>20)||(RES[i]&&RES[i].t&&RES[i].t.length>20)))){alert("Antes de completar, realiza el análisis y responde la evaluación del módulo.");return;}var t=document.getElementById("rp-txt");if(t&&t.value)RPRES[i]=t.value;COMP[i]=true;renderNav();renderRight(i);saveState();}
 function confirmarNota(){
   var chk=document.getElementById("chk-nota-app");
   if(chk&&chk.checked){COMP["nota_leida"]=true;saveState();}
