@@ -4,8 +4,8 @@
 <body><header class="head"><strong>Nat Moreno &amp; Co.</strong><span>INITIUM ACADEMY · ONE LAB</span></header>
 <main class="wrap"><div style="font-size:11px;letter-spacing:1px;color:#9B7B40;font-weight:bold">PROTOTIPO INTERACTIVO · SIN DATOS EMPRESARIALES</div><h1>Diagnóstico real del negocio</h1>
 <p class="sub">Prueba las seis microlecciones, su audio opcional y sus casos de decisión. Esta página no realiza diagnósticos ni llama a ninguna API de IA.</p>
-<div id="aula"></div><div class="warn">Esta vista previa es una prueba pedagógica independiente. El código del campus publicado permanece en la rama principal sin cambios. El audio utiliza las voces disponibles en tu navegador y dispositivo.</div>
+<div id="aula"></div><div id="tutor"></div><div class="warn">Esta vista previa es una prueba pedagógica independiente. El código del campus publicado permanece en la rama principal sin cambios. El audio utiliza las voces disponibles en tu navegador y dispositivo.</div>
 <button type="button" id="reset" style="border:1px solid #DDD5C6;background:transparent;padding:9px 14px;cursor:pointer">Reiniciar las seis lecciones</button>
 <p class="foot">© Nat Moreno &amp; Co. 2026 · INITIUM ONE LAB · Vista de prueba.</p></main>
 <script>var VIDW={1:0};function saveState(){}function renderMod(){document.getElementById("aula").innerHTML=initiumAulaMarkup();}document.getElementById("reset").onclick=function(){try{localStorage.removeItem("initium_aula_m1_v1")}catch(e){}renderMod()};</script>
-<script src="./aula-initium.js"></script><script>renderMod();</script></body></html>
+<script src="./aula-initium.js"></script><script src="./tutor-initium.js"></script><script>renderMod();document.getElementById("tutor").innerHTML=initiumTutorPanel("1",initiumAulaProgress());</script></body></html>
