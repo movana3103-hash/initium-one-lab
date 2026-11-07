@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INITIUM ONE LAB — Vista de desarrollo</title><link rel="stylesheet" href="./initium-ui.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font:15px/1.6 Arial,"Segoe UI",sans-serif;background:#F7F4EE;color:#111}
+.pg{display:flex;min-height:100vh}.cl{background:#111;color:#F7F4EE;padding:22px 18px;overflow:auto}
+.cl-top{padding:18px 8px}.cl-nav{padding:22px 5px;border-top:1px solid #504650}
+.cl-nav a{display:block;color:#e6dfe9;text-decoration:none;padding:12px 10px;font-size:13px}
+.cl-nav a.current{border-left:3px solid #D3BC8D;background:#774C8A;color:#fff}
+.cl-logo-text{color:#D3BC8D;font-weight:800;letter-spacing:.5px;font-size:17px;line-height:1.45}
+.cl-logo-text small{display:block;font-size:10px;font-weight:400;letter-spacing:1px;color:#D8CCD9}
+.cm{padding:34px;flex:1}.cr{flex:1;padding:32px}.ey{color:#774C8A;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.mt{font-size:28px;font-weight:800}.mbdg{display:inline-block;color:#774C8A;font-size:12px;margin:8px 0}
+.rps,.mc,.locked{background:#fff;padding:20px;margin:10px 0;border:1px solid #DED8D0}
+.iux-application h3{font-size:18px;margin:10px 0}.iux-application label{display:block;font-weight:700;font-size:13px}
+.iux-application textarea{display:block;width:100%;min-height:120px;border:1px solid #DED8D0;padding:12px;margin-top:10px;font:inherit}
+.ey,.mt,.mbdg{max-width:1050px}
+@media(max-width:720px){.cl{padding:9px 14px}.cm{padding:16px}}
+</style></head>
+<body><main class="pg" id="pg-app">
+<aside class="cl"><div class="cl-top"><div class="cl-logo-text">INITIUM<br>ONE LAB<small>Nat Moreno &amp; Co.</small></div>
+<p style="color:#D3BC8D;font-size:11px;margin:25px 0 0">MI RUTA · DEMOSTRACIÓN</p><p style="font-size:12px;color:#D8CCD9;margin-top:5px">Módulo 1 · Diagnóstico real</p>
+</div><nav class="cl-nav" aria-label="Ruta de aprendizaje"><a href="#" class="current">01 · Diagnóstico real</a><a href="#" onclick="alert('Esta vista demuestra únicamente el Módulo 1.');return false">Siguiente: hallazgos iniciales</a></nav></aside>
+<section class="cm" id="col-mid"></section><aside class="cr"><div id="cr-inner"></div></aside></main>
+<script>var VIDW={1:0};function saveState(){}
+function renderMod(){
+const middle=document.getElementById("col-mid");
+middle.innerHTML="<div class='ey'>INITIUM ACADEMY · MÓDULO 1</div><h1 class='mt'>Diagnóstico real del negocio</h1><div class='mbdg'>Aprende a separar síntomas, hipótesis y evidencia.</div>"
++initiumAulaMarkup()+initiumTutorPanel("1",initiumAulaProgress())
++"<div class='iux-application'><div class='mc'><label>Aplicación · Tu negocio</label><h3>Recupera el plan estratégico actual</h3>"
++"<p>En el campus real, este espacio ejecutará el prompt profesional validado para analizar la información aportada. Aquí mostramos solo la experiencia visual.</p>"
++"<label for='demo-data'>Datos de práctica (no se envían a una IA)</label><textarea id='demo-data' placeholder='¿Existe un plan? ¿Qué objetivos, ventas y actividades conoces?'></textarea>"
++"<p style='font-size:12px;color:#5F5957'>No introduzcas información confidencial. La versión real requiere seguridad y cuenta privada.</p></div></div>";
+const results=document.getElementById("cr-inner");
+results.innerHTML="<div class='rps'><h3>Estado del análisis</h3><p>El diagnóstico profesional todavía no se ejecuta en esta demostración.</p></div>"
++"<div class='rps'><h3>Hallazgos</h3><p>Los hallazgos reales aparecerán completos después de aportar datos y realizar el análisis.</p></div>"
++"<div class='rps'><h3>Tu próximo paso</h3><p>Completar el ejercicio, reunir evidencia y revisar el diagnóstico estructurado.</p></div>";
+initiumUXBuild();
+}
+</script><script src="./aula-initium.js"></script><script src="./tutor-initium.js"></script><script src="./initium-ux.js"></script><script>renderMod();</script>
+</body></html>
