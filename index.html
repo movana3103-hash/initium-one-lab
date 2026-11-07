@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>INITIUM ONE LAB — Nat Moreno &amp; Co.</title>
+<link rel="stylesheet" href="./initium-ui.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:#111111;min-height:100vh;-webkit-font-smoothing:antialiased}
@@ -394,8 +395,8 @@ nav{display:flex;flex-direction:column;gap:1px}
       <div class="mbd">Modo: <span id="modo-lbl">—</span></div>
       <div class="pw">
         <div class="pl2">Avance del programa</div>
-        <div class="pn"><span id="prog-n">0</span> / 20</div>
-        <div class="psc" id="sc-lbl">Puntaje: 0 / 95 pts</div>
+        <div class="pn"><span id="prog-n">0</span> / 23</div>
+        <div class="psc" id="sc-lbl">Puntaje: 0 / 115 pts</div>
         <div class="pb"><div class="pf" id="prog-f" style="width:0%"></div></div>
       </div>
     </div>
@@ -421,6 +422,7 @@ nav{display:flex;flex-direction:column;gap:1px}
 
 <script src="./aula-initium.js"></script>
 <script src="./tutor-initium.js"></script>
+<script src="./initium-ux.js"></script>
 <script>
 const M=[
   {
@@ -1755,7 +1757,7 @@ function startApp(){
 
 function renderNav(){
   var done=Object.keys(COMP).filter(function(k){return COMP[k];}).length;
-  var pct=Math.round(done/19*100);
+  var pct=Math.round(done/M.length*100);
   document.getElementById("prog-n").textContent=done+" ("+pct+"%)";
   document.getElementById("prog-f").style.width=pct+"%";
   document.getElementById("sc-lbl").textContent="Puntaje: "+SCORE+" / "+TOTAL+" pts";
@@ -1938,6 +1940,7 @@ function renderMod(i){
   }
   setTimeout(function(){renderImgP(i);renderPDFP(i);},50);
   renderRight(i);
+  if(i===1){initiumUXBuild();}else{initiumUXReset();}
 }
 
 function detectSem(t){
