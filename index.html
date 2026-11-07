@@ -420,6 +420,7 @@ nav{display:flex;flex-direction:column;gap:1px}
 <div id="pg-cert" class="pg" style="background:#111111;align-items:center;justify-content:center;padding:32px 16px"></div>
 
 <script src="./aula-initium.js"></script>
+<script src="./tutor-initium.js"></script>
 <script>
 const M=[
   {
@@ -1837,7 +1838,7 @@ function renderMod(i){
     +"<button class='btn-vw"+(allW?" done":"")+"' onclick='markAllWatched("+i+")'>"
     +(allW?"&#10003; Clases vistas — Práctica desbloqueada":"He visto "+(nv===1?"la clase":"todas las clases"))
     +"</button></div></div>";
-  if(i===1){videoH=initiumAulaMarkup();}
+  if(i===1){videoH=initiumAulaMarkup()+initiumTutorPanel("1",initiumAulaProgress());}
   var ht=tipo==="cero"?"Copia los campos, completa con tu caso y pega aquí.":tipo==="lanzamiento"?"Incluye datos de tu negocio base y del nuevo producto.":"Copia los campos con los datos de tu negocio y pega aquí.";
   var casoH="";
   if(i===0&&tipo==="cero"&&caso){
