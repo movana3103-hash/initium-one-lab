@@ -2670,7 +2670,10 @@ async function gen(i){
   content.push({type:"text",text:textPart});
   try{
     var tx=await callAPI([{role:"user",content:content}],tokensUsar);
-    RES[i]={t:tx,f:new Date().toLocaleString()};saveState();renderNav();renderMod(i);
+    RES[i]={t:tx,f:new Date().toLocaleString()};
+    // Sin copiar y pegar: el análisis íntegro se guarda directamente en Resultados.
+    RPRES[i]=tx;
+    saveState();renderNav();renderMod(i);
   }catch(e){
     document.getElementById("em").textContent="Error: "+e.message;
     btn.disabled=false;btn.textContent="Generar análisis con Método INITIUM";
