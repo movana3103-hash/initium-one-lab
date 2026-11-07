@@ -1778,7 +1778,7 @@ function renderNav(){
 }
 
 function watchVid(mi,vi){if(!VIDW[mi])VIDW[mi]=0;if(vi===VIDW[mi])VIDW[mi]++;saveState();renderMod(mi);}
-function markAllWatched(mi){VIDW[mi]=VC[M[mi].c]||1;saveState();renderMod(mi);}
+function markAllWatched(mi){if(mi===1){alert("Para avanzar, completa las lecciones y sus ejercicios de comprensión.");return;}VIDW[mi]=VC[M[mi].c]||1;saveState();renderMod(mi);}
 
 function addImage(i){
   var inp=document.createElement("input");inp.type="file";inp.accept="image/*";
@@ -2012,23 +2012,16 @@ function copyResult(i){
 
 // Extrae el HALLAZGO DEL MÓDULO del texto real generado por la IA
 function extractHallazgo(txt){
-  if(!txt||txt.length<30)return null;
-  // Busca la sección de hallazgo con varios formatos posibles
-  var patrones=[
-    /HALLAZGO DEL MÓDULO[:\s]*\n?([\s\S]{80,600}?)(?=\n[A-ZÁÉÍÓÚÑ]{3,}[\s:]|NIVEL DE PROBLEMA|$)/i,
-    /HALLAZGO[:\s]*\n?([\s\S]{80,600}?)(?=\n[A-ZÁÉÍÓÚÑ]{3,}[\s:]|NIVEL DE PROBLEMA|$)/i,
-    /hallazgo del módulo[:\s]*\n?([\s\S]{80,600}?)(?=\n[a-záéíóúñA-ZÁÉÍÓÚÑ]{3,}[\s:]|nivel de problema|$)/i,
-  ];
-  for(var p=0;p<patrones.length;p++){
-    var m=txt.match(patrones[p]);
-    if(m&&m[1]&&m[1].trim().length>40){
-      return m[1].trim().replace(/\n{3,}/g,"\n\n");
-    }
-  }
-  // Si no encuentra sección específica, busca texto después de "Hallazgo:"
-  var m2=txt.match(/hallazgo[:\s]+([^\n]{60,300})/i);
-  if(m2&&m2[1])return m2[1].trim();
-  return null;
+  if(!txt||txt.trim().length<20)return null;
+  // Se preserva el hallazgo completo, sin máximos arbitrarios de 300 o 600 caracteres.
+  // Se detiene únicamente ante un encabezado estructural conocido o fin del análisis.
+  var matches=[...txt.matchAll(/(?:^|\n)\s*(?:#{1,4}\s*)?(?:HALLAZGO DEL MÓDULO|HALLAZGO PRINCIPAL|HALLAZGO)\s*[:—-]?\s*/gi)];
+  if(!matches.length)return null;
+  var start=matches[matches.length-1].index+matches[matches.length-1][0].length;
+  var remaining=txt.substring(start);
+  var next=remaining.search(/\n\s*(?:#{1,4}\s*)?(?:NIVEL DE PROBLEMA|SEMÁFORO(?: POR ÁREA)?|SIGUIENTE MÓDULO|FIN DEL ANÁLISIS)\s*[:—-]?/i);
+  var value=(next>=0?remaining.substring(0,next):remaining).trim();
+  return value.length>=15?value:null;
 }
 
 function renderRight(i){
