@@ -1,0 +1,22 @@
+name: INITIUM ONE LAB V2 · UI y contratos
+on:
+  push:
+    branches: [feature/initium-campus-v2-rebuild]
+    paths:
+      - 'v2/**'
+      - '.github/workflows/v2-ui-tests.yml'
+  pull_request:
+    paths:
+      - 'v2/**'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar sintaxis JavaScript
+        run: node --check v2/app.js
+      - name: Verificar navegación, marca y contratos de documentos
+        run: node --test v2/tests/*.test.mjs
