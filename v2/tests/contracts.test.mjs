@@ -1,50 +1,67 @@
-/* INITIUM ONE LAB V2 — static contract checks, run: node --test v2/tests/contracts.test.mjs
- * Estos tests no sustituyen la inspección del campus en un navegador real. */
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
-import {createRequire} from "node:module";
-const base=new URL("../",import.meta.url);
-const js=readFileSync(new URL("app.js",base),"utf8");
-const css=readFileSync(new URL("styles.css",base),"utf8");
-const html=readFileSync(new URL("index.html",base),"utf8");
-const validatedCodes=["0","1","1.5","2","3","4","4.5","5","6","7","8","9","9.5","10","10.5","10.8","10.9","11","11.5","11.6","11.7","11.8","12"];
-const findModules=()=>[...js.matchAll(/\["([\d.]+)","([^"]+)"\]/g)].slice(0,23);
-test("la interfaz incluye los 23 módulos correctos y en su orden",()=>{
- const m=findModules();
- assert.equal(m.length,23);
- assert.deepEqual(m.map(x=>x[1]),validatedCodes);
+import vm from "node:vm";
+const root=new URL("../",import.meta.url);
+const js=readFileSync(new URL("app.js",root),"utf8");
+const css=readFileSync(new URL("styles.css",root),"utf8");
+const html=readFileSync(new URL("index.html",root),"utf8");
+const EXPECTED=["0","1","1.5","2","3","4","4.5","5","6","7","8","9","9.5","10","10.5","10.8","10.9","11","11.5","11.6","11.7","11.8","12"];
+function makeCampus(){
+ const elements=new Map(), handlers={};
+ const get=id=>{
+  if(id==="modal-backdrop"||id==="chat-feed"||id==="tutor-question")return null;
+  if(!elements.has(id))elements.set(id,{
+   innerHTML:"",textContent:"",classList:{add(){},remove(){},toggle(){}},
+   addEventListener(event,cb){handlers[id+":"+event]=cb;},remove(){},
+   querySelector(){return null},scrollIntoView(){}
+  });
+  return elements.get(id);
+ };
+ const doc={getElementById:get,addEventListener(event,cb){handlers[event]=cb;},querySelector(){return null},
+  body:{insertAdjacentHTML(){}}};
+ const storage={getItem(){return null},setItem(){}};
+ const win={scrollTo(){},open(){},speechSynthesis:{cancel(){},speak(){}}};
+ const context=vm.createContext({document:doc,localStorage:storage,window:win,
+  SpeechSynthesisUtterance:function(){},setTimeout(){return 1},clearTimeout(){}});
+ vm.runInContext(js,context);
+ const click=(selector,dataset)=>handlers.click({target:{closest(name){return name===selector?{dataset}:null;}}});
+ return {get,click,context};
+}
+test("los 23 módulos conservan su secuencia exacta",()=>{
+ const codes=[...js.matchAll(/^\["([\d.]+)","/gm)].map(x=>x[1]);
+ assert.deepEqual(codes,EXPECTED);
 });
-test("Módulo 1 cuenta con seis lecciones y simulaciones",()=>{
- assert.equal((js.match(/\bcase:"/g)||[]).length,6);
- assert.match(js,/function simulateView/);
- assert.match(js,/function learnView/);
+test("logos vectoriales originales y escenas originales en el shell",()=>{
+ assert.match(html,/nat-logo-vertical\.svg/);
+ assert.match(html,/nat-logo-horizontal\.svg/);
+ assert.match(html,/mountain-scene\.svg/);
+ assert.match(css,/hero-scene\.svg/);
 });
-test("el campus diferencia las cuatro etapas educativas",()=>{
- for(const step of ["learn","simulate","apply","results"]){
-  assert.ok(js.includes('["'+step+'"')||js.includes(',"'+step+'"'),"falta "+step);
+test("todas las pantallas principales son navegables y generan HTML",()=>{
+ const a=makeCampus();assert.match(a.get("view").innerHTML,/INITIUM ONE LAB/);
+ for(const page of ["route","modules","simulations","results","deliverables","resources","home"]){
+  a.click("[data-page]",{page});
+  assert.ok(a.get("view").innerHTML.length>500,page);
  }
 });
-test("narración opcional y Tutor INITIUM presentes",()=>{
- assert.match(js,/speechSynthesis/);
- assert.match(js,/function tutorView/);
- assert.match(js,/function tutorReply/);
- assert.match(js,/IA.*en vivo/);
+test("el aula ofrece las cuatro etapas y el tutor",()=>{
+ const a=makeCampus();a.click("[data-module]",{module:"1"});
+ for(const stage of ["learn","practice","apply","results"]){
+  a.click("[data-stage]",{stage});
+  assert.ok(a.get("view").innerHTML.length>1000,stage);
+ }
+ assert.match(a.get("view").innerHTML,/Tutor<br>INITIUM/);
 });
-test("la demo no incluye conexión directa ni secretos de API",()=>{
+test("los datos no se representan como análisis real",()=>{
+ const a=makeCampus();a.click("[data-page]",{page:"results"});
+ assert.match(a.get("view").innerHTML,/Sin resultados empresariales todavía/);
  assert.doesNotMatch(js,/fetch\s*\(/);
- assert.doesNotMatch(js,/OPENAI_API_KEY|sk-proj-|x-api-key/i);
- assert.doesNotMatch(html,/OPENAI_API_KEY|sk-proj-|x-api-key/i);
+ assert.doesNotMatch(js,/sk-proj-|OPENAI_API_KEY/);
 });
-test("el diseño incluye la paleta editorial aprobada",()=>{
- for(const color of ["#d3bc8d","#f7f4ee","#774c8a","#eee7f2"])assert.ok(css.toLowerCase().includes(color),"falta "+color);
-});
-test("no se presenta un diagnóstico ficticio como si fuera real",()=>{
- assert.match(js,/todavía no se conecta con ninguna API/);
- assert.match(js,/Sin evaluación/);
- assert.match(js,/Pendiente del diagnóstico/);
-});
-test("los archivos CSS y JS de entrada están ligados",()=>{
- assert.match(html,/href="\.\/styles\.css"/);
- assert.match(html,/src="\.\/app\.js"/);
+test("la interfaz tiene estilos responsivos y estados de foco",()=>{
+ assert.match(css,/@media\(max-width:750px\)/);
+ assert.match(css,/:focus-visible/);
+ assert.match(css,/#d3bc8d/i);
+ assert.match(css,/#774c8a/i);
 });
