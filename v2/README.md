@@ -76,3 +76,14 @@ Se validó sintaxis JavaScript mediante parser V8 sobre `v2/app.js`. **Esto NO s
 - Progreso **solo de microlecciones de demostración** conservado en navegador, sin expediente empresarial persistido.
 - Control de estado/pruebas en `v2/CONTROL_DE_CALIDAD_V2.md`.
 - El código V2 sigue sin validación de navegador real, sin sistema comercial, sin autenticación, sin base de datos activa ni documentos profesionales finales.
+
+## Reconstrucción visual total de pantallas — versión revisada
+- Se reemplazaron **desde cero** los tres archivos de interfaz `v2/index.html`, `v2/styles.css` y `v2/app.js`, dejando fuera el diseño previo que no correspondía a la referencia.
+- Las **ocho pantallas** navegables son: Campus, Mi ruta, Módulos, Simulaciones, Resultados, Entregables, Recursos y Aula de módulo.
+- El aula dispone de **cuatro etapas**: Aprender, Practicar, Aplicar, Resultados; hay seis microlecciones y seis simulaciones desarrolladas para M1, y vistas educativas de muestra para los otros 22 módulos (contenido final pendiente).
+- Los logotipos se sustituyeron por **trazados vectoriales** realizados desde los logos originales de alta resolución de Nat, para evitar pixelación al escalarlos.
+- Se crearon ilustraciones SVG propias `hero-scene.svg` y `mountain-scene.svg`, y el panel tutor mantiene el retrato provisional de Nat (no conversación en vivo).
+- El avance de demostración de microlecciones M1 se guarda localmente y es distinto del progreso certificado (0/23 sin backend).
+- Se renovaron `v2/tests/contracts.test.mjs` y `v2/tests/documents.test.mjs`, y se añadió GitHub Actions para ejecutar comprobaciones en futuras actualizaciones.
+- Se verificó la ejecución inicial mediante un DOM simulado en V8: home, ruta, módulos, simulaciones, resultados generales, entregables y recursos renderizan; las cuatro etapas del aula funcionan y se recorrieron las seis decisiones correctas sin errores de ejecución. **Falta prueba visual real en navegador** con CSS y activos cargados.
+- Los contratos de 23 prompts validados, persistencia remota, revisión documental y conexión OpenAI continúan como tareas separadas: la interfaz visual no prueba que esas integraciones ya funcionen.
