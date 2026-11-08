@@ -20,7 +20,11 @@ const LESSONS=[
 {title:"Convierte hallazgos en acciones",detail:"Un hallazgo puede ser una fortaleza, contradicción, riesgo o vacío de medición. Debe incorporar evidencia, relevancia y una solución preliminar, priorizada de acuerdo con su impacto.",facts:[["Hallazgo","Qué observaste y con qué evidencia."],["Prioridad","Qué exige atención antes de invertir."],["Solución","Qué corregir, medir o validar primero."]],case:"No sabes qué canal aporta ventas. ¿Qué solución es defendible?",answers:["Inventar porcentajes de atribución.","Registrar origen, seguimiento y cierre de cada oportunidad.","Eliminar todas las redes."],correct:1,feedback:"La solución recupera trazabilidad sin afirmar que un canal funciona o fracasa sin evidencia."},
 {title:"Prepara tu diagnóstico profesional",detail:"El semáforo orienta decisiones, pero requiere evidencia. Verde exige datos favorables; amarillo señala riesgos o información insuficiente; rojo indica intervención prioritaria sustentada. Reúne plan, ventas, costos, oferta, canales y preguntas pendientes.",facts:[["Verde","Señales favorables sustentadas."],["Amarillo","Riesgos o información insuficiente."],["Rojo","Problema prioritario con evidencia."]],case:"No hay datos para saber si la publicidad es rentable. ¿Cómo debes clasificar el problema?",answers:["Verde, porque no se probaron pérdidas.","Como información insuficiente y prioridad de validación.","Rojo automáticamente, porque toda pauta es negativa."],correct:1,feedback:"Falta evidencia para asegurar ganancias o pérdidas: la prioridad es recuperar información."}
 ];
-const state={page:"home",module:1,step:"learn",lesson:0,completedLessons:new Set(),picked:null,feedback:"",tutorOpen:true,tutorMessages:[{who:"tutor",text:"Soy la demostración del Tutor INITIUM. Puedo explicar los conceptos del Módulo 1. La conversación real de IA se conectará más adelante."}],speaking:false,rate:1,trialText:"",dataQuality:"pending"};
+// Solo los avances de las microlecciones de DEMOSTRACIÓN se recuerdan en este navegador.
+// No usar este almacenamiento para expedientes ni información confidencial de alumnos.
+const DEMO_LESSONS=(()=>{try{const v=JSON.parse(localStorage.getItem("initium-v2-lessons-demo")||"[]");return Array.isArray(v)?v.filter(x=>Number.isInteger(x)&&x>=0&&x<6):[];}catch{return [];}})();
+const INITIAL_LESSON=[0,1,2,3,4,5].find(i=>!DEMO_LESSONS.includes(i))??5;
+const state={page:"home",module:1,step:"learn",lesson:INITIAL_LESSON,completedLessons:new Set(DEMO_LESSONS),picked:null,feedback:"",tutorOpen:true,tutorMessages:[{who:"tutor",text:"Soy la demostración del Tutor INITIUM. Puedo explicar los conceptos del Módulo 1. La conversación real de IA se conectará más adelante."}],speaking:false,rate:1,trialText:"",dataQuality:"pending"};
 const main=document.getElementById("main");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function element(tag,klass,text){const e=document.createElement(tag);if(klass)e.className=klass;if(text!==undefined)e.textContent=text;return e;}
@@ -153,6 +157,7 @@ function bindEvents(){
   if(a==="retry-case"){state.picked=null;state.feedback="";render();}
   if(a==="next-lesson"){
     state.completedLessons.add(state.lesson);
+    try{localStorage.setItem("initium-v2-lessons-demo",JSON.stringify([...state.completedLessons]));}catch(e){}
     if(state.lesson<5){state.lesson++;state.step="learn";}else state.step="apply";
     state.picked=null;state.feedback="";stopAudio();render();
   }
