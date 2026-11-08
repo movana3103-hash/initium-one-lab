@@ -47,7 +47,7 @@ function homeView(){
  +'<div class="surface surface-pad"><h3 style="font-family:Georgia,serif;font-size:19px;font-weight:400;margin:0 0 15px">Acciones rápidas</h3><div class="quick-grid"><button class="quick-btn" data-action="go-module"><span class="quick-ico">▷</span> Continuar aula</button><button class="quick-btn" data-action="go-route"><span class="quick-ico">▤</span> Ver mi ruta</button><button class="quick-btn" data-action="go-results"><span class="quick-ico">▥</span> Resultados</button><button class="quick-btn" data-action="go-deliverables"><span class="quick-ico">⇩</span> Entregables</button></div></div>'
  +'<div class="surface tutor-home"><div class="tutor-top"><div><h3>Tutor<br>INITIUM</h3><p>Tu acompañante pedagógica de IA durante el curso.</p></div>'+mentor()+'</div><div class="tutor-bottom"><ul><li>Te ayuda a comprender</li><li>Explica otros ejemplos</li><li>Te orienta durante la práctica</li></ul><button class="btn-dark" data-action="go-learn">Conocer al tutor →</button></div></div></aside></div>';
 }
-function mentor(){return '<div class="mentor-placeholder" role="img" aria-label="Espacio reservado para ilustración editorial autorizada de Nat"><span aria-hidden="true">◇</span><small>TUTOR INITIUM</small></div>';}
+function mentor(){return '<div class="mentor-portrait"><img src="./assets/tutor-nat-reference.svg" alt="Fotografía de Nat Moreno, creadora de la metodología INITIUM" width="120" height="130" loading="lazy"><span class="mentor-photo-label">REFERENCIA REAL</span></div>';}
 function moduleView(){
  const l=LESSONS[state.lesson],lessonDone=state.completedLessons.has(state.lesson);
  let h='<div class="page-header"><div><div class="section-tag">PROGRAMA · EL AULA INTELIGENTE INITIUM</div><h1>Módulo 1 · Diagnóstico real del negocio</h1><p>Identifica la situación de tu negocio con una mirada estratégica y basada en evidencia.</p></div><div class="module-progress"><div><strong>Lecciones del módulo</strong><div class="progress-track" style="margin-top:10px"><span class="progress-fill" style="--progress:'+(state.completedLessons.size/6*100)+'%"></span></div><div class="metric">'+state.completedLessons.size+' de 6 lecciones completadas</div></div><b>'+Math.round(state.completedLessons.size/6*100)+'%</b></div></div>'
@@ -108,7 +108,7 @@ function tutorView(){
  +'<button class="prompt-chip" data-tutor="¿Cómo priorizo los hallazgos?">¿Cómo priorizo los hallazgos?</button>'
  +'<div class="section-tag" style="margin:17px 0 10px">TU CONVERSACIÓN</div><div class="chat-log" id="chat-log" role="log" aria-label="Conversación didáctica demostrativa">'+state.tutorMessages.map(x=>'<div class="chat-bubble '+x.who+'"><strong>'+(x.who==="tutor"?"Tutor INITIUM":"Tú")+': </strong>'+esc(x.text)+'</div>').join('')+'</div>'
  +'<form class="chat-compose" id="chat-form"><input id="chat-question" maxlength="300" aria-label="Tu pregunta al tutor" placeholder="Escribe tu pregunta…" required><button type="submit" aria-label="Enviar pregunta">➜</button></form>'
- +'<p class="tutor-disclosure">Vista de prueba con respuestas pedagógicas preparadas, sin OpenAI en vivo. La ilustración de Nat se incorporará con una fotografía autorizada.</p></div></aside>';
+ +'<p class="tutor-disclosure">Vista de prueba con respuestas pedagógicas preparadas, sin OpenAI en vivo. La fotografía de Nat aparece como referencia temporal; su retrato editorial definitivo todavía está en producción.</p></div></aside>';
 }
 function tutorReply(q){
  const v=q.toLowerCase();
