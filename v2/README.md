@@ -26,8 +26,8 @@ Se construye **un frontend independiente en `v2/`** para evitar modificar el gra
 - Ruta de los 23 módulos con nombres y códigos exactos verificados en fuente anterior.
 
 ## Qué no está listo
-1. **Marca gráfica real:** El archivo `logo Nat Moreno & Co. Vertical.png` fue localizado y visualizado en biblioteca, pero su exportación de bytes al repositorio fue denegada. No se ha incrustado un sustituto; el wordmark de la V2 es texto temporal. Se necesita el PNG o SVG original con acceso de archivo.
-2. **Retrato de Nat para Tutor:** la dirección visual está aprobada, pero faltan fotografías autorizadas para elaborar una ilustración reconocible. El panel utiliza un marcador de posición explícito.
+1. **Marca gráfica real:** los logos vertical y horizontal originales aportados por Nat ya se incorporaron en `v2/assets/` como reproducciones raster optimizadas embebidas en SVG. Para entrega comercial final se revisará resolución/legibilidad y, si es necesario, se actualizarán a versiones de alta resolución.
+2. **Retrato de Nat para Tutor:** se integró la fotografía proporcionada, recortada sin el pie de página, como referencia provisional. Falta sustituirla por la ilustración editorial final reconocible y autorizada.
 3. **Tutor OpenAI real:** se necesita autenticación, proxy Cloudflare, secreto de API, límites por alumno y prueba de costos. No conectar directamente desde cliente.
 4. **Prompts profesionales:** conservados en `main` original; aún NO migrados ni conectados en V2.
 5. **Expediente empresarial:** requiere persistencia servidor, tipado, trazabilidad, versiones y segregación por alumno.
@@ -65,3 +65,14 @@ Probar pagos, acceso privado, persistencia, límites por usuario, consumo de IA 
 
 ## Inspección de código
 Se validó sintaxis JavaScript mediante parser V8 sobre `v2/app.js`. **Esto NO sustituye pruebas de navegador real.** La rama se mantiene separada de producción. El demo no genera costos de OpenAI.
+
+## Estado actualizado de implementación (2026-11-07)
+- Logo vertical original, logo horizontal original y fotografía recortada de Nat integrados en el frontend V2.
+- Se guardó la copia textual exacta del catálogo de 23 módulos y prompts validados en `v2/src/data/validated-module-prompts.js` para migración controlada. **Aún no conectado al motor V2.**
+- Se creó esquema D1 propuesto `v2/backend/migrations/0001_schema.sql`, sin aplicación real.
+- Se agregó Worker tutor OpenAI de referencia, sin desplegar y sin credenciales activas.
+- Se definieron 7 entregables en `v2/src/data/document-specs.js`, con validación de completitud y evidencias; no significa documentos reales generados.
+- Se creó ensamblador HTML de capítulos `v2/src/core/document-renderer.js` y muestra editorial `v2/document-preview.html`, enlazada desde Entregables; no hay PDF real de alumno todavía.
+- Progreso **solo de microlecciones de demostración** conservado en navegador, sin expediente empresarial persistido.
+- Control de estado/pruebas en `v2/CONTROL_DE_CALIDAD_V2.md`.
+- El código V2 sigue sin validación de navegador real, sin sistema comercial, sin autenticación, sin base de datos activa ni documentos profesionales finales.
