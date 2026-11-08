@@ -45,3 +45,6 @@ footer.pilot-footer{margin-top:38px;padding-top:20px;border-top:1px solid var(--
   .topbar .topbar-title{font-size:11px;padding-left:9px}
   .topbar .topbar-brand{gap:8px}
 }
+
+/* Garantiza contraste del logo dorado original sobre barra clara */
+.topbar-brand>img{background:#332239;padding:9px 12px;border-radius:6px;box-sizing:content-box}
