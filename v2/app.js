@@ -147,6 +147,9 @@ document.addEventListener("click",e=>{
 });
 document.addEventListener("submit",e=>{if(e.target.id==="tutor-form"){e.preventDefault();const v=e.target.querySelector("input")?.value.trim();if(v)ask(v);}});
 document.addEventListener("input",e=>{if(window.INITIUM_M1_UI&&window.INITIUM_M1_UI.input(e))return;if(e.target.id==="demo-notes")state.demoNotes=e.target.value;});
-document.addEventListener("change",e=>{if(window.INITIUM_M1_UI&&window.INITIUM_M1_UI.change(e))return;if(e.target.id==="data-quality")state.quality=e.target.value;});
+document.addEventListener("change",e=>{if(e.target?.dataset?.m1File&&window.INITIUM_M1_UI){void window.INITIUM_M1_UI.handleAttachmentChange(e,toast);return;}if(window.INITIUM_M1_UI&&window.INITIUM_M1_UI.change(e))return;if(e.target.id==="data-quality")state.quality=e.target.value;});
 document.getElementById("mobile-menu").addEventListener("click",()=>document.getElementById("sidebar").classList.toggle("open"));
+for(const eventName of ["dragover","dragleave","drop"])document.addEventListener(eventName,e=>{if(window.INITIUM_M1_UI)window.INITIUM_M1_UI.handleFileDrop(e,toast);});
+window.addEventListener("initium-attachments-changed",()=>{if(state.page==="classroom"&&state.module===1&&state.stage==="apply")window.INITIUM_ATTACH?.refresh();});
+if(window.INITIUM_ATTACH)void window.INITIUM_ATTACH.init().then(x=>{if(!x.ready)toast("Adjuntos no disponibles en este navegador. "+x.lastError);else if(state.page==="classroom"&&state.stage==="apply")window.INITIUM_ATTACH.refresh();});
 render();
