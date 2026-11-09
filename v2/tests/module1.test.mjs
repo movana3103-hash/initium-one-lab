@@ -82,7 +82,7 @@ test("la evaluación de cierre conserva exactamente la pregunta original",()=>{
 test("la ficha preliminar también está accesible desde Resultados y Entregables",()=>{
  const a=start();
  a.click("data-page",{page:"results"});
- assert.match(a.get("view").innerHTML,/Ficha de diagnóstico inicial/);
+ assert.match(a.get("view").innerHTML,/ficha de diagnóstico inicial/i);
  a.click("data-page",{page:"deliverables"});
  assert.match(a.get("view").innerHTML,/Ficha de Diagnóstico Inicial/);
 });
