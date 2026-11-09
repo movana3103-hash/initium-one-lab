@@ -38,20 +38,20 @@ options:[
 "Cambiar a otro marketplace con menos competencia"
 ],
 correct:2,points:5,
-explanation:"Las ventas brutas en marketplace no son lo mismo que las ventas netas. Hay que descontar comisiones, devoluciones, envíos y descuentos para calcular la contribución real. La tasa de comisión depende de cada plataforma y contrato."
+explanation:"Las ventas brutas en marketplace no son lo mismo que las ventas netas. Hay que descontar comisiones (16-20% típicamente), devoluciones, envíos y descuentos. Muchos negocios descubren que su margen real es mínimo o negativo después de este cálculo."
 });
 const TRACKS=[["marcha","Negocio en marcha"],["lanzamiento","Producto o servicio en lanzamiento"],["cero","Idea de negocio desde cero"]];
 const STATUSES=[["verified","Documentado y verificable"],["declared","Declarado (sin comprobante)"],["estimated","Estimación"],["hypothetical","Hipótesis"],["missing","No disponible"]];
 function initial(){return {schema:1,track:"marcha",projectName:"",entries:{},group:"direction",quiz:{answer:null,attempts:0,passed:false},updatedAt:null};}
 let state=initial();
-function cleanText(v,max=12000){return String(v??"").slice(0,max);}
+function cleanText(v,max=null){const text=String(v??"");return max===null?text:text.slice(0,max);}
 function safeEntry(o){const status=STATUSES.some(x=>x[0]===o?.status)?o.status:"missing";return {value:cleanText(o?.value),status,source:cleanText(o?.source,800)};}
 function load(){try{const raw=localStorage.getItem(KEY);if(!raw)return;const v=JSON.parse(raw);if(!v||v.schema!==1||typeof v.entries!=="object")return;const p=initial();p.projectName=cleanText(v.projectName,180);p.track=TRACKS.some(x=>x[0]===v.track)?v.track:"marcha";p.entries={};for(const f of FIELDS){p.entries[f.id]=safeEntry(v.entries[f.id]||{})}p.group=GROUPS.some(g=>g.id===v.group)?v.group:"direction";p.quiz={answer:Number.isInteger(v.quiz?.answer)&&v.quiz.answer>=0&&v.quiz.answer<4?v.quiz.answer:null,attempts:Math.max(0,Number(v.quiz?.attempts)||0),passed:Boolean(v.quiz?.passed)};p.updatedAt=v.updatedAt||null;state=p;}catch{}}
 function save(){state.updatedAt=new Date().toISOString();try{localStorage.setItem(KEY,JSON.stringify(state));return true}catch{return false}}
 function snapshot(){return JSON.parse(JSON.stringify(state));}
 function updateMeta(name,value){if(name==="projectName")state.projectName=cleanText(value,180);if(name==="track"&&TRACKS.some(x=>x[0]===value))state.track=value;save();}
 function setGroup(g){if(GROUPS.some(x=>x.id===g)){state.group=g;save();}}
-function updateField(id,property,value){const f=FIELDS.find(x=>x.id===id);if(!f||!["value","status","source"].includes(property))return;const current=safeEntry(state.entries[id]||{});current[property]=property==="status"?(STATUSES.some(x=>x[0]===value)?value:"missing"):cleanText(value,property==="source"?800:12000);state.entries[id]=current;save();}
+function updateField(id,property,value){const f=FIELDS.find(x=>x.id===id);if(!f||!["value","status","source"].includes(property))return;const current=safeEntry(state.entries[id]||{});current[property]=property==="status"?(STATUSES.some(x=>x[0]===value)?value:"missing"):cleanText(value,property==="source"?800:null);if(property==="value"&&current.status==="missing"&&current.value.trim())current.status="declared";state.entries[id]=current;save();}
 function takeQuiz(answer){const a=Number(answer);if(!Number.isInteger(a)||a<0||a>3)return {ok:false};state.quiz.answer=a;state.quiz.attempts++;state.quiz.passed=state.quiz.passed||a===QUIZ.correct;save();return {ok:true,correct:a===QUIZ.correct,passed:state.quiz.passed,points:state.quiz.passed?QUIZ.points:0};}
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function evidence(){return FIELDS.map(f=>{const v=safeEntry(state.entries[f.id]||{});const has=v.value.trim().length>0;const status=has?v.status:"missing";const needsProof=status==="verified"&&!v.source.trim();return {...f,...v,status:needsProof?"declared":status,has,needsProof,usable:has&&status!=="missing"};});}
