@@ -69,3 +69,36 @@
 .m1-evidence-details[open] summary span{transform:rotate(180deg)}
 .m1-camera-button{display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border:1px solid #d9c7dc;border-radius:10px;background:#fdf9fd;color:#664774;font-size:11px;font-weight:700;cursor:pointer;margin-top:9px;position:relative;overflow:hidden}
 .m1-camera-button input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+
+
+/* M1 Aula legible: texto íntegro, audición opcional, práctica visible */
+.lesson-reading-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(195px,30%);gap:18px;align-items:start}
+.lesson-reading{min-width:0;overflow-wrap:anywhere}
+.lesson-reading-title{font-size:clamp(21px,2.2vw,28px);letter-spacing:-.9px;line-height:1.22;margin:10px 0 13px}
+.lesson-intro{font-size:13px;line-height:1.85;color:#514554;margin:0 0 16px}
+.lesson-reading-layout .lesson-picture{min-height:210px;position:sticky;top:20px}
+.lesson-chapter{padding:16px 18px;margin:15px 0;background:#faf7fb;border-left:3px solid #b08abc;border-radius:7px}
+.lesson-chapter h3,.lesson-example h3{font-size:16px;margin:9px 0 8px}
+.lesson-chapter p,.lesson-example p{font-size:12px;line-height:1.85;color:#5f5460;margin:0 0 8px}
+.lesson-reading .idea-grid{display:grid;grid-template-columns:1fr;gap:8px;margin:0 0 20px}
+.lesson-reading .idea{display:grid;grid-template-columns:26px 1fr;gap:2px 9px;padding:12px 14px;min-height:0;align-items:start}
+.lesson-reading .idea svg{grid-row:1 / span 2;margin:2px 0 0;width:20px;height:20px}
+.lesson-reading .idea b{grid-column:2;font-size:12px;line-height:1.45;white-space:normal;word-break:normal}
+.lesson-reading .idea p{grid-column:2;font-size:11px;line-height:1.7;overflow-wrap:break-word}
+.lesson-example{margin-top:14px;padding:17px;background:#fffaf6;border:1px solid #eaded1;border-radius:12px}
+.lesson-knowledge-check{margin:22px 0 0;padding:20px;border-radius:13px;background:linear-gradient(110deg,#f2e8f5,#fffaf6);border:1px solid #e5d7e7}
+.lesson-knowledge-check h3{font-size:17px;line-height:1.5;margin:9px 0 9px}
+.lesson-knowledge-check p{font-size:12px;line-height:1.7;color:#685a68;margin:0 0 14px}
+.lesson-knowledge-check .btn{white-space:normal;text-align:center;min-height:44px}
+.audio-box{padding:12px 13px;background:#f8f2fa;border-radius:13px;border:1px solid #e6d8e9;margin:12px 0}
+.audio-heading{display:flex;align-items:center;gap:8px;color:#633f72}
+.audio-heading strong{font-size:12px}
+.audio-helper{font-size:10px;color:#857387;margin-left:auto}
+.audio-box .audio-player{max-width:unset;width:100%;margin:10px 0 7px;border:1px solid #e1d3e5;background:white;border-radius:15px;padding:8px}
+.audio-box .audio-player .play{width:38px;height:38px;flex:none}
+.audio-description{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.audio-description strong{font-size:11px;font-weight:700;color:#56405c;line-height:1.3}
+.audio-description small{font-size:10px;color:#857585;line-height:1.4}
+.audio-notice{font-size:10px;color:#7f7081;line-height:1.6;margin:5px 0 0}
+@media(max-width:950px){.lesson-reading-layout{grid-template-columns:1fr}.lesson-reading-layout .lesson-picture{position:static;min-height:170px;order:-1}.lesson-reading{order:0}}
+@media(max-width:750px){.lesson-reading-layout .lesson-picture{min-height:165px}.lesson-reading-title{font-size:24px}.lesson-knowledge-check{padding:15px}.lesson-knowledge-check .btn{width:100%}.audio-helper{font-size:9px}}
