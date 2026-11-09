@@ -56,6 +56,7 @@ function takeQuiz(answer){const a=Number(answer);if(!Number.isInteger(a)||a<0||a
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function evidence(){return FIELDS.map(f=>{const v=safeEntry(state.entries[f.id]||{});const has=v.value.trim().length>0;const status=has?v.status:"missing";const needsProof=status==="verified"&&!v.source.trim();return {...f,...v,status:needsProof?"declared":status,has,needsProof,usable:has&&status!=="missing"};});}
 function demoLessonCount(){try{const x=JSON.parse(localStorage.getItem("initium-v2-lessons-demo")||"[]");return Array.isArray(x)?new Set(x.filter(n=>Number.isInteger(n)&&n>=0&&n<6)).size:0;}catch{return 0;}}
+function attachmentsMeta(){return global.INITIUM_ATTACH?.metadata?.()||[];}
 function analyze(){
  const entries=evidence();
  const missing=entries.filter(x=>x.status==="missing");
@@ -71,8 +72,8 @@ function analyze(){
  return {
   version:1,projectName:state.projectName||"Proyecto sin nombre",track:state.track,createdAt:new Date().toISOString(),
   verified:verified.length,unverified:unverified.length,missing:missing.length,total:entries.length,
-  findings,entries,
-  handoff:{fromModule:"1",toModule:"1.5",projectName:state.projectName||"Proyecto sin nombre",track:state.track,findings:findings.map(x=>({statement:x.statement,action:x.action,confidence:x.confidence})),information:entries.map(x=>({field:x.id,value:x.value,status:x.status,source:x.source}))},
+  findings,entries,attachments:attachmentsMeta(),
+  handoff:{fromModule:"1",toModule:"1.5",projectName:state.projectName||"Proyecto sin nombre",track:state.track,findings:findings.map(x=>({statement:x.statement,action:x.action,confidence:x.confidence})),information:entries.map(x=>({field:x.id,value:x.value,status:x.status,source:x.source})),attachments:attachmentsMeta()},
   learning:{sixLessonsCompleted:demoLessonCount(),sixLessonsTotal:6,finalQuizPassed:state.quiz.passed,finalQuizScore:state.quiz.passed?5:0,finalQuizMax:5,quizAttempts:state.quiz.attempts},
   severity:"insufficient",severityLabel:"Sin evaluación profesional suficiente",
   limitations:["Resultado preliminar automatizado a partir de lo escrito por el alumno; no existe análisis de IA activo.","No se ha confirmado ninguna causa raíz ni la veracidad de los registros.","Este borrador está en el navegador; todavía no está almacenado en una cuenta privada."]
@@ -80,6 +81,7 @@ function analyze(){
 }
 function documentHTML(result){
  const rows=result.entries.map(x=>'<tr><th>'+esc(x.title)+'</th><td>'+esc(x.value||"No disponible").replace(/\n/g,"<br>")+'</td><td>'+esc(STATUSES.find(z=>z[0]===x.status)?.[1]||x.status)+'</td><td>'+esc(x.source||"Sin referencia")+'</td></tr>').join("");
+ const attachmentRows=(result.attachments||[]).map((a,i)=>"<tr><td>"+esc(a.name)+"</td><td>"+esc(a.fieldId)+"</td><td>"+esc(a.type)+"</td><td>Solo guardado en el navegador · no leído por IA</td></tr>").join("");
  const find=result.findings.map((f,i)=>'<article><h3>'+esc((i+1)+". "+f.statement)+'</h3><p><b>Fundamento:</b> '+esc(f.basis)+'</p><p><b>Próxima acción:</b> '+esc(f.action)+'</p><small>'+esc(f.confidence)+'</small></article>').join("");
  return '<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Ficha de diagnóstico inicial · INITIUM ONE LAB</title><style>@page{size:A4;margin:18mm}*{box-sizing:border-box}body{font:12px/1.6 Arial,Helvetica,sans-serif;color:#211724;margin:40px auto;max-width:880px;padding:25px}header{background:#2e1b35;color:#d3bc8d;padding:38px}header h1{color:white;font-size:28px;margin:12px 0 0}h2{border-bottom:2px solid #d3bc8d;padding-bottom:8px;margin-top:34px}h3{font-size:15px}table{border-collapse:collapse;width:100%;table-layout:fixed}td,th{border:1px solid #e9dce7;padding:8px;vertical-align:top;overflow-wrap:anywhere}th{background:#efe4f2;text-align:left;width:23%}td{width:25%}article{background:#faf6fb;padding:12px 15px;margin:10px 0;border-left:3px solid #774c8a}footer{margin-top:36px;color:#796b7a;font-size:10px}@media print{body{margin:0;padding:0;max-width:none}header{-webkit-print-color-adjust:exact;print-color-adjust:exact}article,table tr{break-inside:avoid}}</style></head><body>'
  +'<header><b>NAT MORENO & CO. · INITIUM ACADEMY</b><h1>Ficha de Diagnóstico Inicial</h1><p>Módulo 1 · INITIUM ONE LAB</p></header>'
@@ -87,8 +89,8 @@ function documentHTML(result){
  +'<h2>01 · Resultado del aprendizaje</h2><p>Microlecciones de demostración completadas: '+result.learning.sixLessonsCompleted+' de 6. Evaluación de cierre: '+(result.learning.finalQuizPassed?"Aprobada, 5/5 puntos":"Pendiente o no aprobada")+'. Microlecciones: progreso de demostración, no acreditación certificada.</p>'
  +'<h2>02 · Lectura preliminar de información</h2><p>'+result.verified+' campos documentados con referencia, '+result.unverified+' datos por validar, '+result.missing+' vacíos. <b>'+esc(result.severityLabel)+'.</b></p>'+find
  +'<h2>03 · Información utilizada</h2><table><thead><tr><th>Área</th><th>Respuesta</th><th>Estado</th><th>Fuente</th></tr></thead><tbody>'+rows+'</tbody></table>'
- +'<h2>04 · Qué llevar al siguiente módulo</h2><p>Trasladar la realidad del negocio, el plan existente, los datos declarados, las hipótesis y las áreas por verificar. No presentar las hipótesis como causas confirmadas.</p>'
- +'<h2>05 · Límites del resultado</h2><ul>'+result.limitations.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul><footer>Ficha preliminar · No sustituye al diagnóstico profesional del Analista INITIUM. Documento generado localmente por el alumno.</footer></body></html>';
+ +'<h2>04 · Inventario de archivos aportados</h2><p>El inventario es referencial. Los archivos no están incorporados en esta descarga ni se han examinado. Debes mantener sus originales.</p>'+(attachmentRows?'<table><thead><tr><th>Archivo</th><th>Campo</th><th>Tipo</th><th>Estado</th></tr></thead><tbody>'+attachmentRows+'</tbody></table>':'<p>Sin archivos adjuntos.</p>')+'<h2>05 · Qué llevar al siguiente módulo</h2><p>Trasladar la realidad del negocio, el plan existente, los datos declarados, las hipótesis y las áreas por verificar. No presentar las hipótesis como causas confirmadas.</p>'
+ +'<h2>06 · Límites del resultado</h2><ul>'+result.limitations.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul><footer>Ficha preliminar · No sustituye al diagnóstico profesional del Analista INITIUM. Documento generado localmente por el alumno.</footer></body></html>';
 }
 function exportHTML(){const r=analyze(),html=documentHTML(r);const blob=new Blob([html],{type:"text/html;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="INITIUM_Modulo_1_Ficha_Diagnostico_Inicial.html";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);return r;}
 load();
