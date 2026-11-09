@@ -38,7 +38,7 @@ async function handleAttachmentChange(e,notify){
  const library=global.INITIUM_ATTACH;
  if(!library){notify("Los adjuntos no están disponibles en este navegador.");return true;}
  try{
-  const result=await library.add(input.files,input.dataset.m1File);
+  const result=await library.add(input.files,input.dataset.m1File,input.dataset.m1Module||"1");
   library.refresh();
   notify(result.rejected.length?result.rejected.slice(0,2).join(" · "):result.added+" archivo(s) guardado(s) en el navegador.");
  }catch(err){notify("Error al guardar: "+String(err?.message||err));}
@@ -63,7 +63,7 @@ function handleFileDrop(e,notify){
  if(e.type==="drop"){
   target.classList.remove("dragging");
   const library=global.INITIUM_ATTACH;
-  if(library)library.add(e.dataTransfer.files,target.dataset.m1Drop).then(r=>{library.refresh();notify(r.rejected.length?r.rejected.join(" · "):r.added+" archivo(s) guardado(s) localmente.");}).catch(err=>notify("Error al guardar: "+String(err?.message||err)));
+  if(library)library.add(e.dataTransfer.files,target.dataset.m1Drop,target.dataset.m1Module||"1").then(r=>{library.refresh();notify(r.rejected.length?r.rejected.join(" · "):r.added+" archivo(s) guardado(s) localmente.");}).catch(err=>notify("Error al guardar: "+String(err?.message||err)));
   return true;
  }
  return false;
