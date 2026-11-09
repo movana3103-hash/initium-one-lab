@@ -22,7 +22,7 @@ function moduleApply(){
 function moduleResults(){
  const r=M.analyze(),s=M.snapshot(),filled=r.verified+r.unverified;
  let out='<div class="eyebrow violet">MÓDULO 1 · TRES RESULTADOS</div><h2 class="sec-title">Tu diagnóstico inicial</h2><p class="sec-sub">Aprendizaje, lectura preliminar de los datos y ficha exportable. No es un diagnóstico generado por IA.</p>'+draftBar();
- out+='<div class="m1-three-results"><article><small>01 · APRENDIZAJE</small><h3>'+ (s.quiz.passed?'Evaluación aprobada':'Evaluación pendiente')+'</h3><p>Seis microlecciones, seis simulaciones y evaluación de cierre validada.</p><b>'+(s.quiz.passed?'5 / 5 puntos':'0 / 5 puntos')+'</b></article>';
+ out+='<div class="m1-three-results"><article><small>01 · APRENDIZAJE</small><h3>'+ (s.quiz.passed?'Evaluación aprobada':'Evaluación pendiente')+'</h3><p>'+r.learning.sixLessonsCompleted+' de 6 microlecciones practicadas y evaluación de cierre validada.</p><b>'+(s.quiz.passed?'5 / 5 puntos':'0 / 5 puntos')+'</b></article>';
  out+='<article><small>02 · RESULTADO DEL NEGOCIO</small><h3>'+filled+' de '+r.total+' campos registrados</h3><p>'+r.verified+' documentados con referencia aportada · '+r.unverified+' sin verificar · '+r.missing+' pendientes.</p><b>Sin causas confirmadas</b></article>';
  out+='<article><small>03 · ENTREGABLE</small><h3>Ficha de Diagnóstico Inicial</h3><p>Información completa y sin recortar; observaciones preliminares, fuentes y acciones de validación.</p><b>Archivo HTML local</b></article></div>';
  out+='<div class="m1-results-heading"><h3>Qué encontramos en tu captura</h3><span class="status-chip">Información insuficiente para determinar causas</span></div>';
