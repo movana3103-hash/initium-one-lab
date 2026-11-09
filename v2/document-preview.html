@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INITIUM · Vista de formato documental</title>
+<style>
+:root{--black:#111;--plum:#39283f;--violet:#774c8a;--lavender:#eee7f2;--gold:#d3bc8d;--cream:#f7f4ee}
+*{box-sizing:border-box}body{margin:0;background:#eee8ed;color:var(--black);font:14px/1.7 Arial,Helvetica,sans-serif}
+.toolbar{max-width:880px;margin:18px auto;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.toolbar a{color:var(--plum);font-weight:700}.toolbar span{color:#706770;font-size:12px}
+.sheet{max-width:800px;margin:20px auto 35px;padding:60px 68px;background:#fffdfb;min-height:1020px;box-shadow:0 12px 35px #39283f20;position:relative}
+.brand-mark{background:#35253b;display:inline-flex;padding:15px 20px;border-radius:3px}
+.brand-mark img{height:29px;width:auto;max-width:310px}
+.kicker{font-size:10px;font-weight:700;letter-spacing:2.3px;color:var(--violet);margin-top:105px}
+h1{font-size:38px;line-height:1.18;letter-spacing:-1px;margin:18px 0 34px;max-width:580px}
+hr{border:0;border-top:3px solid var(--gold);width:65px;margin:0 0 36px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:22px;color:#6d626b;font-size:13px}
+.meta strong{display:block;color:#17131a;margin-bottom:4px}
+.note{background:#f6eff8;border-left:3px solid #774c8a;padding:15px 18px;margin-top:70px;color:#55475b}
+.footer{position:absolute;bottom:45px;left:68px;right:68px;border-top:1px solid #e5dce3;padding-top:15px;font-size:10px;letter-spacing:1px;color:#7a7077}
+.section-head{font-size:11px;color:var(--violet);letter-spacing:2px;font-weight:700;text-transform:uppercase}
+h2{font-size:28px;letter-spacing:-.5px;margin:11px 0 17px}
+.lede{color:#6c626b;font-size:15px;line-height:1.8}
+.table{margin-top:30px;border:1px solid #e6dce8;border-radius:4px;overflow:hidden}
+.table-row{display:grid;grid-template-columns:1.3fr 1fr 1fr;border-bottom:1px solid #eee5ec}
+.table-row:last-child{border:0}.table-row>div{padding:12px 14px;font-size:12px}
+.table-row.header{background:var(--lavender);color:#513759;font-weight:700}
+.fineprint{color:#8a8088;font-size:12px;font-style:italic;margin-top:22px}
+@media print{@page{size:A4;margin:0}body{background:white}.toolbar{display:none}.sheet{margin:0;max-width:none;width:210mm;height:297mm;min-height:0;box-shadow:none;page-break-after:always;padding:20mm}.footer{left:20mm;right:20mm;bottom:15mm}}
+@media(max-width:800px){.sheet{margin:8px;padding:27px;min-height:700px}.toolbar{margin:15px;padding:0 16px}.footer{left:27px;right:27px}h1{font-size:28px}.kicker{margin-top:60px}}
+</style></head><body>
+<div class="toolbar"><a href="./index.html">← Volver al campus V2</a><span>Vista editorial de ejemplo · Sin información de ningún alumno</span></div>
+<main>
+<section class="sheet"><div class="brand-mark"><img src="./assets/nat-logo-horizontal.svg" alt="Nat Moreno & Co."></div>
+<div class="kicker">INITIUM ACADEMY · ONE LAB</div>
+<h1>Plan Estratégico de Marketing a 12 meses</h1><hr>
+<div class="meta"><div><strong>Negocio</strong>Se incorporará desde el expediente del alumno</div><div><strong>Estado</strong>Plantilla sin datos empresariales</div><div><strong>Alcance</strong>Diagnóstico · estrategia · dirección</div><div><strong>Periodo</strong>12 meses, a partir del plan aprobado</div></div>
+<div class="note">Este es el diseño de un documento futuro, no un plan generado ni validado. Los capítulos reales solo se habilitarán cuando existan datos, análisis y revisión suficientes.</div>
+<div class="footer">NAT MORENO &amp; CO. · INITIUM ONE LAB <span style="float:right">FORMATO EDITORIAL V2</span></div></section>
+<section class="sheet"><div class="section-head">CAPÍTULO · ESTRUCTURA DE RESULTADOS</div><h2>Hallazgos, evidencia y decisiones</h2>
+<p class="lede">Un entregable INITIUM debe distinguir los hallazgos comprobados de las hipótesis, indicar los vacíos de información y conectar cada recomendación con la realidad del negocio.</p>
+<div class="table"><div class="table-row header"><div>Hallazgo</div><div>Estado de evidencia</div><div>Acción</div></div>
+<div class="table-row"><div>Campo por completar</div><div>Por verificar</div><div>Validación pendiente</div></div>
+<div class="table-row"><div>Campo por completar</div><div>Por verificar</div><div>Validación pendiente</div></div>
+<div class="table-row"><div>Campo por completar</div><div>Por verificar</div><div>Validación pendiente</div></div></div>
+<p class="fineprint">Ninguna de estas filas representa resultados de una empresa. El motor documental sustituirá la plantilla únicamente por información respaldada y revisada.</p>
+<div class="footer">NAT MORENO &amp; CO. · INITIUM ONE LAB <span style="float:right">ESTRUCTURA DE REFERENCIA</span></div>
+</section></main></body></html>
