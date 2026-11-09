@@ -31,7 +31,7 @@
 - Exportación de ficha HTML y verificación del contenido capturado.
 - Acceso a M1 desde «Mis resultados» y «Entregables».
 - Worker: respuestas 403 a origen no permitido, 503 si faltan configuraciones y 401 ante sesión ausente.
-- Pruebas automatizadas incorporadas al repositorio; **no se ha verificado que GitHub Actions las haya ejecutado ni inspección gráfica real en Chrome/Safari móvil**.
+- La batería de **17 pruebas automatizadas** de navegación, integridad documental y Módulo 1 pasó en GitHub Actions el 8 de noviembre de 2026 (commits previos a la última actualización documental). **Aún falta inspección gráfica real en Chrome/Safari móvil**.
 
 ## 4. Lo que no se debe declarar terminado
 1. **Análisis real de OpenAI:** sin autenticación, secretos en Cloudflare, binding D1 activo ni Worker publicado. El frontend no enviará datos sensibles ni llamará API hasta aprobar seguridad y presupuesto.
