@@ -14,7 +14,7 @@ function moduleApply(){
  out+='<div class="m1-area-body"><div class="eyebrow violet">'+escapeHTML(active.title)+'</div><p class="sec-sub">'+escapeHTML(active.desc)+'</p>';
  for(const f of M.FIELDS.filter(x=>x.group===active.id)){
    const e=rows.find(x=>x.id===f.id);
-   out+='<section class="m1-field-card"><div class="m1-field-heading"><b>'+escapeHTML(f.title)+'</b><span class="status-chip">'+evidenceStatus(e.status)+'</span></div><p class="m1-help">'+escapeHTML(f.hint)+'</p><textarea class="field m1-entry" data-m1-id="'+f.id+'" data-m1-property="value">'+escapeHTML(e.value)+'</textarea><div class="m1-field-controls"><label>Calidad del dato<select class="field" data-m1-id="'+f.id+'" data-m1-property="status">'+M.STATUSES.map(([v,label])=>'<option value="'+v+'" '+(e.status===v?'selected':'')+'>'+escapeHTML(label)+'</option>').join('')+'</select></label><label>Fuente o referencia<input class="field" data-m1-id="'+f.id+'" data-m1-property="source" value="'+escapeHTML(e.source)+'" placeholder="Ej. reporte de ventas, mes, responsable"></label></div></section>';
+   out+='<section class="m1-field-card"><div class="m1-field-heading"><b>'+escapeHTML(f.title)+'</b><span class="status-chip">'+evidenceStatus(e.status)+'</span></div><p class="m1-help">'+escapeHTML(f.hint)+'</p><textarea class="field m1-entry" data-m1-id="'+f.id+'" data-m1-property="value">'+escapeHTML(e.value)+'</textarea>'+((global.INITIUM_ATTACH&&global.INITIUM_ATTACH.uploader(f.id))||'')+'<div class="m1-field-controls"><label>Calidad del dato<select class="field" data-m1-id="'+f.id+'" data-m1-property="status">'+M.STATUSES.map(([v,label])=>'<option value="'+v+'" '+(e.status===v?'selected':'')+'>'+escapeHTML(label)+'</option>').join('')+'</select></label><label>Fuente o referencia<input class="field" data-m1-id="'+f.id+'" data-m1-property="source" value="'+escapeHTML(e.source)+'" placeholder="Ej. reporte de ventas, mes, responsable"></label></div></section>';
  }
  out+='</div><div class="stage-foot"><small>Guardado en el dispositivo. Sin sincronización ni verificación documental.</small><button class="btn btn-plum" data-m1-action="results">Ver mis tres resultados →</button></div>';
  return out;
@@ -32,12 +32,49 @@ function moduleResults(){
  out+='<div class="stage-foot"><button class="btn btn-line" data-m1-action="apply">← Revisar respuestas</button><div class="internal-tools"><button class="btn btn-line" data-m1-action="json">Exportar datos JSON</button><button class="btn btn-gold" data-m1-action="export">Exportar ficha inicial ↗</button></div></div><p class="m1-disclosure">Ficha preliminar local, no análisis estratégico definitivo. No acredita certificación del programa.</p>';
  return out;
 }
+async function handleAttachmentChange(e,notify){
+ const input=e.target;
+ if(!input?.dataset?.m1File)return false;
+ const library=global.INITIUM_ATTACH;
+ if(!library){notify("Los adjuntos no están disponibles en este navegador.");return true;}
+ try{
+  const result=await library.add(input.files,input.dataset.m1File);
+  library.refresh();
+  notify(result.rejected.length?result.rejected.slice(0,2).join(" · "):result.added+" archivo(s) guardado(s) en el navegador.");
+ }catch(err){notify("Error al guardar: "+String(err?.message||err));}
+ input.value="";return true;
+}
+async function handleAttachmentClick(e,notify){
+ const button=e.target.closest("[data-m1-file-delete],[data-m1-file-download]");
+ if(!button)return false;
+ try{
+  const library=global.INITIUM_ATTACH;
+  if(button.dataset.m1FileDelete){await library.remove(button.dataset.m1FileDelete);library.refresh();notify("Adjunto eliminado.");}
+  else await library.download(button.dataset.m1FileDownload);
+ }catch(err){notify("No fue posible completar la operación: "+String(err?.message||err));}
+ return true;
+}
+function handleFileDrop(e,notify){
+ const target=e.target.closest("[data-m1-drop]");
+ if(!target)return false;
+ e.preventDefault();
+ if(e.type==="dragover"){target.classList.add("dragging");return true;}
+ if(e.type==="dragleave"){target.classList.remove("dragging");return true;}
+ if(e.type==="drop"){
+  target.classList.remove("dragging");
+  const library=global.INITIUM_ATTACH;
+  if(library)library.add(e.dataTransfer.files,target.dataset.m1Drop).then(r=>{library.refresh();notify(r.rejected.length?r.rejected.join(" · "):r.added+" archivo(s) guardado(s) localmente.");}).catch(err=>notify("Error al guardar: "+String(err?.message||err)));
+  return true;
+ }
+ return false;
+}
 function downloadJSON(){
  const text=JSON.stringify({type:"initium-m1-preliminary",module:1,snapshot:M.snapshot(),preliminary:M.analyze()},null,2);
  const blob=new Blob([text],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
  a.href=url;a.download="INITIUM_M1_Expediente_Preliminar.json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
 }
 function click(e,stageTo,toast){
+ if(e.target.closest("[data-m1-file-delete],[data-m1-file-download]")){void handleAttachmentClick(e,toast);return true;}
  const el=e.target.closest("[data-m1-group],[data-m1-action],[data-m1-answer]");if(!el)return false;
  if(el.dataset.m1Group){M.setGroup(el.dataset.m1Group);stageTo("apply");return true;}
  if(el.dataset.m1Answer!==undefined){const res=M.takeQuiz(el.dataset.m1Answer);toast(res.correct?"Evaluación de cierre aprobada: 5/5.":"Revisa la explicación y vuelve a intentar.");stageTo("results");return true;}
@@ -57,5 +94,5 @@ function change(e){
  if(x.dataset.m1Id&&x.dataset.m1Property){M.updateField(x.dataset.m1Id,x.dataset.m1Property,x.value);return true;}
  return false;
 }
-global.INITIUM_M1_UI=Object.freeze({moduleApply,moduleResults,click,input,change});
+global.INITIUM_M1_UI=Object.freeze({moduleApply,moduleResults,click,input,change,handleAttachmentChange,handleFileDrop});
 })(window);
