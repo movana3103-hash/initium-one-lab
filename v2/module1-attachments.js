@@ -96,7 +96,7 @@ function fileList(fieldId){
 function uploader(fieldId){
  return '<div class="m1-attachment-box"><div class="m1-attachment-top"><span class="m1-attach-icon">＋</span><div><b>Documentos y evidencias</b><p>Puedes adjuntar uno o varios archivos, además de escribir o pegar información.</p></div></div>'
  +'<label class="m1-drop-zone" data-m1-drop="'+esc(fieldId)+'"><input class="m1-file-input" type="file" multiple accept="'+ACCEPT+'" data-m1-file="'+esc(fieldId)+'"><strong>＋ Seleccionar archivos o fotos</strong><span>PDF · Word · Excel · PowerPoint · CSV · imágenes</span><small>Hasta 15 MB por archivo, 80 MB y 40 archivos por navegador. También puedes arrastrarlos aquí.</small></label>'
- +'<div class="m1-upload-list" data-m1-list="'+esc(fieldId)+'">'+fileList(fieldId)+'</div><p class="m1-attach-disclaimer">Guardados solo en este dispositivo. El Analista INITIUM todavía no puede leer estos adjuntos; falta habilitar procesamiento y almacenamiento privado.</p></div>';
+ +'<label class="m1-camera-button">▣ Tomar foto con el móvil<input type="file" accept="image/*" capture="environment" data-m1-file="'+esc(fieldId)+'"></label><div class="m1-upload-list" data-m1-list="'+esc(fieldId)+'">'+fileList(fieldId)+'</div><p class="m1-attach-disclaimer">Guardados solo en este dispositivo. El Analista INITIUM todavía no puede leer estos adjuntos; falta habilitar procesamiento y almacenamiento privado.</p></div>';
 }
 function refresh(){
  if(!global.document?.querySelectorAll)return;
