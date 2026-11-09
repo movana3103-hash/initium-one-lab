@@ -6,3 +6,35 @@
 @media(max-width:750px){.campus-shell{display:block}.sidebar{position:sticky;top:0;z-index:25;width:100%;min-height:auto;max-height:66px;overflow:hidden;padding:8px 12px;flex-direction:row;align-items:center;transition:max-height .2s}.sidebar.open{max-height:420px;align-items:stretch;flex-direction:column;overflow:auto}.brand-lockup{padding:0 8px;display:flex;align-items:center;gap:10px}.brand-lockup img{height:46px;width:auto;max-width:57px}.brand-divider,.brand-lockup small{display:none}.product-mark{font-size:12px;letter-spacing:1px}.product-mark span{font-size:12px;letter-spacing:1px}.side-nav{flex-direction:row;overflow-x:auto;min-width:0;gap:4px}.nav-button{width:auto;min-width:37px;padding:9px 11px;font-size:0;min-height:40px;gap:0}.nav-button svg{width:20px}.nav-button .nav-count{display:none}.sidebar-bottom{display:none}.sidebar.open .side-nav{flex-direction:column;overflow:visible}.sidebar.open .nav-button{font-size:13px;gap:12px}.sidebar.open .sidebar-bottom{display:block}.topbar{height:57px;padding:0 14px}.mobile-menu{display:block}.top-logo{width:110px;padding:6px}.campus-name{font-size:11px}.top-separator{height:19px}.build-chip{display:none}#view{padding:17px 13px 44px}.layout-two,.classroom-layout{display:block}.right-pane{display:flex;flex-direction:column;margin-top:16px}.home-hero{grid-template-columns:1fr;min-height:unset}.home-hero .hero-copy{padding:23px 19px}.home-hero h1{font-size:31px}.hero-visual{height:160px}.method-grid{grid-template-columns:repeat(2,1fr)}.method-card{min-height:166px}.screen-title{display:block}.screen-title .btn{margin-top:10px}.module-head{display:block}.module-percentage{width:100%;max-width:350px;margin-top:14px}.stepper{grid-template-columns:repeat(2,1fr)}.lesson-grid{grid-template-columns:1fr}.lesson-picture{min-height:170px}.idea-grid{grid-template-columns:1fr}.idea{min-height:auto}.doc-grid{grid-template-columns:1fr}.result-list,.mini-stat-grid{grid-template-columns:1fr}.card-pad{padding:17px}.classroom-stage{padding:17px}.tutor-banner{grid-template-columns:1fr 125px}.portrait-zone img{width:129px}.resume{grid-template-columns:84px 1fr;gap:11px}.resume-thumb{width:84px;height:86px}.module-percentage{margin-top:15px}.quick-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:380px){.top-logo{width:83px}.campus-name{font-size:10px}.topbar-left{gap:8px}.topbar-right{gap:6px}.top-icon{display:none}.method-card{padding:12px}.method-card strong{font-size:12px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+
+/* MÓDULO 1 — Experiencia de tres resultados y captura guiada */
+.m1-draft-status{background:#f1e7f3;border:1px solid #e0cfe6;color:#5b4065;border-radius:10px;padding:12px 14px;font-size:11px;font-weight:700;line-height:1.6;margin:13px 0}
+.m1-project-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0 18px}
+.m1-project-grid label{margin:0}.m1-project-grid .field{margin-top:7px}
+.m1-area-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0 19px}
+.m1-area-tab{border:1px solid #eaddeb;border-radius:11px;background:#fcf8fa;color:#614c65;padding:12px;display:flex;align-items:center;gap:9px;text-align:left;font-size:11px;line-height:1.4}
+.m1-area-tab span{font-size:21px;color:#9e7baf}.m1-area-tab strong{flex:1}.m1-area-tab.active{background:#774c8a;color:#fff;border-color:#774c8a}.m1-area-tab.active span{color:#fff}
+.m1-area-body{background:#fff;border-top:1px solid #ede3ea;padding-top:20px}
+.m1-field-card{padding:17px;border:1px solid #e9dfe8;border-radius:12px;background:#fffdfa;margin:11px 0}
+.m1-field-heading{display:flex;gap:8px;justify-content:space-between;align-items:center}
+.m1-field-heading b{font-size:12px}.m1-help{font-size:11px;color:#786b7a;line-height:1.7;margin:9px 0}
+.m1-entry{min-height:100px!important}.m1-field-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:10px}
+.m1-field-controls label{font-size:10px;font-weight:700;color:#655566}.m1-field-controls .field{margin-top:5px}
+.m1-three-results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0 24px}
+.m1-three-results article{border-radius:12px;border:1px solid #e9dcea;background:linear-gradient(145deg,#fffdfa,#f7f0f8);padding:16px;min-height:180px;display:flex;flex-direction:column;gap:7px}
+.m1-three-results article:nth-child(2){background:#f1e7f4}
+.m1-three-results small{font-size:9px;letter-spacing:1px;font-weight:800;color:#865a91}.m1-three-results h3{font-size:14px;line-height:1.45;margin:2px 0}
+.m1-three-results p{color:#726573;font-size:11px;line-height:1.65;margin:0}.m1-three-results b{margin-top:auto;font-size:11px;color:#694078}
+.m1-results-heading{display:flex;gap:12px;justify-content:space-between;align-items:center;margin:20px 0 9px}.m1-results-heading h3{font-size:16px;margin:0}
+.m1-findings{display:grid;gap:9px}.m1-findings article{display:flex;align-items:start;gap:12px;background:#fcf9fc;padding:15px;border:1px solid #eadfeb;border-radius:11px}
+.m1-findings article h4{font-size:12px;margin:0 0 8px}.m1-findings article p{font-size:11px;line-height:1.7;color:#645664;margin:6px 0}.m1-findings article small{color:#8b718c}
+.m1-finding-number{font-weight:800;color:#aa7b38;font-size:13px}
+.m1-evaluation{background:#faf4fb;padding:19px;border:1px solid #e6d8e8;border-radius:13px;margin-top:23px}
+.m1-evaluation h3{font-size:15px;line-height:1.5;margin:10px 0 14px}
+.m1-quiz-options{display:grid;gap:8px}.m1-quiz-option{border:1px solid #e1d4e3;border-radius:10px;background:#fff;padding:12px;text-align:left;color:#3d2d40;font-size:11px;line-height:1.6}
+.m1-quiz-option:hover:enabled{border-color:#9b72aa;background:#f9f0fa}.m1-quiz-option b{color:#774c8a}
+.m1-transfer{background:#f8f4ed;border-left:3px solid #d3bc8d;padding:15px 18px;margin-top:18px;border-radius:5px}
+.m1-transfer h3{font-size:14px;margin:0 0 8px}.m1-transfer p{font-size:11px;color:#6b5e6a;line-height:1.8;margin:0}
+.m1-disclosure{font-size:10px;color:#8b7a8a;line-height:1.75;margin:15px 0 0}
+@media(max-width:850px){.m1-three-results{grid-template-columns:1fr}.m1-three-results article{min-height:0}.m1-area-nav{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.m1-project-grid,.m1-field-controls,.m1-area-nav{grid-template-columns:1fr}.m1-results-heading{display:block}.m1-results-heading .status-chip{margin-top:8px}}
