@@ -70,7 +70,9 @@ function analyze(){
  return {
   version:1,projectName:state.projectName||"Proyecto sin nombre",track:state.track,createdAt:new Date().toISOString(),
   verified:verified.length,unverified:unverified.length,missing:missing.length,total:entries.length,
-  findings,entries,learning:{sixLessons:null,finalQuizPassed:state.quiz.passed,finalQuizScore:state.quiz.passed?5:0,finalQuizMax:5,quizAttempts:state.quiz.attempts},
+  findings,entries,
+  handoff:{fromModule:"1",toModule:"1.5",projectName:state.projectName||"Proyecto sin nombre",track:state.track,findings:findings.map(x=>({statement:x.statement,action:x.action,confidence:x.confidence})),information:entries.map(x=>({field:x.id,value:x.value,status:x.status,source:x.source}))},
+  learning:{sixLessons:null,finalQuizPassed:state.quiz.passed,finalQuizScore:state.quiz.passed?5:0,finalQuizMax:5,quizAttempts:state.quiz.attempts},
   severity:"insufficient",severityLabel:"Sin evaluación profesional suficiente",
   limitations:["Resultado preliminar automatizado a partir de lo escrito por el alumno; no existe análisis de IA activo.","No se ha confirmado ninguna causa raíz ni la veracidad de los registros.","Este borrador está en el navegador; todavía no está almacenado en una cuenta privada."]
  };
